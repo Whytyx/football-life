@@ -36,3 +36,14 @@ tr.me{background:#2a1c0f;color:var(--or);font-weight:600}
 .cons{list-style:none;margin-top:10px}.cons li{padding:7px 10px;background:var(--card2);border-radius:10px;margin:5px 0;font-size:14px}
 .feed div{padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
 .ev{font-size:17px;line-height:1.5;margin:10px 0}
+.cd{text-align:center;font-size:30px;font-weight:800;color:var(--ye);letter-spacing:1px;margin:6px 0;font-variant-numeric:tabular-nums}
+.btn.dis{background:#3a3a2a;color:#999}
+.opt{display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:8px;color:var(--tx);font:15px Kanit;cursor:pointer}
+.opt:active{transform:scale(.98);border-color:var(--or)}
+.res{font-size:46px;font-weight:800;text-align:center;text-transform:uppercase;margin-top:6px}.res.ok{color:var(--gr)}.res.no{color:var(--re)}
+.roll{text-align:center;color:var(--mu);font-size:14px;letter-spacing:1px}
+.pitch{width:100%;display:block;border-radius:12px;margin:8px 0}
+.ticker{font-size:14px;min-height:150px}.ticker div{padding:4px 0;border-bottom:1px solid var(--line)}.ticker b{color:var(--or);display:inline-block;min-width:44px}
+.clock{font-size:22px;font-weight:800;color:var(--or);font-variant-numeric:tabular-nums}
+.board{background:var(--gr);color:#111;border-radius:6px;padding:0 6px;margin-left:6px;font-size:16px}
+.tl div{display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}.tl b{color:var(--or);min-width:48px}
