@@ -52,3 +52,6 @@ tr.me{background:#2a1c0f;color:var(--or);font-weight:600}
 .chip.gr{color:var(--gr)}#tabs button{font-size:11px}
 .spb{border:0;border-radius:9px;padding:6px 4px;font:600 12px Kanit;background:var(--ye);color:#111;cursor:pointer}.spb.dis{background:#2a3a30;color:#678}
 .badge{position:absolute;top:-6px;right:-12px;background:var(--re);color:#fff;font:700 10px Kanit;font-style:normal;border-radius:9px;padding:1px 5px}
+.post{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.pav{width:40px;height:40px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-size:22px;flex:none}
+.myrep{margin-top:8px;padding:8px 10px;border-left:3px solid var(--or);background:var(--card2);border-radius:8px;font-size:14px}
