@@ -616,60 +616,68 @@ function kitCol(){return S&&S.club&&club()?`hsl(${hue(club().n)},70%,45%)`:'#3a4
 let AVN=0;
 function shade(hex,a){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=v=>Math.max(0,Math.min(255,Math.round(a<0?v*(1+a):v+(255-v)*a)));return '#'+((1<<24)+(f(r)<<16)+(f(g)<<8)+f(b)).toString(16).slice(1)}
 function avatarSVG(av,size=64,kit){av=Object.assign({},DAV,av||{});const id='a'+(AVN++),sk=SKIN[av.s],hc=HC[av.hc];kit=kit||kitCol();
- const skD=shade(sk,-.22),skL=shade(sk,.18),hcL=shade(hc,.28),hcD=shade(hc,-.35),h=av.h;
- const jaw=[ 'M31 38 Q31 60 40 68 Q50 75 60 68 Q69 60 69 38 Q69 17 50 17 Q31 17 31 38Z',
-  'M33 38 Q32 60 42 69 Q50 75 58 69 Q68 60 67 38 Q67 16 50 16 Q33 16 33 38Z',
-  'M30 37 Q29 58 38 67 Q44 72 50 72 Q56 72 62 67 Q71 58 70 37 Q70 17 50 17 Q30 17 30 37Z'][av.f];
- let o=`<defs><radialGradient id="${id}s" cx="45%" cy="38%" r="65%"><stop offset="0" stop-color="${skL}"/><stop offset=".65" stop-color="${sk}"/><stop offset="1" stop-color="${skD}"/></radialGradient>
- <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hcL}"/><stop offset="1" stop-color="${hcD}"/></linearGradient>
- <linearGradient id="${id}k" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${kit}"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
- <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+ const skD=shade(sk,-.16),skL=shade(sk,.14),hcL=shade(hc,.3),hcD=shade(hc,-.3),h=av.h;
+ const w=[18.5,17,19.5][av.f],L=50-w,R=50+w,cy=av.f===2?72:73,cx=av.f===2?7.5:6;
+ const face=`M${L} 36 C${L} 51 ${L+2.5} 60 ${50-cx} 67.5 Q50 ${cy+1} ${50+cx} 67.5 C${R-2.5} 60 ${R} 51 ${R} 36 C${R} 21 ${R-6} 14.5 50 14.5 C${L+6} 14.5 ${L} 21 ${L} 36Z`;
+ let o=`<defs><radialGradient id="${id}s" cx="46%" cy="40%" r="62%"><stop offset="0" stop-color="${skL}"/><stop offset=".7" stop-color="${sk}"/><stop offset="1" stop-color="${skD}"/></radialGradient>
+ <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hcL}"/><stop offset=".55" stop-color="${hc}"/><stop offset="1" stop-color="${hcD}"/></linearGradient>
+ <linearGradient id="${id}k" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${kit}"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient>
+ <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
  <radialGradient id="${id}bg" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#2d4a3a"/><stop offset="1" stop-color="#0d1611"/></radialGradient></defs><rect width="110" height="110" fill="url(#${id}bg)"/>`;
  const H=`url(#${id}h)`;
- // back hair
- if(h===2)o+=`<path d="M22 40 Q16 10 50 8 Q84 10 78 40 Q80 54 72 50 L28 50 Q20 54 22 40Z" fill="${H}"/>`;
- if(h===3)o+=`<path d="M27 34 Q22 72 30 80 L38 74 L62 74 L70 80 Q78 72 73 34Z" fill="${hcD}"/>`;
- if(h===6)o+=`<ellipse cx="50" cy="9" rx="8" ry="6.5" fill="${H}"/><rect x="45" y="13" width="10" height="3" rx="1.5" fill="${hcD}"/>`;
- // body
- o+=`<path d="M2 102 Q4 80 24 75 Q36 72 41 68 L59 68 Q64 72 76 75 Q96 80 98 102Z" fill="url(#${id}k)"/><path d="M2 102 Q4 80 24 75 Q36 72 41 68 L59 68 Q64 72 76 75 Q96 80 98 102Z" fill="url(#${id}g)"/>
- <path d="M18 80 Q30 76 38 74" stroke="#fff" stroke-opacity=".18" stroke-width="2" fill="none"/>`;
- o+=`<path d="M40 60 L40 72 Q50 79 60 72 L60 60Z" fill="${sk}"/><path d="M40 63 Q50 70 60 63 L60 67 Q50 74 40 67Z" fill="${skD}" opacity=".7"/><path d="M45 66 Q50 71 55 66" stroke="${skD}" stroke-width="1" fill="none"/>`;
- o+=`<path d="M38 69 L50 84 L62 69 L58 67 L50 77 L42 67Z" fill="#fff" opacity=".92"/><path d="M38 69 L50 84 L62 69" stroke="${shade('#888888',-.3)}" stroke-width=".6" fill="none"/><path d="M33 72 L41 68 L44 75Z M67 72 L59 68 L56 75Z" fill="${kit}" stroke="#fff" stroke-width="1.2" stroke-opacity=".8"/>`;
- // ears & head
- o+=`<path d="M31 40 Q25 38 26 46 Q27 52 32 52Z" fill="${sk}"/><path d="M69 40 Q75 38 74 46 Q73 52 68 52Z" fill="${sk}"/><path d="M29 43 Q28 47 31 49 M71 43 Q72 47 69 49" stroke="${skD}" stroke-width="1" fill="none"/>`;
- o+=`<path d="${jaw}" fill="url(#${id}s)"/><path d="M62 24 Q70 34 68 50 Q66 62 58 69 Q65 58 64 44 Q63 32 62 24Z" fill="${skD}" opacity=".35"/>`;
+ // hair geometry attached to skull
+ const vol=[2.5,0.5,0,1.5,0,1,0.5,0,4,3,2,0][h];const T=13-vol;
+ const outer=`M${L-1.6} 46 L${L-1.6} 34 C${L-1.6} ${T+6} ${L+5} ${T} 50 ${T} C${R-5} ${T} ${R+1.6} ${T+6} ${R+1.6} 34 L${R+1.6} 46`;
+ const hl=[ [27,'side'],[28,'n'],[26,'n'],[25,'mid'],[28,'n'],[27,'n'],[27,'n'],[0,'n'],[26,'side'],[25,'n'],[27.5,'fringe'],[27,'n'] ][h];
+ let hairline;const tY=hl[0];
+ if(hl[1]==='fringe')hairline=`L${R-1} 46 L${R-1} 33 L${R-4} ${tY} L${R-8} ${tY-2} L${R-12} ${tY+.5} L50 ${tY-2} L${L+12} ${tY+.5} L${L+8} ${tY-2} L${L+4} ${tY} L${L+1} 33 L${L+1} 46Z`;
+ else if(hl[1]==='mid')hairline=`L${R-1} 48 L${R-1} 34 Q${R-3} ${tY} 50.5 ${tY-1} L50 ${tY+1.5} L49.5 ${tY-1} Q${L+3} ${tY} ${L+1} 34 L${L+1} 48Z`;
+ else if(hl[1]==='side')hairline=`L${R-1} 46 L${R-1} 33 Q${R-2.5} ${tY} ${50+4} ${tY-1.2} Q${50-6} ${tY-2.5} ${L+3} ${tY+2} Q${L+1} 30 ${L+1} 33 L${L+1} 46Z`;
+ else hairline=`L${R-1} 46 L${R-1} 33 Q${R-3} ${tY} 50 ${tY-1.5} Q${L+3} ${tY} ${L+1} 33 L${L+1} 46Z`;
+ const cap=outer+hairline;
+ // back hair (behind ears/head)
+ if(h===2)o+=`<circle cx="50" cy="30" r="${w+10}" fill="${H}"/>`;
+ if(h===3)o+=`<path d="M${L-2} 32 Q${L-5} 66 ${L+1} 78 L${R-1} 78 Q${R+5} 66 ${R+2} 32Z" fill="${hcD}"/>`;
+ if(h===6)o+=`<ellipse cx="50" cy="${T-3}" rx="7.5" ry="6" fill="${H}"/><rect x="45.5" y="${T}" width="9" height="2.6" rx="1.3" fill="${hcD}"/>`;
+ if(h!==7)o+=`<path d="M${L-1.6} 34 C${L-1.6} ${T+6} ${L+5} ${T} 50 ${T} C${R-5} ${T} ${R+1.6} ${T+6} ${R+1.6} 34 L${R+1.2} 42 L${L-1.2} 42Z" fill="${hcD}" opacity="${[1,.7,1,1,.35,1,1,0,.4,1,1,.5][h]}"/>`;
+ // body + neck
+ o+=`<path d="M2 102 Q4 81 24 76 Q36 73 41 70 L59 70 Q64 73 76 76 Q96 81 98 102Z" fill="url(#${id}k)"/><path d="M2 102 Q4 81 24 76 Q36 73 41 70 L59 70 Q64 73 76 76 Q96 81 98 102Z" fill="url(#${id}g)"/>`;
+ o+=`<path d="M41.5 62 L41.5 73 Q50 79 58.5 73 L58.5 62Z" fill="${sk}"/><path d="M41.5 64 Q50 71 58.5 64 L58.5 68 Q50 74 41.5 68Z" fill="${skD}" opacity=".55"/>`;
+ o+=`<path d="M38 71 L50 85 L62 71 L58.5 69 L50 78 L41.5 69Z" fill="#fff" opacity=".92"/><path d="M33 74 L41 69.5 L44 76Z M67 74 L59 69.5 L56 76Z" fill="${kit}" stroke="#fff" stroke-width="1.1" stroke-opacity=".75"/>`;
+ // ears
+ o+=`<path d="M${L+.5} 40 Q${L-5} 38.5 ${L-4.5} 45.5 Q${L-3.5} 51 ${L+1} 51Z" fill="${sk}"/><path d="M${R-.5} 40 Q${R+5} 38.5 ${R+4.5} 45.5 Q${R+3.5} 51 ${R-1} 51Z" fill="${sk}"/><path d="M${L-2.5} 43 Q${L-3} 46.5 ${L-.5} 48.5 M${R+2.5} 43 Q${R+3} 46.5 ${R+.5} 48.5" stroke="${skD}" stroke-width=".9" fill="none" opacity=".7"/>`;
+ // face
+ o+=`<path d="${face}" fill="url(#${id}s)"/>`;
  // facial hair
- const bp=av.f===1?'M33 46 Q34 64 42 70 Q50 76 58 70 Q66 64 67 46 Q66 58 58 62 Q50 60 42 62 Q34 58 33 46Z':'M31 45 Q32 62 40 69 Q50 76 60 69 Q68 62 69 45 Q67 57 59 61 Q50 59 41 61 Q33 57 31 45Z';
- if(av.b===1)o+=`<path d="${bp}" fill="${H}"/>`;if(av.b===4)o+=`<path d="${bp}" fill="${hcD}" opacity=".3"/>`;
- if(av.b===3)o+=`<path d="M45 63 Q50 61 55 63 L54 71 Q50 74 46 71Z" fill="${H}"/>`;
- // mouth
- o+=`<path d="M43.5 59 Q47 57.4 50 58.3 Q53 57.4 56.5 59 Q50 60.2 43.5 59Z" fill="${shade(sk,-.42)}"/><path d="M44.5 59.4 Q50 63.2 55.5 59.4 Q50 60.6 44.5 59.4Z" fill="${shade(sk,-.18)}"/><path d="M47 61.6 Q50 62.4 53 61.6" stroke="${skL}" stroke-width=".7" fill="none" opacity=".8"/>`;
- if(av.b===2||av.b===1)o+=`<path d="M42 57.5 Q46 54.5 50 55.8 Q54 54.5 58 57.5 Q54 56.8 50 57.4 Q46 56.8 42 57.5Z" fill="${hcD}"/>`;
- // nose
- o+=`<path d="M49 41 Q48 48 46.5 51.5 Q48 53.4 50 52.6 Q52 53.4 53.5 51.5" stroke="${skD}" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M50.5 42 L51.5 50" stroke="${skL}" stroke-width="1" opacity=".7"/>`;
+ const bp=`M${L+.3} 44 C${L+.5} 55 ${L+3} 61 ${50-cx} 67.5 Q50 ${cy+1} ${50+cx} 67.5 C${R-3} 61 ${R-.5} 55 ${R-.3} 44 Q${R-2} 56 ${50+5} 60.5 Q50 59 ${50-5} 60.5 Q${L+2} 56 ${L+.3} 44Z`;
+ if(av.b===1)o+=`<path d="${bp}" fill="${H}"/>`;if(av.b===4)o+=`<path d="${bp}" fill="${hcD}" opacity=".22"/>`;
+ if(av.b===3)o+=`<path d="M47.2 64.6 Q50 63.6 52.8 64.6 Q52.6 ${cy-2} 50 ${cy-.3} Q47.4 ${cy-2} 47.2 64.6Z" fill="${H}" opacity=".9"/>`;
+ // lips (fuller)
+ o+=`<path d="M44.6 59.3 Q47.2 57.7 50 58.6 Q52.8 57.7 55.4 59.3 Q50 60 44.6 59.3Z" fill="${shade(sk,-.32)}"/><path d="M45.2 59.5 Q50 64 54.8 59.5 Q50 60.5 45.2 59.5Z" fill="${shade(sk,-.17)}"/><ellipse cx="50" cy="61.4" rx="2.4" ry=".7" fill="${skL}" opacity=".55"/>`;
+ if(av.b===2||av.b===1)o+=`<path d="M43.5 58 Q47 55.4 50 56.4 Q53 55.4 56.5 58 Q53 57.3 50 57.8 Q47 57.3 43.5 58Z" fill="${hcD}"/>`;
+ // nose (subtle)
+ o+=`<path d="M51.4 44 Q52.6 49.5 51.6 51.6" stroke="${skD}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".55"/><path d="M47.6 52 Q50 53.4 52.4 52" stroke="${shade(sk,-.25)}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".55"/>`;
  // eyes
- const ey=av.e===3?42.6:42,eh=av.e===3?2.1:av.e===1?2.4:3;
- for(const x of [41,59]){o+=`<path d="M${x-5} ${ey} Q${x} ${ey-eh-.5} ${x+5} ${ey} Q${x} ${ey+eh-.6} ${x-5} ${ey}Z" fill="#f4f1ea"/><circle cx="${x+.3}" cy="${ey}" r="${Math.min(2.4,eh-.4)}" fill="#3b2a1d"/><circle cx="${x+.3}" cy="${ey}" r="1.1" fill="#0b0b0b"/><circle cx="${x+1}" cy="${ey-.8}" r=".6" fill="#fff"/><path d="M${x-5.4} ${ey} Q${x} ${ey-eh-1.1} ${x+5.4} ${ey}" stroke="#1a120c" stroke-width="1.2" fill="none"/>`}
- o+=`<path d="M35 46 Q41 48 46 46 M54 46 Q59 48 65 46" stroke="${skD}" stroke-width=".7" fill="none" opacity=".6"/>`;
+ const ey=42,eh=av.e===3?2.2:av.e===1?2.3:2.7;
+ for(const x of [50-8.3,50+8.3]){o+=`<path d="M${x-4.6} ${ey} Q${x} ${ey-eh-.4} ${x+4.6} ${ey} Q${x} ${ey+eh-.5} ${x-4.6} ${ey}Z" fill="#f6f3ee"/><circle cx="${x+.2}" cy="${ey}" r="${Math.min(2.2,eh-.3)}" fill="#3b2a1d"/><circle cx="${x+.2}" cy="${ey}" r="1" fill="#0b0b0b"/><circle cx="${x+.9}" cy="${ey-.8}" r=".55" fill="#fff"/><path d="M${x-5} ${ey+.1} Q${x} ${ey-eh-1} ${x+5} ${ey+.1}" stroke="#1a120c" stroke-width="1.1" fill="none" stroke-linecap="round"/>`}
  // brows
- const bc=h===7?shade(sk,-.55):hcD,ang=av.e===2?2.6:0;
- o+=`<path d="M34.5 ${37.5+ang*.2} L46 ${35.8+ang} L46.2 ${37.4+ang} L35 ${39+ang*.2}Z" fill="${bc}"/><path d="M65.5 ${37.5+ang*.2} L54 ${35.8+ang} L53.8 ${37.4+ang} L65 ${39+ang*.2}Z" fill="${bc}"/>`;
- // front hair
- const top='M30 36 Q29 15 50 14 Q71 15 70 36 Q68 26 60 24 Q50 22 40 24 Q32 26 30 36Z';
- if(h===0)o+=`<path d="M30 36 Q28 14 50 13 Q72 14 70 36 Q66 24 56 25 L52 21 L48 25 Q36 24 30 36Z" fill="${H}"/>`;
- if(h===1)o+=`<path d="${top}" fill="${H}"/><path d="M30 36 Q29 30 31 26 L33 34Z M70 36 Q71 30 69 26 L67 34Z" fill="${sk}" opacity=".55"/>`;
- if(h===2)o+=`<path d="M27 38 Q24 12 50 11 Q76 12 73 38 Q66 22 50 23 Q34 22 27 38Z" fill="${H}"/>${[34,42,50,58,66].map(x=>`<circle cx="${x}" cy="${16+Math.abs(x-50)/4}" r="4" fill="${hcL}" opacity=".35"/>`).join('')}`;
- if(h===3)o+=`<path d="M29 40 Q27 13 50 12 Q73 13 71 40 Q69 24 50 22 Q38 22 33 30 Q30 34 29 40Z" fill="${H}"/>`;
- if(h===4)o+=`<path d="${top}" fill="${hcD}" opacity=".3"/><path d="M43 26 Q44 6 50 4 Q56 6 57 26Z" fill="${H}"/>`;
- if(h===5)o+=`<path d="M30 36 L31 18 L36 23 L38 10 L44 20 L48 6 L53 19 L58 8 L61 21 L67 14 L70 36 Q66 25 50 24 Q34 25 30 36Z" fill="${H}"/>`;
- if(h===6)o+=`<path d="M30 36 Q29 15 50 14 Q71 15 70 36 Q66 24 50 21 Q34 24 30 36Z" fill="${H}"/><path d="M40 16 Q50 13 60 16" stroke="${hcL}" stroke-width="1" fill="none" opacity=".6"/>`;
- if(h===8)o+=`<path d="${top}" fill="${hcD}" opacity=".28"/><path d="M33 26 Q36 10 52 9 Q70 10 70 24 Q60 18 48 21 Q38 22 33 26Z" fill="${H}"/>`;
- if(h===9)o+=`<path d="M30 34 Q29 13 50 12 Q71 13 70 34 Q67 24 60 22 Q50 20 40 22 Q33 24 30 34Z" fill="${H}"/>${[40,47,54,61].map(x=>`<path d="M${x-4} 21 Q${x} 14 ${x+5} 13" stroke="${hcL}" stroke-width=".9" fill="none" opacity=".55"/>`).join('')}`;
- if(h===10)o+=`<path d="M30 35 Q29 15 50 14 Q71 15 70 35 Q67 26 62 25 L58 22 L53 26 L48 22 L43 26 L38 23 Q32 27 30 35Z" fill="${H}"/>`;
- if(h===11)o+=`<path d="${top}" fill="${hcD}" opacity=".3"/>${[[36,20],[42,15],[49,13],[56,14],[63,18],[39,25],[46,20],[53,19],[60,23]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.6" fill="${H}"/><circle cx="${x-1}" cy="${y-1.3}" r="1.6" fill="${hcL}" opacity=".5"/>`).join('')}`;
+ const bc=h===7?shade(sk,-.5):hcD,ang=av.e===2?2.2:0;
+ o+=`<path d="M36.5 ${37.4+ang*.2} Q41 ${35.2+ang*.6} 46 ${36+ang} L46 ${37.3+ang} Q41 ${36.8+ang*.6} 36.8 ${38.6+ang*.2}Z" fill="${bc}"/><path d="M63.5 ${37.4+ang*.2} Q59 ${35.2+ang*.6} 54 ${36+ang} L54 ${37.3+ang} Q59 ${36.8+ang*.6} 63.2 ${38.6+ang*.2}Z" fill="${bc}"/>`;
+ // front hair on skull
+ const op=[1,.8,1,1,.35,1,1,0,.35,1,1,.45][h];
+ if(h!==7)o+=`<path d="${cap}" fill="${H}" opacity="${op}"/>`;else o+=`<path d="${cap}" fill="${hcD}" opacity=".1"/>`;
+ if(h===0)o+=`<path d="M${L+6} ${T+4} Q50 ${T-1.5} ${R-2} ${T+6}" stroke="${hcL}" stroke-width="1" fill="none" opacity=".5"/><path d="M${L+9} ${T+2} L${L+10} 25" stroke="${hcD}" stroke-width=".8" opacity=".6"/>`;
+ if(h===2)o+=[L+2,L+9,50,R-9,R-2].map(x=>`<circle cx="${x}" cy="${T+3+Math.abs(x-50)/3}" r="4.5" fill="${hcL}" opacity=".25"/>`).join('');
+ if(h===4)o+=`<path d="M45 ${tY} Q45 ${T-6} 50 ${T-9} Q55 ${T-6} 55 ${tY}Z" fill="${H}"/>`;
+ if(h===5)o+=`<path d="M${L+1} ${T+8} L${L+2} ${T-2} L${L+7} ${T+3} L${L+9} ${T-6} L${L+14} ${T+2} L50 ${T-8} L${R-14} ${T+2} L${R-9} ${T-6} L${R-7} ${T+3} L${R-2} ${T-2} L${R-1} ${T+8}Z" fill="${H}"/>`;
+ if(h===6)o+=`<path d="M${L+5} ${T+5} Q50 ${T+1} ${R-5} ${T+5}" stroke="${hcL}" stroke-width=".8" fill="none" opacity=".5"/>`;
+ if(h===8)o+=`<path d="M${L+2.5} 29 Q${L+3} ${T-2} 52 ${T-1} Q${R+1} ${T} ${R-1} 28 Q${R-6} ${T+7} 52 ${T+8} Q${L+8} ${T+9} ${L+2.5} 29Z" fill="${H}"/><path d="M${L+8} ${T+4} Q52 ${T} ${R-3} ${T+5}" stroke="${hcL}" stroke-width=".9" fill="none" opacity=".55"/>`;
+ if(h===9)o+=[-9,-3,3,9].map(d=>`<path d="M${50+d-2} ${tY-1} Q${50+d} ${T+4} ${50+d*1.3+3} ${T+1}" stroke="${hcL}" stroke-width=".8" fill="none" opacity=".5"/>`).join('');
+ if(h===10)o+=[-10,-5,0,5,10].map(d=>`<path d="M${50+d} ${T+2} l1.5 4" stroke="${hcL}" stroke-width=".9" opacity=".5"/>`).join('');
+ if(h===11)o+=[[-9,4],[-4.5,1.5],[0,.5],[4.5,1.5],[9,4],[-7,8],[-2,6],[3,6],[7.5,8]].map(([d,y])=>`<circle cx="${50+d}" cy="${T+y}" r="3.9" fill="${H}"/><circle cx="${50+d-1}" cy="${T+y-1.2}" r="1.3" fill="${hcL}" opacity=".45"/>`).join('');
  // accessories
- if(av.a===1||av.a===3)o+=`<path d="M30 30 Q50 24 70 30 L70 34 Q50 28 30 34Z" fill="#f2f2f2"/><path d="M30 32 Q50 26 70 32" stroke="${kit}" stroke-width="1.2" fill="none"/>`;
- if(av.a===2||av.a===3)o+=`<circle cx="27.5" cy="51" r="1.7" fill="#ffd21f" stroke="#fff6" stroke-width=".4"/>`;
+ if(av.a===1||av.a===3)o+=`<path d="M${L-1.8} 31.5 Q50 24 ${R+1.8} 31.5 L${R+1.8} 35 Q50 27.6 ${L-1.8} 35Z" fill="#f2f2f2"/><path d="M${L-1.8} 33.2 Q50 25.8 ${R+1.8} 33.2" stroke="${kit}" stroke-width="1.1" fill="none"/>`;
+ if(av.a===2||av.a===3)o+=`<circle cx="${L-3.2}" cy="50.5" r="1.5" fill="#ffd21f"/>`;
  return `<svg class="avs" viewBox="12 5 76 76" width="${size}" height="${size}">${o}</svg>`}
 function avEditor(av){return `<div class="row" style="justify-content:center">${avatarSVG(av,120)}</div>${Object.entries(AVO).map(([k,[l,opts]])=>`<div class="row sp aer"><span class="mu">${l}</span><div class="row"><button class="ab" data-ae="${k}:-1">◀</button><b style="min-width:96px;text-align:center">${opts[av[k]]}</b><button class="ab" data-ae="${k}:1">▶</button></div></div>`).join('')}<button class="btn s" style="text-align:center" data-ae="rand:0">🎲 สุ่ม</button>`}
 function bindAe(av,redraw){document.querySelectorAll('[data-ae]').forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.ae.split(':');if(k==='rand')for(const q in AVO)av[q]=rnd(0,AVO[q][1].length-1);else{const n=AVO[k][1].length;av[k]=(av[k]+(+d)+n)%n}redraw()})}
