@@ -267,7 +267,7 @@ FM.forEach(([id,c,x,o])=>EV.push({id,fm:1,m:1,c,x,o}));
 const EVM=Object.fromEntries(EV.map(e=>[e.id,e]));
 // ===== TIME (Asia/Bangkok) =====
 const HR=3600e3,MIN=60e3,DAY=24*HR,TZ=7*HR,NR=28;
-const now=()=>Date.now()+((S&&S.devOff)||0);
+const now=()=>S&&S.gameT?S.gameT:Date.now();
 const bday=t=>Math.floor((t+TZ)/DAY)*DAY-TZ, dkey=t=>Math.floor((t+TZ)/DAY);
 const bk=(y,m,d,h=0)=>Date.UTC(y,m,d)+h*HR-TZ, ymd=t=>{const d=new Date(t+TZ);return[d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()]};
 const fdt=t=>new Date(t).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+' น.';
@@ -288,9 +288,9 @@ const sorted=()=>[...S.table].sort((x,y)=>y.pts-x.pts||(y.gf-y.ga)-(x.gf-x.ga)||
 // ===== NEW GAME =====
 function newGame(name,pos,c){const w=genWorld();
  const base={pac:50,sho:50,pas:50,dri:50,def:50,phy:50};for(const k in base)base[k]=rnd(44,56)+Math.round(W[pos][k]*25);
- S={world:w,club:null,startC:c,season:1,abs:0,news:[],chains:[],log:[],devOff:0,lastT:Date.now(),evDay:dkey(Date.now()),
+ const ry=new Date().getFullYear()-(new Date().getMonth()<5?1:0);S={gameT:bk(ry,7,1,9),world:w,club:null,startC:c,season:1,abs:0,news:[],chains:[],log:[],devOff:0,lastT:Date.now(),evDay:dkey(Date.now()),
   p:{name,pos,age:18,a:base,stamina:90,morale:65,trust:50,ref:55,media:50,fans:300,money:20000,wage:0,contract:2,ban:0,inj:0,yc:0,rc:0,fines:0,tg:0,ta:0,sg:0,sa:0,app:0,caps:0,ig:0,benched:0,agent:0,trainDay:-1}};
- newSeason(now());save()}
+ newSeason(bk(ry,7,8,9));save()}
 // ===== UI =====
 function bar(v,cls=''){return `<div class="bar ${cls}"><i style="width:${cl(v)}%"></i></div>`}
 function setup(){let pos='FW',c='ENG';const draw=()=>{$('#app').innerHTML=`
@@ -338,21 +338,20 @@ function offers(auto,country,list){list=list||genOffers(country);const first=!!c
   news(first?`✍️ ${p.name} เซ็นสัญญาอาชีพฉบับแรกกับ ${club().n} (${LEAGUES[o.c].n} · ${tierOf(o.c,o.t).n}) ในบทบาท${ROLE[o.role][0]}`:`✈️ ย้ายทีม! ${p.name} ${old?'จาก '+old.n:''} สู่ ${club().n} (${LEAGUES[o.c].n}) บทบาท${ROLE[o.role][0]}`);newSeasonKeep();save();closeM();render()});
  $('#stay')&&($('#stay').onclick=()=>{closeM();save();render()})}
 // ===== RENDER =====
-let LIVE=null,CDT=null,devTap=0;
+let LIVE=null;
 function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();const p=S.p;let h=header();
- if(TAB==='home'){const nx=nextFix(),t=now();
-  if(nx){const ko=S.ko[S.week],ready=t>=ko;
+ if(TAB==='home'){const nx=nextFix(),t=now();h+=`<div class="datebar">📅 ${new Date(t).toLocaleDateString('th-TH',{timeZone:'Asia/Bangkok',weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>`;
+  if(nx){const ko=S.ko[S.week],ready=dkey(t)>=dkey(ko);
    h+=`<div class="card"><div class="row sp"><span class="tag o">นัดที่ ${S.week+1}/${S.N}</span><span class="mu">ฤดูกาล ${S.slabel}</span></div>
    <div class="score"><div><b>${club().n}</b><div class="mu">${nx.home?'เหย้า':'เยือน'}</div></div><div class="big or">VS</div><div><b>${nx.opp.n}</b><div class="mu">พลังทีม ${nx.opp.s}</div></div></div>
-   <div style="text-align:center" class="mu">🗓️ ${fdt(ko)}</div><div id="cd" class="cd">${ready?'🔴 LIVE · ถึงเวลาแข่งแล้ว!':cdown(ko-t)}</div>
+   <div style="text-align:center" class="mu">🗓️ คิกออฟ ${fdt(ko)}</div><div class="cd">${ready?'🔴 วันแข่ง!':'อีก '+(dkey(ko)-dkey(t))+' วัน'}</div>
    ${p.ban?`<div class="re">⛔ คุณติดแบน ${p.ban} นัด</div>`:p.inj?`<div class="re">🚑 บาดเจ็บ ${p.inj} นัด</div>`:p.benched?`<div class="ye">🪑 โค้ชอาจไม่ส่งคุณลงสนาม</div>`:''}
-   <button class="btn ${ready?'':'dis'}" id="play" ${ready?'':'disabled'}>${ready?'⚽ ลงสนาม!':'⏳ รอเวลาคิกออฟ'}</button>${ready?`<p class="mu" style="margin-top:6px">ถ้าไม่ลงสนามภายใน 3 ชม. หลังคิกออฟ ระบบจะจำลองผลให้ (เรตติ้งต่ำ)</p>`:''}</div>`}
-  else if(!S.club)h+=`<div class="card"><h2>ไร้สังกัด</h2><p>คุณไม่มีสโมสร รอข้อเสนอ...</p><button class="btn" id="wait">${S.news.length?'รอข้อเสนอสัปดาห์นี้':'ดูสโมสรที่สนใจคุณ'}</button></div>`;
+   ${ready?'<button class="btn" id="play">⚽ PLAY MATCH</button>':'<div class="row"><button class="btn s" style="flex:1;text-align:center" id="nd">☀️ ไปวันถัดไป</button><button class="btn" style="flex:1.3" id="sk">⏩ ข้ามไปวันแข่ง</button></div>'}</div>`}
+  else if(!S.club)h+=`<div class="card"><h2>ไร้สังกัด</h2><p>คุณไม่มีสโมสร รอข้อเสนอ...</p><button class="btn s" id="nd" style="text-align:center">☀️ ไปวันถัดไป</button><button class="btn" id="wait">${S.news.length?'รอข้อเสนอสัปดาห์นี้':'ดูสโมสรที่สนใจคุณ'}</button></div>`;
   h+=`<div class="grid2">${[['สตามิน่า',p.stamina,'gr'],['ขวัญกำลังใจ',p.morale,'gr'],['ความเชื่อใจโค้ช',p.trust,'or'],['กรรมการ',p.ref,'or']].map(([l,v,c])=>`<div class="mini"><span class="mu">${l}</span><b class="${v<30?'re':c}">${Math.round(v)}</b>${bar(v,v<30?'r':c==='or'?'o':'')}</div>`).join('')}
-   <div class="mini"><span class="mu">ผู้ติดตาม</span><b>${fmt(p.fans)}</b></div><div class="mini"><span class="mu">เงิน</span><b class="${p.money<0?'re':'ye'}">฿${fmt(p.money)}</b></div></div><p class="mu" style="margin-top:6px">🔋 สตามิน่าฟื้น +3/ชั่วโมงตามเวลาจริง</p>`;
+   <div class="mini"><span class="mu">ผู้ติดตาม</span><b>${fmt(p.fans)}</b></div><div class="mini"><span class="mu">เงิน</span><b class="${p.money<0?'re':'ye'}">฿${fmt(p.money)}</b></div></div><p class="mu" style="margin-top:6px">🔋 สตามิน่าฟื้น +12 ต่อวัน</p>`;
   const trained=p.trainDay===dkey(t);
   h+=`<h2>การซ้อมวันนี้</h2><div class="card">${trained?`<p class="gr">✅ ซ้อมแล้ววันนี้ — กลับมาซ้อมใหม่พรุ่งนี้</p>`:[['heavy','🏋️ ซ้อมหนัก (+ค่าพลัง, -สตามิน่า)'],['skill','🎯 ซ้อมจุดเด่นเฉพาะตำแหน่ง'],['tactic','📋 ประชุมแท็กติก (+ความเชื่อใจโค้ช)'],['rest','🧘 พักฟื้น (+สตามิน่า, +ขวัญ)']].map(([k,l])=>`<button class="btn s" data-tr="${k}">${l}</button>`).join('')}</div>`;
-  if(S.dev)h+=`<div class="card" style="border-color:var(--re)"><h2>🛠️ DEV · ข้ามเวลา</h2><div class="row wrap">${nx?'<button class="btn s" style="flex:1" data-dv="ko">⏩ ไปเวลาคิกออฟ</button>':''}<button class="btn s" style="flex:1" data-dv="3">+3 ชม.</button><button class="btn s" style="flex:1" data-dv="24">+1 วัน</button><button class="btn s" style="flex:1" data-dv="0">รีเซ็ตเวลา</button></div><p class="mu">เวลาเกม: ${fdt(t)}</p></div>`;
   h+=`<h2>ข่าวล่าสุด</h2><div class="card feed">${S.news.slice(0,4).map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`}
  if(TAB==='table'&&S.club){const T=tierOf(S.club.c,S.club.t);h+=`<div class="card"><h2>${T.n}</h2><table><tr><th>#</th><th>ทีม</th><th>น.</th><th>ช</th><th>ส</th><th>+/-</th><th>แต้ม</th></tr>${sorted().map((r,k)=>`<tr class="${r.i===S.club.i?'me':''}"><td>${k+1}</td><td>${T.clubs[r.i].n}</td><td>${r.p}</td><td>${r.w}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table><p class="mu" style="margin-top:8px">อันดับ 1-2 เลื่อนชั้น · 2 อันดับสุดท้ายตกชั้น</p></div>`;
   h+=`<div class="card"><h2>โปรแกรม ${S.slabel}</h2>${S.fix.map((r,k)=>{const m=r.find(x=>x.includes(S.club.i));const o=m[0]===S.club.i?m[1]:m[0];return `<div class="row sp mu" style="padding:5px 0;font-size:13px;${k===S.week?'color:var(--or)':''}"><span>${k+1}. ${m[0]===S.club.i?'🏠':'✈️'} ${T.clubs[o].n}<br><small>${fdt(S.ko[k])}</small></span><b>${S.log[k]||''}</b></div>`}).join('')}</div>`}
@@ -364,20 +363,22 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();c
  $('#app').innerHTML=h;
  $('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));
- document.querySelectorAll('[data-dv]').forEach(b=>b.onclick=()=>{const v=b.dataset.dv;if(v==='ko')S.devOff+=Math.max(0,S.ko[S.week]-now()+1000);else if(v==='0')S.devOff=0;else S.devOff+=(+v)*HR;save();render()});
- $('#ovrb')&&($('#ovrb').onclick=()=>{if(++devTap>=5){devTap=0;S.dev=!S.dev;save();render()}});
  $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');S=null;render()}});
- clearInterval(CDT);if($('#cd')&&S.ko)CDT=setInterval(()=>{const e=$('#cd');if(!e||LIVE)return clearInterval(CDT);const ms=S.ko[S.week]-now();if(ms<=0){clearInterval(CDT);render()}else e.textContent=cdown(ms)},1000);
+ $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);
  if(!$('#modal.show'))dailyEvent()}
 // ===== REAL-TIME TICK =====
-function tick(){const t=now(),p=S.p;const h=(t-(S.lastT||t))/HR;if(h>0){p.stamina=cl(p.stamina+h*3);p.morale=cl(p.morale+(65-p.morale)*Math.min(1,h/72));}S.lastT=t;
- let n=0;while(S.week<S.N&&t>S.ko[S.week]+3*HR&&n++<NR){autoRound()}
+function tick(){const t=now(),p=S.p;const d=dkey(t)-dkey(S.lastT||t);if(d>0){p.stamina=cl(p.stamina+12*d);p.morale=cl(p.morale+(65-p.morale)*Math.min(1,d/5))}S.lastT=t;
+ let n=0;while(S.week<S.N&&dkey(t)>dkey(S.ko[S.week])&&n++<NR){autoRound()}
  if(S.week>=S.N&&!$('#modal.show'))endSeason();save()}
+function advance(){S.gameT=bday(S.gameT)+DAY+9*HR;render()}
+function skipToMatch(){let n=0;while(n++<400){const nx=nextFix();if(nx&&dkey(now())>=dkey(S.ko[S.week]))break;if(!nx&&S.club)break;S.gameT=bday(S.gameT)+DAY+9*HR;tick();if(!S.club)break;if(!$('#modal.show')&&maybeDaily())break;if($('#modal.show'))break}render()}
 function autoRound(){const nx=nextFix();if(!nx){S.fix[S.week].forEach(([x,y])=>rec(x,y,pois(1.3),pois(1.2)));S.week++;return}
  const p=S.p,M={opp:nx.opp.n,gf:0,ga:0,g:0,as:0,r:5.0,played:false,tl:[]};if(!(p.ban||p.inj||p.benched))M.missed=1;p.benched=0;finish(nx,M,'',true)}
-function dailyEvent(){const t=now();if(LIVE||!S.club||S.evDay===dkey(t))return;S.evDay=dkey(t);save();
- const due=S.chains.findIndex(c=>c.at<=S.abs);let ev=null;if(due>=0){ev=EVM[S.chains[due].id];S.chains.splice(due,1)}else if(chance(.85))ev=pick(EV.filter(e=>e.off&&(!e.c||e.c())));
- if(ev)showEvent(ev,null,()=>{closeM();save();render()})}
+function maybeDaily(){const t=now();if(LIVE||!S.club||S.evDay===dkey(t))return false;S.evDay=dkey(t);save();
+ const due=S.chains.findIndex(c=>c.at<=S.abs);let ev=null;const summer=S.week===0&&S.ko[0]-t>10*DAY;
+ if(due>=0){ev=EVM[S.chains[due].id];S.chains.splice(due,1)}else if(!summer&&chance(.3))ev=pick(EV.filter(e=>e.off&&(!e.c||e.c())));
+ if(ev){showEvent(ev,null,()=>{closeM();save();render()});return true}return false}
+function dailyEvent(){maybeDaily()}
 function train(k){const p=S.p;CONS=[];const ks=Object.keys(AT);
  if(k==='heavy'){E(pick(ks),rnd(1,2));E(pick(ks),1);E('stamina',-18);if(chance(.08)){p.inj=1;CONS.push('🚑 เจ็บจากการซ้อม 1 นัด')}}
  if(k==='skill'){const best=Object.entries(W[p.pos]).sort((a,b)=>b[1]-a[1])[0][0];E(best,rnd(1,2));E('stamina',-10)}
@@ -420,7 +421,7 @@ const COMM=['บอลเปลี่ยนแข้งกันกลางส�
 const TM=['เบอร์ 9','เบอร์ 10','เบอร์ 7','กัปตันทีม','ตัวสำรองที่เพิ่งลงมา','กองหลังเบอร์ 4'];
 const clock=M=>M.ext?`${M.half===1?45:90}+${M.ext}'`:`${M.min}'`;
 function tk(M,t){M.tick.unshift(`<b>${clock(M)}</b> ${t}`);M.tick=M.tick.slice(0,6)}
-function playMatch(){const nx=nextFix(),p=S.p;if(!nx||now()<S.ko[S.week])return render();
+function playMatch(){const nx=nextFix(),p=S.p;if(!nx||dkey(now())<dkey(S.ko[S.week]))return render();
  const base={opp:nx.opp.n,gf:0,ga:0,g:0,as:0,y:0,red:false,sub:0,r:6.0,queue:[],min:0,played:true,tl:[],tick:[],boost:0};
  if(p.ban||p.inj){base.played=false;return finish(nx,base,p.ban?'⛔ คุณติดแบน นั่งดูอยู่บนอัฒจันทร์':'🚑 คุณบาดเจ็บ พักรักษาตัว')}
  if(p.benched||(p.trust<25&&chance(.6))){p.benched=0;base.played=false;return finish(nx,base,'🪑 โค้ชไม่ส่งคุณลงสนาม นั่งปั้นหน้าบนม้านั่งสำรอง')}
@@ -498,4 +499,4 @@ function endSeason(){if(!S.club){S.season++;S.p.age++;newSeason(S.ko[S.N-1]+DAY)
  msg+=`<br><span class="mu">ฤดูกาลใหม่ ${S.slabel} เริ่ม ${fdt(S.ko[0])}</span>`;
  save();sheet(`<span class="tag g">สรุปฤดูกาล</span><div class="ev">${msg}</div><button class="btn" id="nx">ตลาดซื้อขายช่วงซัมเมอร์ ›</button>`);$('#nx').onclick=()=>offers(true)}
 window.closeM=closeM;window.render=render;
-load();if(S&&!S.ko)S=null;render();
+load();if(S&&!S.ko)S=null;if(S&&!S.gameT){S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}render();
