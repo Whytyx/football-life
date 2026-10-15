@@ -304,7 +304,7 @@ function setup(){let pos='FW',c='ENG';const draw=()=>{$('#app').innerHTML=`
  document.querySelectorAll('[data-c]').forEach(e=>e.onclick=()=>{c=e.dataset.c;draw()});
  $('#go').onclick=()=>{const n=$('#nm').value.trim()||'ไบคัง';newGame(n,pos,c);TAB='home';render();offers(false,c)}};
  $('#tabs').innerHTML='';draw()}
-function tabs(){const T=[['home','🏠','หน้าหลัก'],['table','🏆','ตาราง'],['me','👤','นักเตะ'],['news','📰','ข่าว'],['career','💼','อาชีพ']];
+function tabs(){const T=[['home','🏠','หน้าหลัก'],['table','🏆','ตาราง'],['me','👤','นักเตะ'],['news','📰','ข่าว'],['life','💎','ไลฟ์สไตล์'],['career','💼','อาชีพ']];
  $('#tabs').innerHTML=T.map(([k,i,l])=>`<button class="${TAB===k?'on':''}" data-t="${k}"><span>${i}</span>${l}</button>`).join('');
  document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{TAB=b.dataset.t;render()})}
 function header(){const c=club(),L=S.club?LEAGUES[S.club.c]:null;return `<div class="card row sp"><div><div class="mu">${c?L.f+' '+tierOf(S.club.c,S.club.t).n:'ไร้สังกัด'}</div><h1>${S.p.name}</h1><div class="mu">${POS[S.p.pos]} · อายุ ${S.p.age} · ${c?c.n:'Free Agent'}</div></div><div class="ovr" id="ovrb"><div style="font-size:11px">OVR</div><div class="big" style="font-size:36px">${ovr()}</div></div></div>`}
@@ -357,11 +357,12 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();c
   h+=`<div class="card"><h2>โปรแกรม ${S.slabel}</h2>${S.fix.map((r,k)=>{const m=r.find(x=>x.includes(S.club.i));const o=m[0]===S.club.i?m[1]:m[0];return `<div class="row sp mu" style="padding:5px 0;font-size:13px;${k===S.week?'color:var(--or)':''}"><span>${k+1}. ${m[0]===S.club.i?'🏠':'✈️'} ${T.clubs[o].n}<br><small>${fdt(S.ko[k])}</small></span><b>${S.log[k]||''}</b></div>`}).join('')}</div>`}
  if(TAB==='me'){h+=`<div class="card"><h2>ค่าพลัง</h2>${Object.entries(AT).map(([k,l])=>`<div class="stat"><span>${l}</span>${bar(p.a[k])}<b>${p.a[k]}</b></div>`).join('')}</div>
   <div class="card"><h2>สถิติ</h2><div class="grid2">${[['ลงเล่นฤดูกาลนี้',p.app],['ประตู/แอสซิสต์',p.sg+' / '+p.sa],['ประตูรวมอาชีพ',p.tg],['ใบเหลือง/แดง',p.yc+' / '+p.rc],['ทีมชาติไทย',p.caps+' นัด '+p.ig+' ประตู'],['ค่าปรับรวม','฿'+fmt(p.fines)],['ภาพลักษณ์สื่อ',p.media],['ค่าเหนื่อย/สัปดาห์','฿'+fmt(p.wage)]].map(([l,v])=>`<div class="mini"><span class="mu">${l}</span><b>${v}</b></div>`).join('')}</div></div>`}
+ if(TAB==='life')h+=lifeHTML();
  if(TAB==='news')h+=`<div class="card feed"><h2>ฟีดข่าว</h2>${S.news.map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`;
  if(TAB==='career')h+=`<div class="card"><h2>สัญญา</h2><p>${club()?club().n:'-'} · เหลือ ${p.contract} ฤดูกาล · ฿${fmt(p.wage)}/สัปดาห์</p><p class="mu">${p.agent?'มีเอเยนต์ดูแล':'ไม่มีเอเยนต์'}${p.wantOut?' · ยื่นขอย้ายแล้ว':''}</p><button class="btn o" id="offers">🔎 ดูข้อเสนอย้ายทีม</button></div>
   <div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · 🇹🇭 ติดทีมชาติไทย (OVR 66+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
  $('#app').innerHTML=h;
- $('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
+ if(TAB==='life')lifeBind();$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));
  $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');S=null;render()}});
  $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);
@@ -498,5 +499,58 @@ function endSeason(){if(!S.club){S.season++;S.p.age++;newSeason(S.ko[S.N-1]+DAY)
  if(S.p.contract<=0){S.p.contract=rnd(1,3);S.p.wage=Math.round(S.p.wage*(1+(ovr()-60)/100));msg+=` · ต่อสัญญาอัตโนมัติ ฿${fmt(S.p.wage)}/สัปดาห์`}
  msg+=`<br><span class="mu">ฤดูกาลใหม่ ${S.slabel} เริ่ม ${fdt(S.ko[0])}</span>`;
  save();sheet(`<span class="tag g">สรุปฤดูกาล</span><div class="ev">${msg}</div><button class="btn" id="nx">ตลาดซื้อขายช่วงซัมเมอร์ ›</button>`);$('#nx').onclick=()=>offers(true)}
+// ===== LIFESTYLE =====
+let LS='boost',LC='rec';
+const BST={
+ ice:{c:'rec',ic:'🧊',n:'อ่างแช่น้ำแข็ง',d:'บำบัดความเย็น ฟื้นฟูกล้ามเนื้อ',days:3,p:8000,k:'stamina',v:[5,8]},
+ chair:{c:'rec',ic:'💆',n:'เก้าอี้นวดไฟฟ้า',d:'นวดผ่อนคลายระดับมืออาชีพที่บ้าน',days:5,p:15000,k:'stamina',v:[8,12]},
+ cryo:{c:'rec',ic:'❄️',n:'ห้องไครโอเทอราพี',d:'เทคโนโลยีฟื้นฟูระดับยุโรป',days:7,p:45000,k:'stamina',v:[12,18]},
+ bike:{c:'trn',ic:'🚴',n:'จักรยานซ้อมที่บ้าน',d:'คาร์ดิโอเสริมทุกเช้า',days:4,p:12000,k:'trust',v:[2,3]},
+ gym:{c:'trn',ic:'🏋️',n:'โฮมยิมส่วนตัว',d:'เวทเทรนนิ่ง เพิ่มค่าพลัง',days:5,p:30000,k:'xp',v:[1,1]},
+ coachp:{c:'trn',ic:'🧑‍🏫',n:'โค้ชส่วนตัว',d:'วิเคราะห์เกมตัวต่อตัว',days:7,p:60000,k:'trust',v:[3,5]},
+ chef:{c:'life',ic:'👨‍🍳',n:'เชฟส่วนตัว',d:'อาหารอร่อยถูกหลักโภชนาการ',days:5,p:20000,k:'morale',v:[4,6]},
+ nutri:{c:'life',ic:'🥗',n:'นักโภชนาการ',d:'วางแผนอาหาร เพิ่มพลังทุกด้าน',days:7,p:35000,k:'both',v:[3,5]},
+ spa:{c:'life',ic:'🧖',n:'สปาวันหยุด',d:'พักใจ คลายเครียดจากดราม่า',days:3,p:10000,k:'morale',v:[5,8]}};
+const BCAT={rec:'ฟื้นฟู',trn:'ซ้อม',life:'ไลฟ์สไตล์'};
+const KL={stamina:'สตามิน่า',trust:'ความเชื่อใจโค้ช',morale:'ขวัญกำลังใจ',xp:'ค่าพลัง',both:'ขวัญ+สตามิน่า'};
+const ASSETS=[
+ ['scooter','🛵','สกู๊ตเตอร์ไฟฟ้า','รถ',25000,1,300],['civic','🚗','รถเก๋งซิ่ง','รถ',900000,2,3000],['benz','🚙','SUV หรู','รถ',4500000,3,15000],['super','🏎️','ซูเปอร์คาร์อิตาลี','รถ',18000000,5,80000],
+ ['condo','🏢','คอนโดใกล้สนาม','บ้าน',2500000,2,2000],['villa','🏡','พูลวิลล่า','บ้าน',15000000,4,40000],['mansion','🏰','คฤหาสน์ริมทะเล','บ้าน',60000000,5,150000],
+ ['casio','⌚','นาฬิกาสปอร์ต','นาฬิกา',8000,1,100],['rolex','⌚','นาฬิกาสวิสทองคำ','นาฬิกา',800000,3,8000],['apm','💎','นาฬิกาเพชรลิมิเต็ด','นาฬิกา',6000000,5,50000],
+ ['chain','📿','สร้อยทองเส้นใหญ่','เครื่องประดับ',120000,2,1500],['shoes','👟','สนีกเกอร์แรร์','เครื่องประดับ',45000,1,800],['ring','💍','แหวนเพชร','เครื่องประดับ',1500000,3,12000],
+ ['paint','🖼️','ภาพวาดศิลปินไทย','ศิลปะ',300000,2,2000],['nft','🐒','NFT ลิงเบื่อโลก','ศิลปะ',2000000,3,20000],['sculpt','🗿','ประติมากรรมยุโรป','ศิลปะ',9000000,4,40000]];
+const AM=Object.fromEntries(ASSETS.map(a=>[a[0],a]));
+const INV={sav:['🏦','บัญชีออมทรัพย์','ความเสี่ยงต่ำมาก',7,1,2],idx:['📈','กองทุนดัชนี','ความเสี่ยงกลาง',14,-5,12],reit:['🏘️','กองทุนอสังหาฯ','ความเสี่ยงกลาง',30,-3,15],cry:['🪙','คริปโต','ความเสี่ยงสูงมาก!',7,-45,70]};
+function LI(){S.boost=S.boost||[];S.blv=S.blv||{};S.assets=S.assets||[];S.inv=S.inv||[]}
+const portVal=()=>{LI();return S.assets.reduce((s,id)=>s+AM[id][4]*.7,0)+S.inv.reduce((s,x)=>s+x.amt,0)};
+function lifeHTML(){LI();const p=S.p,today=dkey(now());S.boost=S.boost.filter(b=>b.end>=today);
+ let h=`<div class="card row sp" style="border-left:5px solid var(--or)"><div><div class="big or" style="font-size:34px">฿${fmt(p.money)}</div><div class="mu">ยอดเงินคงเหลือ</div></div><div style="text-align:right"><b class="ye" style="font-size:20px">฿${fmt(portVal())}</b><div class="mu">มูลค่าพอร์ต</div></div></div>
+ <div class="seg">${[['boost','บูสเตอร์'],['asset','ทรัพย์สิน'],['inv','ลงทุน']].map(([k,l])=>`<div class="${LS===k?'on':''}" data-ls="${k}">${l}</div>`).join('')}</div>`;
+ if(LS==='boost'){h+=`<div class="row sp"><h2>บูสเตอร์ที่ใช้งาน</h2><span class="tag">${S.boost.length}/4 ช่อง</span></div>`;
+  h+=S.boost.length?S.boost.map((b,i)=>{const B=BST[b.id],v=B.v[b.lv-1],can=b.last!==today;return `<div class="card" style="border-color:var(--gr)"><div class="row sp"><b>${B.ic} ${B.n} <span class="tag o">LV${b.lv}</span></b><span class="mu">เหลือ ${b.end-today+1} วัน</span></div>${bar((b.end-today+1)/B.days*100)}<button class="btn o ${can?'':'dis'}" data-cl="${i}" ${can?'':'disabled'}>${can?`รับ +${v} ${KL[B.k]}`:'รับแล้ววันนี้ — กลับมาพรุ่งนี้'}</button></div>`}).join(''):`<div class="card mu">ยังไม่มีบูสเตอร์ ซื้อด้านล่างได้เลย</div>`;
+  h+=`<div class="chips" style="margin:10px 0">${Object.entries(BCAT).map(([k,l])=>`<div class="chip ${LC===k?'on':''}" data-lc="${k}">${l}</div>`).join('')}</div>`;
+  h+=Object.entries(BST).filter(([,B])=>B.c===LC).map(([id,B])=>{const lv=S.blv[id]||1,act=S.boost.some(b=>b.id===id),full=S.boost.length>=4,up=Math.round(B.p*2.5);
+   return `<div class="card"><div class="row sp"><div class="row"><span style="font-size:30px">${B.ic}</span><div><b>${B.n}</b><div class="mu">${B.d}</div></div></div><span class="tag o">LV${lv}</span></div>
+   <div class="row" style="margin:8px 0"><span class="chip">${B.days} วัน</span><span class="chip gr">+${B.v[lv-1]} ${KL[B.k]}/วัน</span></div>
+   <div class="mini mu">LV1 +${B.v[0]} · <span class="gr">LV2 +${B.v[1]}</span></div>
+   <div class="row"><button class="btn s" style="flex:1;text-align:center" data-up="${id}" ${lv>1?'disabled':''}>${lv>1?'✅ LV สูงสุด':`⬆️ อัปเกรด ฿${fmt(up)}`}</button><button class="btn ${act||full?'dis':''}" style="flex:1" data-bb="${id}" ${act||full?'disabled':''}>${act?'ใช้งานอยู่':full?'ช่องเต็ม':`ซื้อ ฿${fmt(B.p)}`}</button></div></div>`}).join('')}
+ if(LS==='asset'){h+=`<h2>ของที่คุณมี (${S.assets.length})</h2><div class="card">${S.assets.length?S.assets.map(id=>`<span class="chip" style="display:inline-block;margin:3px">${AM[id][1]} ${AM[id][2]}</span>`).join(''):'<span class="mu">ยังไม่มีทรัพย์สิน</span>'}</div><h2>ร้านค้า</h2>`;
+  h+=ASSETS.map(([id,ic,n,cat,pr,st,f])=>{const own=S.assets.includes(id);return `<div class="card row sp"><div class="row"><span style="font-size:30px">${ic}</span><div><b>${n}</b><div class="mu">${cat} · <span class="ye">${'★'.repeat(st)}${'☆'.repeat(5-st)}</span> · +${fmt(f)} ผู้ติดตาม</div></div></div><button class="btn ${own?'dis':''}" style="width:auto;padding:10px 12px;font-size:14px" data-as="${id}" ${own?'disabled':''}>${own?'มีแล้ว':'฿'+fmt(pr)}</button></div>`}).join('')}
+ if(LS==='inv'){h+=`<h2>พอร์ตลงทุน</h2>${S.inv.length?S.inv.map((x,i)=>{const I=INV[x.id],done=today>=x.end;return `<div class="card"><div class="row sp"><b>${I[0]} ${I[1]}</b><b>฿${fmt(x.amt)}</b></div>${bar(Math.min(100,(today-x.start)/(x.end-x.start)*100))}<button class="btn ${done?'':'dis'}" data-ic="${i}" ${done?'':'disabled'}>${done?'💰 รับผลตอบแทน':`ครบกำหนดอีก ${x.end-today} วัน`}</button></div>`}).join(''):'<div class="card mu">ยังไม่มีการลงทุน</div>'}
+  <h2>ผลิตภัณฑ์</h2><div class="card"><span class="mu">จำนวนเงินลงทุน</span><input id="amt" type="number" inputmode="numeric" value="${Math.max(1000,Math.round(p.money*.25/1000)*1000)}"><div class="mu">ภาษี 15% จากกำไร · ขาดทุนได้!</div></div>`+
+  Object.entries(INV).map(([id,[ic,n,r,d,mn,mx]])=>`<div class="card"><div class="row sp"><b>${ic} ${n}</b><span class="tag ${mn<-10?'':mn<0?'o':'g'}">${r}</span></div><div class="row sp mu" style="margin:6px 0"><span>${d} วัน</span><span>ผลตอบแทน <span class="${mn<0?'re':'gr'}">${mn}%</span> ถึง <span class="gr">+${mx}%</span></span></div><button class="btn s" style="text-align:center" data-iv="${id}">ลงทุน</button></div>`).join('')}
+ return h}
+function lifeMsg(t){sheet(`<span class="tag g">ไลฟ์สไตล์</span><ul class="cons">${(Array.isArray(t)?t:[t]).map(c=>`<li>${c}</li>`).join('')}</ul><button class="btn" onclick="closeM();render()">ตกลง</button>`)}
+function pay(x){if(S.p.money<x){lifeMsg('💸 เงินไม่พอ!');return false}S.p.money-=x;return true}
+function lifeBind(){const q=(s,f)=>document.querySelectorAll(s).forEach(b=>b.onclick=()=>f(b));const today=dkey(now());
+ q('[data-ls]',b=>{LS=b.dataset.ls;render()});q('[data-lc]',b=>{LC=b.dataset.lc;render()});
+ q('[data-bb]',b=>{const id=b.dataset.bb,B=BST[id];if(!pay(B.p))return;S.boost.push({id,lv:S.blv[id]||1,end:today+B.days-1,last:null});save();lifeMsg(`${B.ic} เปิดใช้ ${B.n} ${B.days} วัน`)});
+ q('[data-up]',b=>{const id=b.dataset.up,B=BST[id];if(!pay(Math.round(B.p*2.5)))return;S.blv[id]=2;S.boost.forEach(x=>{if(x.id===id)x.lv=2});save();lifeMsg(`⬆️ ${B.n} อัปเกรดเป็น LV2`)});
+ q('[data-cl]',b=>{const x=S.boost[+b.dataset.cl],B=BST[x.id],v=B.v[x.lv-1];x.last=today;CONS=[];
+  if(B.k==='xp'){E(pick(Object.keys(AT)),v)}else if(B.k==='both'){E('morale',v);E('stamina',v)}else E(B.k,v);save();lifeMsg(CONS)});
+ q('[data-as]',b=>{const a=AM[b.dataset.as];if(!pay(a[4]))return;S.assets.push(a[0]);CONS=[];E('fans',a[6]);E('morale',a[5]*2);if(a[5]>=4){E('media',-3);N('สื่อเริ่มวิจารณ์ความฟุ้งเฟ้อ')}news(`🛍️ ${S.p.name} ถอย${a[2]}ราคา ฿${fmt(a[4])}`);save();lifeMsg(CONS)});
+ q('[data-iv]',b=>{const id=b.dataset.iv,amt=Math.round(+$('#amt').value);if(!(amt>=1000))return lifeMsg('ขั้นต่ำ ฿1,000');if(!pay(amt))return;S.inv.push({id,amt,start:today,end:today+INV[id][3]});save();lifeMsg(`${INV[id][0]} ลงทุน ${INV[id][1]} ฿${fmt(amt)} ครบกำหนดใน ${INV[id][3]} วัน`)});
+ q('[data-ic]',b=>{const i=+b.dataset.ic,x=S.inv[i],I=INV[x.id];const r=I[4]+R()*(I[5]-I[4]);let pr=Math.round(x.amt*r/100);const tax=pr>0?Math.round(pr*.15):0;S.inv.splice(i,1);S.p.money+=x.amt+pr-tax;save();
+  lifeMsg([`${I[0]} ${I[1]} ผลตอบแทน ${r>=0?'+':''}${r.toFixed(1)}%`,`${pr>=0?'📈 กำไร':'📉 ขาดทุน'} ฿${fmt(pr)}`,tax?`🧾 ภาษี 15%: -฿${fmt(tax)}`:'ไม่มีภาษี (ไม่มีกำไร)',`💰 ได้รับคืน ฿${fmt(x.amt+pr-tax)}`])})}
 window.closeM=closeM;window.render=render;
 load();if(S&&!S.ko)S=null;if(S&&!S.gameT){S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}render();

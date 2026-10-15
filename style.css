@@ -48,3 +48,5 @@ tr.me{background:#2a1c0f;color:var(--or);font-weight:600}
 .board{background:var(--gr);color:#111;border-radius:6px;padding:0 6px;margin-left:6px;font-size:16px}
 .tl div{display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}.tl b{color:var(--or);min-width:48px}
 .datebar{text-align:center;font-weight:600;color:var(--or);margin:-4px 0 10px;font-size:15px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:6px}.seg div{flex:1;text-align:center;padding:10px;border-radius:10px;font-weight:600;color:var(--mu);cursor:pointer}.seg .on{background:var(--or);color:#111}
+.chip.gr{color:var(--gr)}#tabs button{font-size:11px}
