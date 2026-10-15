@@ -143,6 +143,14 @@ const EV=[
  {l:'🎵 เปิดเพลงมันส์ ๆ เต้นในห้อง',f:M=>{E('morale',6);M.boost=(M.boost||0)+.5;if(chance(.2))E('trust',-3)}},
  {l:'📹 ดูคลิปจุดอ่อนคู่แข่ง',f:M=>{E('trust',3);M.r+=.3}}]},
 // ===== OFF-FIELD =====
+{id:'homesick',off:1,c:()=>foreign(),x:()=>`${NF()} คุณคิดถึงบ้านที่${NN()}มาก อาหาร ภาษา อากาศ ทุกอย่างแปลกไปหมด`,o:[
+ {l:'📞 วิดีโอคอลหาครอบครัวทุกคืน',f:()=>{E('morale',5);E('stamina',-4)}},
+ {l:'🍜 ตามหาร้านอาหารบ้านเกิด ชวนเพื่อนร่วมทีมไปกิน',f:()=>{E('morale',4);E('trust',2);E('fans',0.02)}},
+ {l:'😔 เก็บตัวเงียบในห้อง',f:()=>{E('morale',-6)}}]},
+{id:'lang',off:1,c:()=>foreign(),x:()=>`🗣️ โค้ชอธิบายแท็กติกเป็นภาษาท้องถิ่นเร็วปรื๋อ คุณฟังไม่ทันครึ่งหนึ่ง`,o:[
+ {l:'📚 จ้างครูสอนภาษา',f:()=>{E('money',-15000);E('trust',6)}},
+ {l:'👍 พยักหน้าเหมือนเข้าใจ',f:()=>{if(chance(.5)){E('trust',-6);N('ลงสนามยืนผิดตำแหน่งในการซ้อม')}else N('รอดไปได้')}},
+ {l:'🙋 ขอให้เพื่อนร่วมทีมช่วยแปล',f:()=>{E('trust',2);E('morale',2)}}]},
 {id:'journo',off:1,x:()=>`นักข่าวยื่นไมค์: "มีข่าวว่าคุณไม่พอใจที่ไม่ได้เป็นตัวจริงบ่อย ๆ จริงไหม?"`,o:[
  {l:'😇 "ผมเคารพการตัดสินใจของโค้ช"',f:()=>{E('trust',4);E('fans',0.01)}},
  {l:'😐 "ผมอยากลงเล่นมากกว่านี้ครับ"',f:()=>{E('trust',-3);E('morale',2);E('fans',0.02)}},
@@ -224,9 +232,9 @@ const EV=[
  {l:'🎤 แถลงข่าวขอโทษน้ำตาซึม',f:()=>{E('fans',0.03);E('money',-50000);N('สปอนเซอร์ถอนตัวเจ้าหนึ่ง แต่ภาพลักษณ์ดีขึ้น')}},
  {l:'🕶️ หายเงียบ ปิดโซเชียล',f:()=>{E('morale',-8);E('money',-100000)}},
  {l:'😎 "Bad publicity is still publicity"',f:()=>{E('fans',0.1);E('money',-150000);E('trust',-10)}}]},
-{id:'thai',off:1,c:()=>ovr()>=66&&!S.p.called,x:()=>`🇹🇭 สมาคมฟุตบอลแห่งประเทศไทยเรียกตัวคุณติดทีมชาติไทยชุดใหญ่! แต่ช่วงนั้นสโมสรมีเกมสำคัญ`,o:[
- {l:'🇹🇭 รับใช้ชาติ!',f:()=>{S.p.called=1;S.p.caps++;E('fans',0.25);E('morale',10);E('stamina',-10);if(chance(.3+sk('sho')*.4)){S.p.ig++;N('ยิงประตูให้ทีมชาติไทย!! คนทั้งประเทศเรียกชื่อคุณ')}else N('ได้ลงเล่นให้ทีมชาติครั้งแรก ภูมิใจที่สุดในชีวิต');news(`${S.p.name} ติดธงทีมชาติไทย!`)}},
- {l:'🏟️ ขอโฟกัสสโมสร',f:()=>{E('trust',6);E('fans',-0.1);N('แฟนบอลไทยบางส่วนผิดหวัง')}}]},
+{id:'thai',off:1,c:()=>ovr()>=NAT()[2]&&!S.p.called,x:()=>`${NF()} สมาคมฟุตบอล${NN()}เรียกตัวคุณติดทีมชาติ${NN()}ชุดใหญ่!${foreign()?' ต้องบินข้ามทวีปกลับไปรายงานตัว':''} แต่ช่วงนั้นสโมสรมีเกมสำคัญ`,o:[
+ {get l(){return NF()+' รับใช้ชาติ!'},f:()=>{S.p.called=1;S.p.caps++;E('fans',0.25);E('morale',10);E('stamina',-10);if(chance(.3+sk('sho')*.4)){S.p.ig++;N(`ยิงประตูให้ทีมชาติ${NN()}!! คนทั้งประเทศเรียกชื่อคุณ`)}else N('ได้ลงเล่นให้ทีมชาติครั้งแรก ภูมิใจที่สุดในชีวิต');news(`${NF()} ${S.p.name} ติดธงทีมชาติ${NN()}!`)}},
+ {l:'🏟️ ขอโฟกัสสโมสร',f:()=>{E('trust',6);E('fans',-0.1);N(`แฟนบอล${NN()}บางส่วนผิดหวัง`)}}]},
 {id:'raise',off:1,c:()=>S.p.sg>=4,x:()=>`ฟอร์มคุณร้อนแรง เอเยนต์บอกว่าถึงเวลาขอขึ้นเงินเดือน`,o:[
  {l:'💼 ขอขึ้น 20%',f:()=>{if(chance(.6)){const x=Math.round(S.p.wage*.2);S.p.wage+=x;CONS.push(`💰 ค่าเหนื่อย +฿${fmt(x)}/สัปดาห์`)}else{E('trust',-4);N('บอร์ดปฏิเสธ')}}},
  {l:'💎 ขอขึ้น 80% ไม่งั้นไม่ซ้อม',f:()=>{if(chance(.2)){const x=Math.round(S.p.wage*.8);S.p.wage+=x;CONS.push(`💰 ค่าเหนื่อย +฿${fmt(x)}`)}else{E('trust',-15);E('fans',-0.05);S.p.benched=1;N('สโมสรไม่ยอม! ดองยาว')}}},
@@ -293,21 +301,24 @@ function newGame(name,pos,c){const w=genWorld();
  newSeason(bk(ry,7,8,9));save()}
 // ===== UI =====
 function bar(v,cls=''){return `<div class="bar ${cls}"><i style="width:${cl(v)}%"></i></div>`}
-function setup(){let pos='FW',c='ENG';const draw=()=>{$('#app').innerHTML=`
+function setup(){let pos='FW',c='ENG',nat='THA';const av=Object.assign({},DAV);const draw=()=>{$('#app').innerHTML=`
  <div style="text-align:center;padding:30px 0 10px"><div style="font-size:54px">⚽</div><h1>เส้นทางแข้ง</h1><div class="or" style="font-weight:800;letter-spacing:3px">FOOTBALL LIFE</div><p class="mu">จากเด็กบ้านนอก สู่ซูเปอร์สตาร์ ทุกการตัดสินใจมีราคา</p></div>
  <div class="card"><h2>ชื่อนักเตะ</h2><input id="nm" maxlength="20" placeholder="เช่น ชนาธิป จ." value="${$('#nm')?.value||''}">
+ <h2>สัญชาติ</h2><select id="nat">${Object.entries(NATS).map(([k,[f,n]])=>`<option value="${k}" ${k===nat?'selected':''}>${f} ${n}</option>`).join('')}</select>
+ <h2>หน้าตานักเตะ</h2><div class="card" style="background:var(--card2)">${avEditor(av)}</div>
  <h2>ตำแหน่ง</h2><div class="chips">${Object.entries(POS).map(([k,v])=>`<div class="chip ${k===pos?'on':''}" data-pos="${k}">${v}</div>`).join('')}</div>
  <h2>เลือกลีกเริ่มต้น</h2><div class="chips">${Object.entries(LEAGUES).map(([k,L])=>`<div class="chip ${k===c?'on':''}" data-c="${k}">${L.f} ${L.n}</div>`).join('')}</div>
- <p class="mu" style="margin-top:10px">คุณจะเริ่มที่สโมสรเล็กใน <b class="or">${LEAGUES[c].tiers.at(-1)[0]}</b> ลีกล่างสุดของ${LEAGUES[c].n} — ย้ายข้ามลีกได้ภายหลัง และยังติดทีมชาติไทยได้ 🇹🇭</p>
+ <p class="mu" style="margin-top:10px">คุณจะเริ่มที่สโมสรเล็กใน <b class="or">${LEAGUES[c].tiers.at(-1)[0]}</b> ลีกล่างสุดของ${LEAGUES[c].n} — ย้ายข้ามลีกได้ภายหลัง และติดทีมชาติ${NATS[nat][1]} ${NATS[nat][0]} ได้เมื่อ OVR ${NATS[nat][2]}+${nat!==c&&NATS[c]?' · คุณจะเป็นนักเตะต่างชาติในลีกนี้ 🌍':''}</p>
  <button class="btn" id="go">เริ่มอาชีพ</button></div>`;
+ $('#nat').onchange=e=>{nat=e.target.value;draw()};bindAe(av,draw);
  document.querySelectorAll('[data-pos]').forEach(e=>e.onclick=()=>{pos=e.dataset.pos;draw()});
  document.querySelectorAll('[data-c]').forEach(e=>e.onclick=()=>{c=e.dataset.c;draw()});
- $('#go').onclick=()=>{const n=$('#nm').value.trim()||'ไบคัง';newGame(n,pos,c);TAB='home';render();offers(false,c)}};
+ $('#go').onclick=()=>{const n=$('#nm').value.trim()||'ไบคัง';newGame(n,pos,c);S.p.nat=nat;S.p.av=av;save();TAB='home';render();offers(false,c)}};
  $('#tabs').innerHTML='';draw()}
 function tabs(){if(S&&S.p)PI();const T=[['home','🏠','หน้าหลัก'],['table','🏆','ตาราง'],['me','👤','นักเตะ'],['news','📰','ข่าว'],['life','💎','ไลฟ์สไตล์'],['career','💼','อาชีพ']];
  $('#tabs').innerHTML=T.map(([k,i,l])=>`<button class="${TAB===k?'on':''}" data-t="${k}"><span style="position:relative">${i}${k==='me'&&S.p.sp?`<i class="badge">${S.p.sp}</i>`:''}</span>${l}</button>`).join('');
  document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{TAB=b.dataset.t;render()})}
-function header(){const c=club(),L=S.club?LEAGUES[S.club.c]:null;return `<div class="card row sp"><div><div class="mu">${c?L.f+' '+tierOf(S.club.c,S.club.t).n:'ไร้สังกัด'}</div><h1>${S.p.name}</h1><div class="mu">${POS[S.p.pos]} · อายุ ${S.p.age} · ${c?c.n:'Free Agent'}</div></div><div class="ovr" id="ovrb"><div style="font-size:11px">OVR</div><div class="big" style="font-size:36px">${ovr()}</div></div></div>`}
+function header(){const c=club(),L=S.club?LEAGUES[S.club.c]:null;AVI();return `<div class="card row sp"><div class="row">${avatarSVG(S.p.av,64)}<div><div class="mu">${NF()} · ${c?L.f+' '+tierOf(S.club.c,S.club.t).n:'ไร้สังกัด'}</div><h1>${S.p.name}</h1><div class="mu">${POS[S.p.pos]} · อายุ ${S.p.age} · ${c?c.n:'Free Agent'}</div></div></div><div class="ovr" id="ovrb"><div style="font-size:11px">OVR</div><div class="big" style="font-size:36px">${ovr()}</div></div></div>`}
 const COACH=[['🛡️ เน้นวินัย','ไม่ชอบนักเตะเกเร'],['🚀 บุกสุดตัว','ชอบนักเตะสร้างสรรค์'],['🧓 พ่อพระ','ใจดี ให้โอกาสเด็ก'],['🔥 เผด็จการ','เปลี่ยนตัวไว ด่าแรง'],['📊 สายแท็กติก','ชอบคนทำตามแผน']];
 const ROLE={star:['ตัวจริง','g',62],rot:['สำรอง','',38],kid:['ดาวรุ่ง','o',50]};
 function hue(n){let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))%360;return h}
@@ -332,12 +343,12 @@ function avgR(){const r=S.p.rh||[];return r.length?r.reduce((a,b)=>a+b,0)/r.leng
 function earned(){const p=S.p,c=club();if(!c)return true;const r=p.rh||[];return (r.length>=3&&avgR()>=7.0)||ovr()>=c.s+6||(p.sg+p.sa)>=8||p.fans>=100000}
 function offers(auto,country,list){if(!list&&!country&&S.club&&!earned()&&!S.p.bonusOffer){if(auto){closeM();save();return render()}return sheet(`<h2>ข้อเสนอ</h2><p>ยังไม่มีสโมสรสนใจคุณ</p><p class="mu">ต้องทำผลงานให้โดดเด่นก่อน: เรตติ้งเฉลี่ย 7.0+ (5 นัดล่าสุด ตอนนี้ ${avgR().toFixed(1)}), OVR สูงกว่าระดับทีมชัดเจน, ยิง/แอสซิสต์รวม 8+ หรือผู้ติดตาม 100K+</p><button class="btn" onclick="closeM()">ปิด</button>`)}list=list||genOffers(country);const first=!!country;
  if(!list.length){if(auto){closeM();save();return render()}return sheet(`<h2>ข้อเสนอ</h2><p>ยังไม่มีสโมสรสนใจ พัฒนาฝีเท้าก่อนนะ</p><button class="btn" onclick="closeM()">ปิด</button>`)}
- sheet(`<span class="tag o">${first?'เริ่มต้นอาชีพ':'ตลาดซื้อขาย'}</span><h2>สโมสรที่สนใจคุณ</h2><p class="mu" style="margin-bottom:10px">${first?'เลือกสโมสรแรกในชีวิตค้าแข้ง — ทีมใหญ่อาจได้นั่งสำรอง ทีมเล็กได้เป็นตัวจริง':'ต่อรองได้ครั้งเดียวต่อทีม แต่ระวังเขาถอนตัว!'}</p>${list.map(offerCard).join('')}${first?'':`<button class="btn s" id="stay" style="text-align:center">${S.club?'อยู่ทีมเดิม':'ปิด'}</button>`}`);
+ sheet(`<span class="tag o">${first?'เริ่มต้นอาชีพ':'ตลาดซื้อขาย'}</span><div class="row">${avatarSVG(S.p.av,56)}<h2>สโมสรที่สนใจคุณ</h2></div><p class="mu" style="margin-bottom:10px">${first?'เลือกสโมสรแรกในชีวิตค้าแข้ง — ทีมใหญ่อาจได้นั่งสำรอง ทีมเล็กได้เป็นตัวจริง':'ต่อรองได้ครั้งเดียวต่อทีม แต่ระวังเขาถอนตัว!'}</p>${list.map(offerCard).join('')}${first?'':`<button class="btn s" id="stay" style="text-align:center">${S.club?'อยู่ทีมเดิม':'ปิด'}</button>`}`);
  document.querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>{const o=list[+b.dataset.ng];o.neg=1;
   if(chance(o.role==='star'?.3:.4)){o.gone=1;if(list.every(x=>x.gone))list.push(...genOffers(country))}else if(chance(.6)){o.wage=Math.round(o.wage*1.25/10)*10;o.bonus=Math.round((o.bonus||o.wage)*1.5/100)*100;o.msg='✅ ยอมขึ้นค่าเหนื่อย +25% และเพิ่มเงินเซ็นสัญญา!';o.msgc='gr'}else{o.msg='😐 "นี่คือข้อเสนอสุดท้ายแล้ว"';o.msgc='mu'}
   const y=$('.sheet').scrollTop;offers(auto,country,list);$('.sheet').scrollTop=y});
  document.querySelectorAll('[data-of]').forEach(b=>b.onclick=()=>{const o=list[+b.dataset.of];const old=club();S.club={c:o.c,t:o.t,i:o.i};const p=S.p;p.wage=o.wage;p.contract=o.yrs;p.trust=ROLE[o.role][2];p.role=o.role;p.coach=o.coach;p.wantOut=0;p.benched=0;p.trained=0;if(o.bonus)p.money+=o.bonus;
-  news(first?`✍️ ${p.name} เซ็นสัญญาอาชีพฉบับแรกกับ ${club().n} (${LEAGUES[o.c].n} · ${tierOf(o.c,o.t).n}) ในบทบาท${ROLE[o.role][0]}`:`✈️ ย้ายทีม! ${p.name} ${old?'จาก '+old.n:''} สู่ ${club().n} (${LEAGUES[o.c].n}) บทบาท${ROLE[o.role][0]}`);newSeasonKeep();save();closeM();render()});
+  news(first?`✍️ ${p.name} เซ็นสัญญาอาชีพฉบับแรกกับ ${club().n} (${LEAGUES[o.c].n} · ${tierOf(o.c,o.t).n}) ในบทบาท${ROLE[o.role][0]}${o.c!==p.nat?` 🌍 นักเตะต่างชาติจาก${NN()} ${NF()}`:''}`:`✈️ ย้ายทีม! ${p.name} ${old?'จาก '+old.n:''} สู่ ${club().n} (${LEAGUES[o.c].n}) บทบาท${ROLE[o.role][0]}`);newSeasonKeep();save();closeM();render()});
  $('#stay')&&($('#stay').onclick=()=>{closeM();save();render()})}
 // ===== RENDER =====
 let LIVE=null;
@@ -357,14 +368,14 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();c
   h+=`<h2>ข่าวล่าสุด</h2><div class="card feed">${S.news.slice(0,4).map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`}
  if(TAB==='table'&&S.club){const T=tierOf(S.club.c,S.club.t);h+=`<div class="card"><h2>${T.n}</h2><table><tr><th>#</th><th>ทีม</th><th>น.</th><th>ช</th><th>ส</th><th>+/-</th><th>แต้ม</th></tr>${sorted().map((r,k)=>`<tr class="${r.i===S.club.i?'me':''}"><td>${k+1}</td><td>${T.clubs[r.i].n}</td><td>${r.p}</td><td>${r.w}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table><p class="mu" style="margin-top:8px">อันดับ 1-2 เลื่อนชั้น · 2 อันดับสุดท้ายตกชั้น</p></div>`;
   h+=`<div class="card"><h2>โปรแกรม ${S.slabel}</h2>${S.fix.map((r,k)=>{const m=r.find(x=>x.includes(S.club.i));const o=m[0]===S.club.i?m[1]:m[0];return `<div class="row sp mu" style="padding:5px 0;font-size:13px;${k===S.week?'color:var(--or)':''}"><span>${k+1}. ${m[0]===S.club.i?'🏠':'✈️'} ${T.clubs[o].n}<br><small>${fdt(S.ko[k])}</small></span><b>${S.log[k]||''}</b></div>`}).join('')}</div>`}
- if(TAB==='me'){PI();h+=`<div class="card"><div class="row sp"><h2 style="margin:0">อัปสกิล</h2><span class="tag ${p.sp?'o':''}">⭐ ${p.sp} SP</span></div><p class="mu">Training LV ${p.tlv} · ค่าใช้จ่าย: &lt;60=1 · 60s=2 · 70s=3 · 80s=4 · 90+=5 SP</p>${Object.entries(AT).map(([k,l])=>{const c=spCost(p.a[k]),can=p.sp>=c&&p.a[k]<99;return `<div class="stat" style="grid-template-columns:80px 1fr 30px 62px"><span>${l}${W[p.pos][k]>=.2?' <span class="or">★</span>':''}</span>${bar(p.a[k])}<b>${p.a[k]}</b><button class="spb ${can?'':'dis'}" data-sp="${k}" ${can?'':'disabled'}>+1 · ${c}SP</button></div>`}).join('')}<p class="mu" style="margin-top:6px">★ = ค่าพลังหลักของตำแหน่ง${POS[p.pos]} (มีผลต่อ OVR มาก)</p></div>
-  <div class="card"><h2>สถิติ</h2><div class="grid2">${[['ลงเล่นฤดูกาลนี้',p.app],['ประตู/แอสซิสต์',p.sg+' / '+p.sa],['ประตูรวมอาชีพ',p.tg],['ใบเหลือง/แดง',p.yc+' / '+p.rc],['ทีมชาติไทย',p.caps+' นัด '+p.ig+' ประตู'],['ค่าปรับรวม','฿'+fmt(p.fines)],['ภาพลักษณ์สื่อ',p.media],['ค่าเหนื่อย/สัปดาห์','฿'+fmt(p.wage)]].map(([l,v])=>`<div class="mini"><span class="mu">${l}</span><b>${v}</b></div>`).join('')}</div></div>`}
+ if(TAB==='me'){PI();h+=`<div class="card row">${avatarSVG(p.av,96)}<div style="flex:1"><b style="font-size:18px">${p.name}</b><div class="mu">${NF()} สัญชาติ${NN()} · ${POS[p.pos]}</div><button class="btn s" id="eav" style="text-align:center;padding:10px">✏️ แก้ไขอวตาร</button></div></div><div class="card"><div class="row sp"><h2 style="margin:0">อัปสกิล</h2><span class="tag ${p.sp?'o':''}">⭐ ${p.sp} SP</span></div><p class="mu">Training LV ${p.tlv} · ค่าใช้จ่าย: &lt;60=1 · 60s=2 · 70s=3 · 80s=4 · 90+=5 SP</p>${Object.entries(AT).map(([k,l])=>{const c=spCost(p.a[k]),can=p.sp>=c&&p.a[k]<99;return `<div class="stat" style="grid-template-columns:80px 1fr 30px 62px"><span>${l}${W[p.pos][k]>=.2?' <span class="or">★</span>':''}</span>${bar(p.a[k])}<b>${p.a[k]}</b><button class="spb ${can?'':'dis'}" data-sp="${k}" ${can?'':'disabled'}>+1 · ${c}SP</button></div>`}).join('')}<p class="mu" style="margin-top:6px">★ = ค่าพลังหลักของตำแหน่ง${POS[p.pos]} (มีผลต่อ OVR มาก)</p></div>
+  <div class="card"><h2>สถิติ</h2><div class="grid2">${[['ลงเล่นฤดูกาลนี้',p.app],['ประตู/แอสซิสต์',p.sg+' / '+p.sa],['ประตูรวมอาชีพ',p.tg],['ใบเหลือง/แดง',p.yc+' / '+p.rc],['ทีมชาติ'+NN(),p.caps+' นัด '+p.ig+' ประตู'],['ค่าปรับรวม','฿'+fmt(p.fines)],['ภาพลักษณ์สื่อ',p.media],['ค่าเหนื่อย/สัปดาห์','฿'+fmt(p.wage)]].map(([l,v])=>`<div class="mini"><span class="mu">${l}</span><b>${v}</b></div>`).join('')}</div></div>`}
  if(TAB==='life')h+=lifeHTML();
  if(TAB==='news')h+=`<h2>โซเชียล</h2>${(S.feed||[]).length?S.feed.map(postCard).join(''):'<div class="card mu">ยังไม่มีโพสต์ — ลงสนามแล้วโลกโซเชียลจะพูดถึงคุณ</div>'}<div class="card feed"><h2>ข่าวสโมสร</h2>${S.news.map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`;
  if(TAB==='career')h+=`<div class="card"><h2>สัญญา</h2><p>${club()?club().n:'-'} · เหลือ ${p.contract} ฤดูกาล · ฿${fmt(p.wage)}/สัปดาห์</p><p class="mu">${p.agent?'มีเอเยนต์ดูแล':'ไม่มีเอเยนต์'}${p.wantOut?' · ยื่นขอย้ายแล้ว':''}</p><button class="btn o" id="offers">🔎 ดูข้อเสนอย้ายทีม</button></div>
-  <div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · 🇹🇭 ติดทีมชาติไทย (OVR 66+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
+  <div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
  $('#app').innerHTML=h;
- if(TAB==='life')lifeBind();document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.rp.split(':').map(Number);replyPost(i,k)});document.querySelectorAll('[data-sp]').forEach(b=>{if(b.classList.contains('spb'))b.onclick=()=>{const k=b.dataset.sp,c=spCost(p.a[k]);if(p.sp<c)return;p.sp-=c;p.a[k]++;save();render()}});$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
+ if(TAB==='life')lifeBind();$('#eav')&&($('#eav').onclick=editAvatar);document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.rp.split(':').map(Number);replyPost(i,k)});document.querySelectorAll('[data-sp]').forEach(b=>{if(b.classList.contains('spb'))b.onclick=()=>{const k=b.dataset.sp,c=spCost(p.a[k]);if(p.sp<c)return;p.sp-=c;p.a[k]++;save();render()}});$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));
  $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');S=null;render()}});
  $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);
@@ -564,7 +575,7 @@ const FT={fan:['แฟนบอล','g'],media:['สื่อ','o'],pundit:['ก
 const AV={fan:['😍','🔥','🥹','🤩','😭','⚽','🦁','💚'],media:['📰','📺','🎙️','🗞️'],pundit:['🧐','👴','🎓','📊'],rival:['😤','🙄','🤡','😈']};
 const HN={fan:['ultras_สายเลือด','บอลคือชีวิต99','เด็กหลังโกล','แฟนพันธุ์แท้_{c3}','น้องมายด์ดูบอล','ลุงแดงข้างสนาม','KopThai_88','หัวใจ{c3}'],media:['ข่าวกีฬาทันใจ','FootballDaily_TH','สปอร์ตเพจ','ขอบสนามนิวส์','บอลเดลี่ช็อต'],pundit:['โค้ชเฒ่าเล่าบอล','อดีตทีมชาติ_เอก','TacticalNerd_TH','กูรูหน้าจอ'],rival:['แฟน_{o3}_ตัวจริง','เกลียด{c3}ทั้งชีวิต','ultras_{o3}','ขี้แพ้ชวนตี']};
 const FP={
- great:[['fan','แม่ถามว่าทำไมกรี๊ดตอนตีสอง... ก็ {n} ยิงอะ 😭'],['media','สื่อนอกเริ่มจับตา {n} ดาวรุ่งจากเอเชีย'],['pundit','การตัดสินใจในจังหวะสุดท้ายของ {n} เหนือชั้นกว่าทุกคนในสนาม'],['rival','ยอมรับก็ได้ว่าเก่ง... แต่ไม่ชอบอยู่ดี 😒'],['fan','{n} คือเทพเจ้า!!! 🙏🙏 เรตติ้ง {r} คืนนี้ ไม่มีใครหยุดได้'],['fan','ฉายาใหม่ "{nick}" มาแล้วว ใครเห็นด้วยกดหัวใจ ❤️'],['fan','ร้องไห้หนักมาก เด็กคนนี้เกิดมาเพื่อ {c} 😭💚'],['pundit','ผมดูบอลมา 30 ปี {n} เกมนี้คือระดับยุโรปจริง ๆ เคลื่อนที่ฉลาดมาก'],['media','🔥 {n} โชว์ฟอร์มสุดร้อนแรง เรตติ้ง {r} พา {c} ผงาด'],['rival','โชคช่วยล้วน ๆ เดี๋ยวนัดหน้าก็กลับมาเป็นตัวตลกเหมือนเดิม 🙄'],['fan','#{tag} ติดเทรนด์อันดับ 1 แล้วว ภูมิใจมากก'],['pundit','ถ้าทีมชาติไทยไม่เรียก {n} ผมจะไม่ดูบอลไทยอีก!'],['rival','ทำไมทีมเราไม่มีแบบ {n} บ้าง... เจ็บใจ 😤'],['fan','เอาเงินเดือนไปเพิ่มให้เขาเดี๋ยวนี้!! 💰💰']],
+ great:[['fan','แม่ถามว่าทำไมกรี๊ดตอนตีสอง... ก็ {n} ยิงอะ 😭'],['media','สื่อนอกเริ่มจับตา {n} ดาวรุ่งจาก{nat}'],['pundit','การตัดสินใจในจังหวะสุดท้ายของ {n} เหนือชั้นกว่าทุกคนในสนาม'],['rival','ยอมรับก็ได้ว่าเก่ง... แต่ไม่ชอบอยู่ดี 😒'],['fan','{n} คือเทพเจ้า!!! 🙏🙏 เรตติ้ง {r} คืนนี้ ไม่มีใครหยุดได้'],['fan','ฉายาใหม่ "{nick}" มาแล้วว ใครเห็นด้วยกดหัวใจ ❤️'],['fan','ร้องไห้หนักมาก เด็กคนนี้เกิดมาเพื่อ {c} 😭💚'],['pundit','ผมดูบอลมา 30 ปี {n} เกมนี้คือระดับยุโรปจริง ๆ เคลื่อนที่ฉลาดมาก'],['media','🔥 {n} โชว์ฟอร์มสุดร้อนแรง เรตติ้ง {r} พา {c} ผงาด'],['rival','โชคช่วยล้วน ๆ เดี๋ยวนัดหน้าก็กลับมาเป็นตัวตลกเหมือนเดิม 🙄'],['fan','#{tag} ติดเทรนด์อันดับ 1 แล้วว ภูมิใจมากก'],['pundit','ถ้าทีมชาติ{nat}ไม่เรียก {n} ผมจะไม่ดูบอล{nat}อีก!'],['fan','นักเตะ{nat}คนนี้ของจริง! {flag}🔥'],['media','{flag} สื่อ{nat}ตีข่าวใหญ่ ภูมิใจใน {n}'],['rival','ทำไมทีมเราไม่มีแบบ {n} บ้าง... เจ็บใจ 😤'],['fan','เอาเงินเดือนไปเพิ่มให้เขาเดี๋ยวนี้!! 💰💰']],
  goal:[['fan','ประตูนั้นของ {n} ผมดูซ้ำไป 40 รอบแล้ว 🥶'],['media','⚽ {n} ซัด {g} ประตู! แฟน {c} คลั่ง'],['fan','{g} ลูก!!! ใครบอกว่าเด็กคนนี้ไม่เก่ง ออกมาขอโทษด่วน'],['rival','ยิงได้เพราะกองหลังเราหลับ ไม่ได้เก่งอะไร']],
  ok:[['fan','ขยันวิ่งดีนะ แต่จบสกอร์ยังต้องฝึกอีกเยอะ'],['rival','ก็งั้น ๆ แหละ ไม่ได้น่ากลัวอะไร'],['fan','วันนี้ {n} ก็โอเคนะ แต่ยังรอให้ระเบิดฟอร์มกว่านี้'],['pundit','{n} เล่นตามระบบ ไม่มีอะไรหวือหวา เรตติ้ง {r} ถือว่าพอใช้'],['media','{c} {sc} {o} — {n} เรตติ้ง {r}'],['fan','เกมนี้สนุกดี แต่หวังว่า {n} จะยิงได้ในนัดหน้า 🙏']],
  bad:[['fan','ดูจบแล้วขอไปนอนร้องไห้ก่อน {c} เป็นอะไรไป 😩'],['media','ชาวเน็ตถล่ม! {n} หลังโชว์ฟอร์มเรตติ้ง {r}'],['rival','อยากให้ {n} ลงทุกนัดเลย ทีมเราชนะง่ายดี 😈'],['pundit','ถ้าเป็นผมคุมทีม {n} นั่งสำรองนัดหน้าแน่นอน'],['fan','{n} วันนี้เดินเล่นในสนามหรอ?? เรตติ้ง {r} 💀'],['fan','ขายทิ้งเถอะ เอาเงินไปซื้อคนอื่น 😮‍💨'],['fan','ฉายาใหม่ "{bnick}" เหมาะสมมาก'],['pundit','ยิงพลาดแบบนั้นในระดับอาชีพ รับไม่ได้ครับ {n} ต้องกลับไปซ้อมพื้นฐาน'],['media','📉 {n} ฟอร์มตกหนัก แฟน {c} เริ่มทนไม่ไหว'],['rival','ขอบคุณ {n} ที่ช่วยทีมเรามากกว่าทีมตัวเอง 🤡'],['fan','#{tag}Out กำลังขึ้นเทรนด์... เศร้าแต่จริง'],['fan','ใจเย็นกันก่อนนะทุกคน เขายังเด็ก ให้โอกาสอีกหน่อย 🥺'],['pundit','ปัญหาไม่ใช่ฝีเท้า แต่คือความมั่นใจ {n} ดูกดดันมาก']],
@@ -577,7 +588,7 @@ const FP={
 };
 const NICK=['เจ้าพายุ','ไอ้หนุ่มสายฟ้า','เมสซี่เมืองไทย','จอมถล่มประตู','เทพบุตรลูกหนัง','มังกรน้อย'],BNICK=['นักวิ่งมาราธอน','ผู้ใจบุญของคู่แข่ง','ลมเพลมพัด','กองหลังคู่แข่งเบอร์ 12'];
 function mkPost(cat,v){const [ty,t]=pick(FP[cat]);const o3=(v.o||'คู่แข่ง').split(' ').pop(),c3=(v.c||'ทีม').split(' ').pop();
- const fill=x=>x.replace(/\{(\w+)\}/g,(_,k)=>({n:S.p.name,c:v.c,o:v.o,r:v.r,g:v.g,sc:v.sc,nick:pick(NICK),bnick:pick(BNICK),tag:S.p.name.replace(/\s/g,''),o3,c3}[k]??''));
+ const fill=x=>x.replace(/\{(\w+)\}/g,(_,k)=>({n:S.p.name,c:v.c,o:v.o,r:v.r,g:v.g,sc:v.sc,nick:pick(NICK),bnick:pick(BNICK),tag:S.p.name.replace(/\s/g,''),o3,c3,nat:NN(),flag:NF()}[k]??''));
  const reach=Math.max(20,S.p.fans)*(.02+R()*.08)*(ty==='media'?2:1);return{ty,av:pick(AV[ty]),h:'@'+fill(pick(HN[ty])),t:fill(t),lk:Math.round(reach),rt:Math.round(reach*(.1+R()*.3)),cat,d:new Date(now()).toLocaleDateString('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short'})}}
 function pushPosts(cats,v){S.feed=S.feed||[];const ps=cats.map(c=>mkPost(c,v));if(chance(.35)){const i=rnd(0,ps.length-1);if(ps[i].ty!=='media')ps[i].rep=1}ps.reverse().forEach(p=>S.feed.unshift(p));S.feed=S.feed.slice(0,40)}
 function matchPosts(M,gf,ga,rating){const c=club().n,v={c,o:M.opp,r:rating,g:M.g,sc:`${gf}-${ga}`};const r=+rating,cats=[];
@@ -588,11 +599,44 @@ function matchPosts(M,gf,ga,rating){const c=club().n,v={c,o:M.opp,r:rating,g:M.g
 function scandalPosts(kind){const v={c:club()?club().n:'',o:'',r:'',g:0};pushPosts(Array.from({length:rnd(2,3)},()=>kind),v)}
 function postCard(p,i){return `<div class="post"><div class="row sp"><div class="row"><span class="pav">${p.av}</span><div><b>${p.h}</b><div class="mu" style="font-size:12px">${p.d}</div></div></div><span class="tag ${FT[p.ty][1]}">${FT[p.ty][0]}</span></div>
  <div style="margin:8px 0;font-size:15px;line-height:1.5">${p.t}</div><div class="row mu" style="font-size:13px;gap:16px"><span>❤️ ${fmt(p.lk)}</span><span>🔁 ${fmt(p.rt)}</span><span>💬 ${fmt(p.rt/3)}</span></div>
- ${p.rep?`<div class="row" style="margin-top:8px;gap:6px"><button class="btn s" style="flex:1;text-align:center;font-size:13px;padding:9px" data-rp="${i}:0">🙈 เมิน</button><button class="btn s" style="flex:1;text-align:center;font-size:13px;padding:9px" data-rp="${i}:1">🙏 ขอบคุณ</button><button class="btn s" style="flex:1;text-align:center;font-size:13px;padding:9px" data-rp="${i}:2">🔥 ตอกกลับ</button></div>`:p.my?`<div class="myrep">↪️ คุณตอบ: ${p.my}</div>`:''}</div>`}
+ ${p.rep?`<div class="row" style="margin-top:8px;gap:6px"><button class="btn s" style="flex:1;text-align:center;font-size:13px;padding:9px" data-rp="${i}:0">🙈 เมิน</button><button class="btn s" style="flex:1;text-align:center;font-size:13px;padding:9px" data-rp="${i}:1">🙏 ขอบคุณ</button><button class="btn s" style="flex:1;text-align:center;font-size:13px;padding:9px" data-rp="${i}:2">🔥 ตอกกลับ</button></div>`:p.my?`<div class="myrep row">${avatarSVG(S.p.av,32)}<span>↪️ <b>${S.p.name}</b>: ${p.my}</span></div>`:''}</div>`}
 function replyPost(i,k){const p=S.feed[i],neg=['bad','red','sub','scandal','coach','party'].includes(p.cat)||p.ty==='rival';CONS=[];p.rep=0;
  if(k===0){p.my='(ไม่ตอบ)';E('morale',neg?-1:0);N('คุณเลือกเงียบ')}
  if(k===1){p.my=neg?'ขอบคุณสำหรับคำติ จะพัฒนาให้ดีขึ้นครับ 🙏':'ขอบคุณทุกกำลังใจครับ 💚';E('fans',neg?0.02:0.03);E('media',neg?5:2);E('morale',neg?1:3)}
  if(k===2){p.my=neg?'คนที่ไม่เคยเตะบอลอาชีพ ไม่ต้องมาสอนผมครับ 😏':'รอดูนัดหน้า จะมันกว่านี้อีก 😎';if(neg){E('fans',chance(.5)?0.05:-0.04);E('media',-8);E('morale',2);N('แคปไปลงเพจดังทั่วประเทศ');if(chance(.3))E('trust',-3)}else{E('fans',0.04);E('morale',3)}}
  save();sheet(`<span class="tag g">ผลที่ตามมา</span><ul class="cons">${CONS.map(c=>`<li>${c}</li>`).join('')}</ul><button class="btn" onclick="closeM();render()">ตกลง</button>`)}
+// ===== NATIONALITY & AVATAR =====
+const NATS={THA:['🇹🇭','ไทย',66],ENG:['🏴','อังกฤษ',80],ESP:['🇪🇸','สเปน',81],BRA:['🇧🇷','บราซิล',82],ARG:['🇦🇷','อาร์เจนตินา',82],FRA:['🇫🇷','ฝรั่งเศส',82],GER:['🇩🇪','เยอรมนี',80],ITA:['🇮🇹','อิตาลี',79],POR:['🇵🇹','โปรตุเกส',80],NED:['🇳🇱','เนเธอร์แลนด์',79],BEL:['🇧🇪','เบลเยียม',78],JPN:['🇯🇵','ญี่ปุ่น',72],KOR:['🇰🇷','เกาหลีใต้',71],KSA:['🇸🇦','ซาอุดีอาระเบีย',68],NGA:['🇳🇬','ไนจีเรีย',72],SEN:['🇸🇳','เซเนกัล',74],USA:['🇺🇸','สหรัฐอเมริกา',72],MEX:['🇲🇽','เม็กซิโก',73],AUS:['🇦🇺','ออสเตรเลีย',70],VIE:['🇻🇳','เวียดนาม',63],IDN:['🇮🇩','อินโดนีเซีย',62],MAS:['🇲🇾','มาเลเซีย',61]};
+const NAT=()=>NATS[(S&&S.p.nat)||'THA'],NF=()=>NAT()[0],NN=()=>NAT()[1];
+const foreign=()=>S.club&&S.club.c!==S.p.nat;
+const SKIN=['#f6d3b3','#e9b98f','#c98d60','#a06a43','#74492b','#4b2e1b'],HC=['#1a1a1a','#4a2c17','#8b5a2b','#d9a441','#e8e0d0','#b8322a','#2a5bd7'];
+const AVO={s:['สีผิว',SKIN.map((_,i)=>'โทน '+(i+1))],h:['ทรงผม',['สั้น','เกรียน','แอฟโฟร','ยาว','โมฮอว์ก','หนามแหลม','มวยผม','หัวล้าน']],hc:['สีผม',['ดำ','น้ำตาลเข้ม','น้ำตาล','บลอนด์','เทา/ขาว','แดง','น้ำเงิน']],f:['รูปหน้า',['กลม','รี','เหลี่ยม']],e:['ดวงตา',['ปกติ','ยิ้ม','ดุ','ง่วง']],b:['หนวดเครา',['ไม่มี','เครางาม','หนวด','เคราแพะ','ไรหนวด']],a:['เครื่องประดับ',['ไม่มี','ผ้าคาดผม','ต่างหู','ผ้าคาด+ต่างหู']]};
+const DAV={s:2,h:0,hc:0,f:0,e:0,b:0,a:0};
+function kitCol(){return S&&S.club&&club()?`hsl(${hue(club().n)},70%,45%)`:'#3a4a40'}
+function avatarSVG(av,size=64,kit){av=Object.assign({},DAV,av||{});const sk=SKIN[av.s],hc=HC[av.hc];kit=kit||kitCol();let o='';
+ if(av.h===2)o+=`<circle cx="50" cy="34" r="29" fill="${hc}"/>`;if(av.h===3)o+=`<path d="M24 38 Q20 76 34 80 L66 80 Q80 76 76 38 Z" fill="${hc}"/>`;if(av.h===6)o+=`<circle cx="50" cy="11" r="8" fill="${hc}"/>`;
+ o+=`<path d="M8 102 Q10 76 36 71 L64 71 Q90 76 92 102 Z" fill="${kit}"/><path d="M40 71 L50 83 L60 71 Z" fill="#fff" opacity=".85"/><rect x="44" y="56" width="12" height="16" fill="${sk}"/><rect x="44" y="64" width="12" height="4" fill="#0002"/>`;
+ o+=`<circle cx="28" cy="45" r="5" fill="${sk}"/><circle cx="72" cy="45" r="5" fill="${sk}"/>`;
+ o+=av.f===2?`<rect x="28" y="17" width="44" height="50" rx="13" fill="${sk}"/>`:`<ellipse cx="50" cy="42" rx="${av.f===1?20:22}" ry="${av.f===1?27:25}" fill="${sk}"/>`;
+ const bp="M28 44 Q30 70 50 71 Q70 70 72 44 Q66 61 50 61 Q34 61 28 44Z";
+ if(av.b===1)o+=`<path d="${bp}" fill="${hc}"/>`;if(av.b===4)o+=`<path d="${bp}" fill="${hc}" opacity=".28"/>`;if(av.b===3)o+=`<ellipse cx="50" cy="65" rx="6" ry="5" fill="${hc}"/>`;
+ o+=`<path d="M44 57 Q50 ${av.e===2?58:62} 56 57" stroke="#6a2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;if(av.b===2)o+=`<path d="M41 55 Q50 50 59 55 Q50 57 41 55Z" fill="${hc}"/>`;
+ o+=`<path d="M50 45 L47.5 52 L52 52" stroke="#0004" stroke-width="1.6" fill="none"/>`;
+ if(av.e===0||av.e===2)o+=`<circle cx="41" cy="44" r="2.8" fill="#111"/><circle cx="59" cy="44" r="2.8" fill="#111"/><circle cx="42" cy="43" r=".9" fill="#fff"/><circle cx="60" cy="43" r=".9" fill="#fff"/>`;
+ if(av.e===1)o+=`<path d="M37.5 45 Q41 40.5 44.5 45 M55.5 45 Q59 40.5 62.5 45" stroke="#111" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+ if(av.e===3)o+=`<path d="M37.5 44 L44.5 44 M55.5 44 L62.5 44" stroke="#111" stroke-width="2.4" stroke-linecap="round"/>`;
+ const bc=av.h===7?'#3a2a1a':hc;o+=av.e===2?`<path d="M36 36 L45 39 M64 36 L55 39" stroke="${bc}" stroke-width="2.8" stroke-linecap="round"/>`:`<path d="M36.5 37.5 Q41 35 45.5 37.5 M54.5 37.5 Q59 35 63.5 37.5" stroke="${bc}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+ const cap=`M27 36 Q29 13 50 13 Q71 13 73 36 Q67 23 50 23 Q33 23 27 36Z`;
+ if([0,3,6].includes(av.h))o+=`<path d="${cap}" fill="${hc}"/>`;if(av.h===1)o+=`<path d="${cap}" fill="${hc}" opacity=".55"/>`;
+ if(av.h===2)o+=`<path d="M25 36 Q28 10 50 10 Q72 10 75 36 Q62 22 50 24 Q38 22 25 36Z" fill="${hc}"/>`;
+ if(av.h===4)o+=`<path d="${cap}" fill="${hc}" opacity=".35"/><path d="M44 25 L45 4 L55 4 L56 25 Z" fill="${hc}"/>`;
+ if(av.h===5)o+=`<polygon points="27,36 29,15 35,23 39,8 45,21 50,5 55,21 61,8 65,23 71,15 73,36 62,24 38,24" fill="${hc}"/>`;
+ if(av.a===1||av.a===3)o+=`<rect x="27" y="27" width="46" height="6" rx="2" fill="#fff"/><rect x="27" y="29" width="46" height="2" fill="${kit}"/>`;
+ if(av.a===2||av.a===3)o+=`<circle cx="72" cy="51" r="2.2" fill="#ffd21f"/>`;
+ return `<svg class="avs" viewBox="0 0 100 100" width="${size}" height="${size}">${o}</svg>`}
+function avEditor(av){return `<div class="row" style="justify-content:center">${avatarSVG(av,120)}</div>${Object.entries(AVO).map(([k,[l,opts]])=>`<div class="row sp aer"><span class="mu">${l}</span><div class="row"><button class="ab" data-ae="${k}:-1">◀</button><b style="min-width:96px;text-align:center">${opts[av[k]]}</b><button class="ab" data-ae="${k}:1">▶</button></div></div>`).join('')}<button class="btn s" style="text-align:center" data-ae="rand:0">🎲 สุ่ม</button>`}
+function bindAe(av,redraw){document.querySelectorAll('[data-ae]').forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.ae.split(':');if(k==='rand')for(const q in AVO)av[q]=rnd(0,AVO[q][1].length-1);else{const n=AVO[k][1].length;av[k]=(av[k]+(+d)+n)%n}redraw()})}
+function editAvatar(){const av=Object.assign({},DAV,S.p.av);const d=()=>{sheet(`<span class="tag o">แก้ไขอวตาร</span>${avEditor(av)}<button class="btn" id="avs">💾 บันทึก</button>`);bindAe(av,d);$('#avs').onclick=()=>{S.p.av=av;save();closeM();render()}};d()}
+function AVI(){const p=S.p;if(!p.nat)p.nat='THA';if(!p.av)p.av=Object.assign({},DAV)}
 window.closeM=closeM;window.render=render;
 load();if(S&&!S.ko)S=null;if(S&&!S.gameT){S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}render();
