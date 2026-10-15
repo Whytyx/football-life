@@ -610,30 +610,67 @@ const NATS={THA:['🇹🇭','ไทย',66],ENG:['🏴','อังกฤษ',80]
 const LF=()=>S&&S.club?LEAGUES[S.club.c].f:'';const NAT=()=>NATS[(S&&S.p.nat)||'THA'],NF=()=>NAT()[0],NN=()=>NAT()[1];
 const foreign=()=>S.club&&S.club.c!==S.p.nat;
 const SKIN=['#f6d3b3','#e9b98f','#c98d60','#a06a43','#74492b','#4b2e1b'],HC=['#1a1a1a','#4a2c17','#8b5a2b','#d9a441','#e8e0d0','#b8322a','#2a5bd7'];
-const AVO={s:['สีผิว',SKIN.map((_,i)=>'โทน '+(i+1))],h:['ทรงผม',['สั้น','เกรียน','แอฟโฟร','ยาว','โมฮอว์ก','หนามแหลม','มวยผม','หัวล้าน']],hc:['สีผม',['ดำ','น้ำตาลเข้ม','น้ำตาล','บลอนด์','เทา/ขาว','แดง','น้ำเงิน']],f:['รูปหน้า',['กลม','รี','เหลี่ยม']],e:['ดวงตา',['ปกติ','ยิ้ม','ดุ','ง่วง']],b:['หนวดเครา',['ไม่มี','เครางาม','หนวด','เคราแพะ','ไรหนวด']],a:['เครื่องประดับ',['ไม่มี','ผ้าคาดผม','ต่างหู','ผ้าคาด+ต่างหู']]};
-const DAV={s:2,h:0,hc:0,f:0,e:0,b:0,a:0};
+const AVO={s:['สีผิว',SKIN.map((_,i)=>'โทน '+(i+1))],h:['ทรงผม',['สั้นปัดข้าง','เฟด','แอฟโฟร','ยาวประบ่า','โมฮอว์ก','หนามแหลม','แมนบัน','หัวโล้น','อันเดอร์คัท','สลิคแบ็ค','เท็กซ์เจอร์ครอป','เคิร์ลลี่ท็อป']],hc:['สีผม',['ดำ','น้ำตาลเข้ม','น้ำตาล','บลอนด์','เทา/ขาว','แดง','น้ำเงิน']],f:['รูปหน้า',['กลม','รี','เหลี่ยม']],e:['ดวงตา',['คม','ยิ้มตา','ดุดัน','เหยี่ยว']],b:['หนวดเครา',['ไม่มี','เครางาม','หนวด','เคราแพะ','ไรหนวด']],a:['เครื่องประดับ',['ไม่มี','ผ้าคาดผม','ต่างหู','ผ้าคาด+ต่างหู']]};
+const DAV={s:2,h:8,hc:0,f:0,e:0,b:0,a:0};
 function kitCol(){return S&&S.club&&club()?`hsl(${hue(club().n)},70%,45%)`:'#3a4a40'}
-function avatarSVG(av,size=64,kit){av=Object.assign({},DAV,av||{});const sk=SKIN[av.s],hc=HC[av.hc];kit=kit||kitCol();let o='';
- if(av.h===2)o+=`<circle cx="50" cy="34" r="29" fill="${hc}"/>`;if(av.h===3)o+=`<path d="M24 38 Q20 76 34 80 L66 80 Q80 76 76 38 Z" fill="${hc}"/>`;if(av.h===6)o+=`<circle cx="50" cy="11" r="8" fill="${hc}"/>`;
- o+=`<path d="M8 102 Q10 76 36 71 L64 71 Q90 76 92 102 Z" fill="${kit}"/><path d="M40 71 L50 83 L60 71 Z" fill="#fff" opacity=".85"/><rect x="44" y="56" width="12" height="16" fill="${sk}"/><rect x="44" y="64" width="12" height="4" fill="#0002"/>`;
- o+=`<circle cx="28" cy="45" r="5" fill="${sk}"/><circle cx="72" cy="45" r="5" fill="${sk}"/>`;
- o+=av.f===2?`<rect x="28" y="17" width="44" height="50" rx="13" fill="${sk}"/>`:`<ellipse cx="50" cy="42" rx="${av.f===1?20:22}" ry="${av.f===1?27:25}" fill="${sk}"/>`;
- const bp="M28 44 Q30 70 50 71 Q70 70 72 44 Q66 61 50 61 Q34 61 28 44Z";
- if(av.b===1)o+=`<path d="${bp}" fill="${hc}"/>`;if(av.b===4)o+=`<path d="${bp}" fill="${hc}" opacity=".28"/>`;if(av.b===3)o+=`<ellipse cx="50" cy="65" rx="6" ry="5" fill="${hc}"/>`;
- o+=`<path d="M44 57 Q50 ${av.e===2?58:62} 56 57" stroke="#6a2a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;if(av.b===2)o+=`<path d="M41 55 Q50 50 59 55 Q50 57 41 55Z" fill="${hc}"/>`;
- o+=`<path d="M50 45 L47.5 52 L52 52" stroke="#0004" stroke-width="1.6" fill="none"/>`;
- if(av.e===0||av.e===2)o+=`<circle cx="41" cy="44" r="2.8" fill="#111"/><circle cx="59" cy="44" r="2.8" fill="#111"/><circle cx="42" cy="43" r=".9" fill="#fff"/><circle cx="60" cy="43" r=".9" fill="#fff"/>`;
- if(av.e===1)o+=`<path d="M37.5 45 Q41 40.5 44.5 45 M55.5 45 Q59 40.5 62.5 45" stroke="#111" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
- if(av.e===3)o+=`<path d="M37.5 44 L44.5 44 M55.5 44 L62.5 44" stroke="#111" stroke-width="2.4" stroke-linecap="round"/>`;
- const bc=av.h===7?'#3a2a1a':hc;o+=av.e===2?`<path d="M36 36 L45 39 M64 36 L55 39" stroke="${bc}" stroke-width="2.8" stroke-linecap="round"/>`:`<path d="M36.5 37.5 Q41 35 45.5 37.5 M54.5 37.5 Q59 35 63.5 37.5" stroke="${bc}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
- const cap=`M27 36 Q29 13 50 13 Q71 13 73 36 Q67 23 50 23 Q33 23 27 36Z`;
- if([0,3,6].includes(av.h))o+=`<path d="${cap}" fill="${hc}"/>`;if(av.h===1)o+=`<path d="${cap}" fill="${hc}" opacity=".55"/>`;
- if(av.h===2)o+=`<path d="M25 36 Q28 10 50 10 Q72 10 75 36 Q62 22 50 24 Q38 22 25 36Z" fill="${hc}"/>`;
- if(av.h===4)o+=`<path d="${cap}" fill="${hc}" opacity=".35"/><path d="M44 25 L45 4 L55 4 L56 25 Z" fill="${hc}"/>`;
- if(av.h===5)o+=`<polygon points="27,36 29,15 35,23 39,8 45,21 50,5 55,21 61,8 65,23 71,15 73,36 62,24 38,24" fill="${hc}"/>`;
- if(av.a===1||av.a===3)o+=`<rect x="27" y="27" width="46" height="6" rx="2" fill="#fff"/><rect x="27" y="29" width="46" height="2" fill="${kit}"/>`;
- if(av.a===2||av.a===3)o+=`<circle cx="72" cy="51" r="2.2" fill="#ffd21f"/>`;
- return `<svg class="avs" viewBox="0 0 100 100" width="${size}" height="${size}">${o}</svg>`}
+let AVN=0;
+function shade(hex,a){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=v=>Math.max(0,Math.min(255,Math.round(a<0?v*(1+a):v+(255-v)*a)));return '#'+((1<<24)+(f(r)<<16)+(f(g)<<8)+f(b)).toString(16).slice(1)}
+function avatarSVG(av,size=64,kit){av=Object.assign({},DAV,av||{});const id='a'+(AVN++),sk=SKIN[av.s],hc=HC[av.hc];kit=kit||kitCol();
+ const skD=shade(sk,-.22),skL=shade(sk,.18),hcL=shade(hc,.28),hcD=shade(hc,-.35),h=av.h;
+ const jaw=[ 'M31 38 Q31 60 40 68 Q50 75 60 68 Q69 60 69 38 Q69 17 50 17 Q31 17 31 38Z',
+  'M33 38 Q32 60 42 69 Q50 75 58 69 Q68 60 67 38 Q67 16 50 16 Q33 16 33 38Z',
+  'M30 37 Q29 58 38 67 Q44 72 50 72 Q56 72 62 67 Q71 58 70 37 Q70 17 50 17 Q30 17 30 37Z'][av.f];
+ let o=`<defs><radialGradient id="${id}s" cx="45%" cy="38%" r="65%"><stop offset="0" stop-color="${skL}"/><stop offset=".65" stop-color="${sk}"/><stop offset="1" stop-color="${skD}"/></radialGradient>
+ <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hcL}"/><stop offset="1" stop-color="${hcD}"/></linearGradient>
+ <linearGradient id="${id}k" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${kit}"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+ <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+ <radialGradient id="${id}bg" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#2d4a3a"/><stop offset="1" stop-color="#0d1611"/></radialGradient></defs><rect width="110" height="110" fill="url(#${id}bg)"/>`;
+ const H=`url(#${id}h)`;
+ // back hair
+ if(h===2)o+=`<path d="M22 40 Q16 10 50 8 Q84 10 78 40 Q80 54 72 50 L28 50 Q20 54 22 40Z" fill="${H}"/>`;
+ if(h===3)o+=`<path d="M27 34 Q22 72 30 80 L38 74 L62 74 L70 80 Q78 72 73 34Z" fill="${hcD}"/>`;
+ if(h===6)o+=`<ellipse cx="50" cy="9" rx="8" ry="6.5" fill="${H}"/><rect x="45" y="13" width="10" height="3" rx="1.5" fill="${hcD}"/>`;
+ // body
+ o+=`<path d="M2 102 Q4 80 24 75 Q36 72 41 68 L59 68 Q64 72 76 75 Q96 80 98 102Z" fill="url(#${id}k)"/><path d="M2 102 Q4 80 24 75 Q36 72 41 68 L59 68 Q64 72 76 75 Q96 80 98 102Z" fill="url(#${id}g)"/>
+ <path d="M18 80 Q30 76 38 74" stroke="#fff" stroke-opacity=".18" stroke-width="2" fill="none"/>`;
+ o+=`<path d="M40 60 L40 72 Q50 79 60 72 L60 60Z" fill="${sk}"/><path d="M40 63 Q50 70 60 63 L60 67 Q50 74 40 67Z" fill="${skD}" opacity=".7"/><path d="M45 66 Q50 71 55 66" stroke="${skD}" stroke-width="1" fill="none"/>`;
+ o+=`<path d="M38 69 L50 84 L62 69 L58 67 L50 77 L42 67Z" fill="#fff" opacity=".92"/><path d="M38 69 L50 84 L62 69" stroke="${shade('#888888',-.3)}" stroke-width=".6" fill="none"/><path d="M33 72 L41 68 L44 75Z M67 72 L59 68 L56 75Z" fill="${kit}" stroke="#fff" stroke-width="1.2" stroke-opacity=".8"/>`;
+ // ears & head
+ o+=`<path d="M31 40 Q25 38 26 46 Q27 52 32 52Z" fill="${sk}"/><path d="M69 40 Q75 38 74 46 Q73 52 68 52Z" fill="${sk}"/><path d="M29 43 Q28 47 31 49 M71 43 Q72 47 69 49" stroke="${skD}" stroke-width="1" fill="none"/>`;
+ o+=`<path d="${jaw}" fill="url(#${id}s)"/><path d="M62 24 Q70 34 68 50 Q66 62 58 69 Q65 58 64 44 Q63 32 62 24Z" fill="${skD}" opacity=".35"/>`;
+ // facial hair
+ const bp=av.f===1?'M33 46 Q34 64 42 70 Q50 76 58 70 Q66 64 67 46 Q66 58 58 62 Q50 60 42 62 Q34 58 33 46Z':'M31 45 Q32 62 40 69 Q50 76 60 69 Q68 62 69 45 Q67 57 59 61 Q50 59 41 61 Q33 57 31 45Z';
+ if(av.b===1)o+=`<path d="${bp}" fill="${H}"/>`;if(av.b===4)o+=`<path d="${bp}" fill="${hcD}" opacity=".3"/>`;
+ if(av.b===3)o+=`<path d="M45 63 Q50 61 55 63 L54 71 Q50 74 46 71Z" fill="${H}"/>`;
+ // mouth
+ o+=`<path d="M43.5 59 Q47 57.4 50 58.3 Q53 57.4 56.5 59 Q50 60.2 43.5 59Z" fill="${shade(sk,-.42)}"/><path d="M44.5 59.4 Q50 63.2 55.5 59.4 Q50 60.6 44.5 59.4Z" fill="${shade(sk,-.18)}"/><path d="M47 61.6 Q50 62.4 53 61.6" stroke="${skL}" stroke-width=".7" fill="none" opacity=".8"/>`;
+ if(av.b===2||av.b===1)o+=`<path d="M42 57.5 Q46 54.5 50 55.8 Q54 54.5 58 57.5 Q54 56.8 50 57.4 Q46 56.8 42 57.5Z" fill="${hcD}"/>`;
+ // nose
+ o+=`<path d="M49 41 Q48 48 46.5 51.5 Q48 53.4 50 52.6 Q52 53.4 53.5 51.5" stroke="${skD}" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M50.5 42 L51.5 50" stroke="${skL}" stroke-width="1" opacity=".7"/>`;
+ // eyes
+ const ey=av.e===3?42.6:42,eh=av.e===3?2.1:av.e===1?2.4:3;
+ for(const x of [41,59]){o+=`<path d="M${x-5} ${ey} Q${x} ${ey-eh-.5} ${x+5} ${ey} Q${x} ${ey+eh-.6} ${x-5} ${ey}Z" fill="#f4f1ea"/><circle cx="${x+.3}" cy="${ey}" r="${Math.min(2.4,eh-.4)}" fill="#3b2a1d"/><circle cx="${x+.3}" cy="${ey}" r="1.1" fill="#0b0b0b"/><circle cx="${x+1}" cy="${ey-.8}" r=".6" fill="#fff"/><path d="M${x-5.4} ${ey} Q${x} ${ey-eh-1.1} ${x+5.4} ${ey}" stroke="#1a120c" stroke-width="1.2" fill="none"/>`}
+ o+=`<path d="M35 46 Q41 48 46 46 M54 46 Q59 48 65 46" stroke="${skD}" stroke-width=".7" fill="none" opacity=".6"/>`;
+ // brows
+ const bc=h===7?shade(sk,-.55):hcD,ang=av.e===2?2.6:0;
+ o+=`<path d="M34.5 ${37.5+ang*.2} L46 ${35.8+ang} L46.2 ${37.4+ang} L35 ${39+ang*.2}Z" fill="${bc}"/><path d="M65.5 ${37.5+ang*.2} L54 ${35.8+ang} L53.8 ${37.4+ang} L65 ${39+ang*.2}Z" fill="${bc}"/>`;
+ // front hair
+ const top='M30 36 Q29 15 50 14 Q71 15 70 36 Q68 26 60 24 Q50 22 40 24 Q32 26 30 36Z';
+ if(h===0)o+=`<path d="M30 36 Q28 14 50 13 Q72 14 70 36 Q66 24 56 25 L52 21 L48 25 Q36 24 30 36Z" fill="${H}"/>`;
+ if(h===1)o+=`<path d="${top}" fill="${H}"/><path d="M30 36 Q29 30 31 26 L33 34Z M70 36 Q71 30 69 26 L67 34Z" fill="${sk}" opacity=".55"/>`;
+ if(h===2)o+=`<path d="M27 38 Q24 12 50 11 Q76 12 73 38 Q66 22 50 23 Q34 22 27 38Z" fill="${H}"/>${[34,42,50,58,66].map(x=>`<circle cx="${x}" cy="${16+Math.abs(x-50)/4}" r="4" fill="${hcL}" opacity=".35"/>`).join('')}`;
+ if(h===3)o+=`<path d="M29 40 Q27 13 50 12 Q73 13 71 40 Q69 24 50 22 Q38 22 33 30 Q30 34 29 40Z" fill="${H}"/>`;
+ if(h===4)o+=`<path d="${top}" fill="${hcD}" opacity=".3"/><path d="M43 26 Q44 6 50 4 Q56 6 57 26Z" fill="${H}"/>`;
+ if(h===5)o+=`<path d="M30 36 L31 18 L36 23 L38 10 L44 20 L48 6 L53 19 L58 8 L61 21 L67 14 L70 36 Q66 25 50 24 Q34 25 30 36Z" fill="${H}"/>`;
+ if(h===6)o+=`<path d="M30 36 Q29 15 50 14 Q71 15 70 36 Q66 24 50 21 Q34 24 30 36Z" fill="${H}"/><path d="M40 16 Q50 13 60 16" stroke="${hcL}" stroke-width="1" fill="none" opacity=".6"/>`;
+ if(h===8)o+=`<path d="${top}" fill="${hcD}" opacity=".28"/><path d="M33 26 Q36 10 52 9 Q70 10 70 24 Q60 18 48 21 Q38 22 33 26Z" fill="${H}"/>`;
+ if(h===9)o+=`<path d="M30 34 Q29 13 50 12 Q71 13 70 34 Q67 24 60 22 Q50 20 40 22 Q33 24 30 34Z" fill="${H}"/>${[40,47,54,61].map(x=>`<path d="M${x-4} 21 Q${x} 14 ${x+5} 13" stroke="${hcL}" stroke-width=".9" fill="none" opacity=".55"/>`).join('')}`;
+ if(h===10)o+=`<path d="M30 35 Q29 15 50 14 Q71 15 70 35 Q67 26 62 25 L58 22 L53 26 L48 22 L43 26 L38 23 Q32 27 30 35Z" fill="${H}"/>`;
+ if(h===11)o+=`<path d="${top}" fill="${hcD}" opacity=".3"/>${[[36,20],[42,15],[49,13],[56,14],[63,18],[39,25],[46,20],[53,19],[60,23]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.6" fill="${H}"/><circle cx="${x-1}" cy="${y-1.3}" r="1.6" fill="${hcL}" opacity=".5"/>`).join('')}`;
+ // accessories
+ if(av.a===1||av.a===3)o+=`<path d="M30 30 Q50 24 70 30 L70 34 Q50 28 30 34Z" fill="#f2f2f2"/><path d="M30 32 Q50 26 70 32" stroke="${kit}" stroke-width="1.2" fill="none"/>`;
+ if(av.a===2||av.a===3)o+=`<circle cx="27.5" cy="51" r="1.7" fill="#ffd21f" stroke="#fff6" stroke-width=".4"/>`;
+ return `<svg class="avs" viewBox="12 5 76 76" width="${size}" height="${size}">${o}</svg>`}
 function avEditor(av){return `<div class="row" style="justify-content:center">${avatarSVG(av,120)}</div>${Object.entries(AVO).map(([k,[l,opts]])=>`<div class="row sp aer"><span class="mu">${l}</span><div class="row"><button class="ab" data-ae="${k}:-1">◀</button><b style="min-width:96px;text-align:center">${opts[av[k]]}</b><button class="ab" data-ae="${k}:1">▶</button></div></div>`).join('')}<button class="btn s" style="text-align:center" data-ae="rand:0">🎲 สุ่ม</button>`}
 function bindAe(av,redraw){document.querySelectorAll('[data-ae]').forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.ae.split(':');if(k==='rand')for(const q in AVO)av[q]=rnd(0,AVO[q][1].length-1);else{const n=AVO[k][1].length;av[k]=(av[k]+(+d)+n)%n}redraw()})}
 function editAvatar(){const av=Object.assign({},DAV,S.p.av);const d=()=>{sheet(`<span class="tag o">แก้ไขอวตาร</span>${avEditor(av)}<button class="btn" id="avs">💾 บันทึก</button>`);bindAe(av,d);$('#avs').onclick=()=>{S.p.av=av;save();closeM();render()}};d()}

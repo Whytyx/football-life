@@ -55,5 +55,5 @@ tr.me{background:#2a1c0f;color:var(--or);font-weight:600}
 .post{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
 .pav{width:40px;height:40px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-size:22px;flex:none}
 .myrep{margin-top:8px;padding:8px 10px;border-left:3px solid var(--or);background:var(--card2);border-radius:8px;font-size:14px}
-.avs{border-radius:50%;background:radial-gradient(circle at 50% 35%,#2a4535,#14201a);flex:none;border:2px solid var(--line)}
+.avs{border-radius:50%;flex:none;border:2px solid var(--line)}
 .aer{padding:5px 0;border-bottom:1px solid var(--line)}.ab{background:var(--card);border:1px solid var(--line);color:var(--or);border-radius:9px;width:34px;height:30px;font-size:13px;cursor:pointer}
