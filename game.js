@@ -466,7 +466,7 @@ function pitch(M,focus){const W2=300,H2=190;let s=`<svg viewBox="0 0 ${W2} ${H2}
  s+=`<circle cx="${bx}" cy="${by}" r="7.5" fill="#ff7a1a" stroke="#fff" stroke-width="2"/><text x="${bx}" y="${by-11}" fill="#fff" font-size="10" text-anchor="middle" font-family="Kanit">คุณ</text><circle cx="${bx+9}" cy="${by+5}" r="3" fill="#ffd21f"/></svg>`;return s}
 // ===== EVENT UI =====
 const ATS={pac:'ความเร็ว',sho:'ยิง',pas:'ผ่าน',dri:'เลี้ยง',def:'รับ',phy:'ร่างกาย'};
-const pct=o=>cl(Math.round((o.b+S.p.a[o.at]*o.k)*.85-(S.p.stamina<40?8:0)+(S.p.morale-60)/8),5,95);
+const pct=o=>cl(Math.round((o.b+S.p.a[o.at]*o.k)*.85+tacFit(o.at)-(S.p.stamina<40?8:0)+(S.p.morale-60)/8),5,95);
 function showEvent(ev,M,cb){const tagged=ev.m?`<span class="tag">${ev.fm?'⚽ จังหวะสำคัญ':ev.ht?'🚿 ห้องแต่งตัว':'⚠️ ดราม่าในสนาม'}</span> ${M?`<span class="mu">${clock(M)} · ${M.gf}-${M.ga}</span>`:''}`:`<span class="tag o">นอกสนาม · ${new Date(now()).toLocaleDateString('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short'})}</span>`;
  const TG={goal:['ยิงประตูได้','g'],assist:['แอสซิสต์ได้','o'],stop:['สกัดบอล',''],foul:['ฟาวล์',''],null:['เล่นปลอดภัย','']};
  const opts=ev.fm?ev.o.map((o,i)=>{const P=pct(o);return `<button class="opt" data-o="${i}"><div class="row sp"><b>${o.l}</b><span class="tag ${TG[o.g][1]}">${TG[o.g][0]}</span></div><div class="row" style="margin:8px 0 4px">${bar(P,P<35?'r':P<60?'o':'')}<b style="width:44px;text-align:right">${P}%</b></div><div class="mu">ใช้: ${ATS[o.at]} ${S.p.a[o.at]} · เรตติ้ง <span class="gr">+${o.rs.toFixed(1)}</span> / <span class="re">${o.rf.toFixed(1)}</span></div></button>`}).join('')
@@ -500,18 +500,18 @@ function playMatch(){const nx=nextFix(),p=S.p;if(!nx||dkey(now())<dkey(S.ko[S.we
  else if(p.tt<4){const sc=cl([.15,.3,.55,.88][p.tt]+(p.trust-50)/250+(fr?(fr-6.5)*.08:0),.05,.97);if(!chance(sc)){if(chance([.35,.2,.08,.02][p.tt])){st='out';reason=`คุณเป็น${RN} โค้ชเลือกคนอื่นติดทีม`}else{st='bench';subIn=rnd(55,80);unused=chance([.35,.25,.15,.05][p.tt]);reason=`คุณเป็น${RN} ยังไม่ได้ใจโค้ชพอจะเป็นตัวจริง`}}else reason=`ฟอร์ม/ความไว้ใจดีพอ โค้ชให้โอกาสตัวจริง!`}
  else reason='คุณคือตัวหลัก/กัปตันของทีม';
  p.benched=0;const PR=p.promise;if(PR&&PR.left>0&&st!=='start'&&!p.ban&&!p.inj){if(chance(.8)){st='start';subIn=0;unused=0;reason='โค้ชรักษาสัญญาที่ให้ไว้ — คุณได้เป็นตัวจริง'}else{PR.broken=1;reason+=' · ⚠️ โค้ชผิดสัญญาที่ให้ไว้!'}}if(PR&&PR.left>0)PR.left--,PR.cur=st;return prematch(nx,base,{st,subIn,unused,reason,why})}
-function prematch(nx,base,o){const c=club(),p=S.p;const T={start:['✅ ตัวจริง','g','คุณลงสนามตั้งแต่นาทีแรก'],bench:['🪑 ม้านั่งสำรอง','o','อาจได้ถูกส่งลงในครึ่งหลัง'],out:['❌ ไม่ติดทีม','r','นัดนี้คุณไม่ได้อยู่ใน 18 คน']}[o.st];
- sheet(`<span class="tag o">ก่อนเกม · ${LF()} ${nx.home?c.n:nx.opp.n} vs ${nx.home?nx.opp.n:c.n}</span><h2 style="margin:12px 0 4px" class="${T[1]==='g'?'gr':T[1]==='r'?'re':'or'}">${T[0]}</h2><p>${T[2]}</p><div class="card" style="margin:8px 0"><b>เหตุผล:</b> ${o.reason}<ul class="cons">${o.why.map(w=>`<li>${w}</li>`).join('')}</ul></div>
+function prematch(nx,base,o){const c=club(),p=S.p;base.tac=pickTac(nx);const T={start:['✅ ตัวจริง','g','คุณลงสนามตั้งแต่นาทีแรก'],bench:['🪑 ม้านั่งสำรอง','o','อาจได้ถูกส่งลงในครึ่งหลัง'],out:['❌ ไม่ติดทีม','r','นัดนี้คุณไม่ได้อยู่ใน 18 คน']}[o.st];
+ sheet(`<span class="tag o">ก่อนเกม · ${LF()} ${nx.home?c.n:nx.opp.n} vs ${nx.home?nx.opp.n:c.n}</span><h2 style="margin:12px 0 4px" class="${T[1]==='g'?'gr':T[1]==='r'?'re':'or'}">${T[0]}</h2><p>${T[2]}</p>${tacCard(base.tac)}<div class="card" style="margin:8px 0"><b>เหตุผล:</b> ${o.reason}<ul class="cons">${o.why.map(w=>`<li>${w}</li>`).join('')}</ul></div>
  <details class="card" style="margin:8px 0"><summary>ℹ️ บทบาทหมายถึงอะไร?</summary><p class="mu"><b>ตัวจริง</b> = ตัวหลัก ลงสนามเกือบทุกนัด<br><b>สำรอง</b> = ตัวเสริม มักได้ลงท้ายเกม บางนัดได้เป็นตัวจริง<br><b>ดาวรุ่ง</b> = เยาวชน ไม่ค่อยได้ลงเป็นตัวจริง ต้องสะสมนาทีจากการซ้อม (ซ้อมแท็กติกเพิ่มความไว้ใจ) และฟอร์มดี ๆ ตอนได้ลง<br>เรตติ้งเฉลี่ย ≥7 ติดกัน 3 นัด + ความไว้ใจ ≥60 → ขึ้นเป็นตัวจริง</p></details>
  ${o.st==='out'?`<button class="btn" id="pm">⏭ ข้ามไปดูผลการแข่งขัน</button>`:o.st==='bench'?`<button class="btn" id="pm">▶ นั่งข้างสนาม (ข้ามไปช่วงที่อาจได้ลง)</button>`:`<button class="btn" id="pm">▶ ลงสนาม</button>`}`);
  $('#pm').onclick=()=>{closeM();if(o.st==='out'){base.played=false;return finish(nx,base,`❌ ไม่ติดทีม — ${o.reason}`)}startLive(nx,base,o)}}
 function startLive(nx,base,o){const p=S.p,subIn=o.subIn;
  if(o.st==='bench'&&o.unused){base.played=false;return finish(nx,base,`🪑 นั่งสำรองทั้งเกม ไม่ได้ถูกส่งลง — ${o.reason}`)}
- const M=base,c=club();const d=c.s+(ovr()-c.s)*.2+(p.morale-50)/25+(nx.home?2:0)-nx.opp.s;M.lf=cl(1.0+d*.05,.2,3);M.la=cl(1.2-d*.05,.2,3);
+ const M=base,c=club();const d=c.s+(ovr()-c.s)*.2+(p.morale-50)/25+(nx.home?2:0)-nx.opp.s;M.lf=cl(1.0+d*.05,.2,3)*TAC[M.tac||"bal"][1];M.la=cl(1.2-d*.05,.2,3)*TAC[M.tac||"bal"][2];
  const tot=subIn?rnd(1,3):rnd(4,6),nf=Math.min(tot,cl(Math.round((ovr()-52)/8)+rnd(0,1),1,4)-(subIn?1:0)||1),nd=tot-nf;
- const fms=EV.filter(e=>e.fm&&e.id!=='pen'&&e.c()).sort(()=>R()-.5).slice(0,nf);
+ const TB=TAC[base.tac||'bal'],nf2=cl(nf+TB[4],1,6),fms=EV.filter(e=>e.fm&&e.id!=='pen'&&e.c()).map(e=>[e,R()-(TB[5].includes(e.id)?.7:0)]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]).slice(0,nf2);
  const dr=EV.filter(e=>e.m&&!e.fm&&!e.ht&&!['redReact','subOff','celebrate','refWarn'].includes(e.id)).sort(()=>R()-.5).slice(0,nd);
- const ids=[...fms,...dr].map(e=>e.id);if(!subIn&&chance(.06))ids.push('pen');
+ const ids=[...fms,...dr].map(e=>e.id);if(chance(.55))ids.push('freelance');if(!subIn&&chance(.06))ids.push('pen');
  if(!subIn&&p.tt<=1)ids.push('kidSub');else if(!subIn&&p.tt<4&&chance([.12,.1,.08,.05][p.tt]+(60-p.trust)/200+(60-p.stamina)/250))ids.push('subOff');
  const used=new Set();if(ids.includes('subOff'))M.subChk=1;M.sched=ids.map(id=>{let m;do{m=id==='kidSub'?rnd(46,65):id==='subOff'?rnd(74,84):subIn?rnd(subIn+2,89):(ids.indexOf(id)%2?rnd(46,88):rnd(4,44))}while(used.has(m)||m===45);used.add(m);return{m,id}}).sort((a,b)=>a.m-b.m);
  if(subIn){M.inMin=subIn;M.subChk=1}M.ht=pick(EV.filter(e=>e.ht)).id;M.st1=rnd(1,4);M.st2=rnd(2,6);M.half=1;M.ext=0;M.home=nx.home;
@@ -529,7 +529,7 @@ function adv(ff){const M=LIVE.M;
  if(chance(lf/92)){M.gf++;const w=pick(TM);tk(M,`⚽ ประตู! ${club().n} — ${w}`);M.tl.push({m:clock(M),t:`⚽ ${w} (เพื่อนร่วมทีม)`});if(!off)M.r+=.05}
  else if(chance(la/92)){M.ga++;tk(M,`⚽ ${M.opp} ยิงได้`);M.tl.push({m:clock(M),t:`🥅 ${M.opp} ยิง`});if(!off)M.r-=.1}
  else if(chance(.13))tk(M,pick(COMM));
- if(ff)return;if(!off){S.p.stamina=cl(S.p.stamina-.12);const bad=(M.half===2&&M.r<=5.5)||(M.min>=60&&M.r<=5.8)||S.p.stamina<15;if(bad&&!M.subChk&&M.half===2&&chance(.07*(1+(55-S.p.trust)/50))){M.subChk=1;tk(M,'🔁 ป้ายเปลี่ยนตัวขึ้นเบอร์คุณ...');return moment('subOff')}}
+ if(ff)return;if(!off&&tacSwitch(M))return;if(!off){S.p.stamina=cl(S.p.stamina-.12*TAC[M.tac||'bal'][3]);const bad=(M.half===2&&M.r<=5.5)||(M.min>=60&&M.r<=5.8)||S.p.stamina<15;if(bad&&!M.subChk&&M.half===2&&chance(.07*(1+(55-S.p.trust)/50))){M.subChk=1;tk(M,'🔁 ป้ายเปลี่ยนตัวขึ้นเบอร์คุณ...');return moment('subOff')}}
  if(!off&&!M.ext&&M.sched.length&&M.sched[0].m<=M.min){const s=M.sched.shift();if(s.id==='kidSub'){if(M.r<7.2||(M.g+M.as===0&&M.r<7.6)){M.sub=1;M.subT=1;M.kidOff=M.min;M.sched=[];M.queue=[];tk(M,'🔁 โค้ชเปลี่ยนดาวรุ่งออก ให้พักตามแผน');M.tl.push({m:clock(M),t:'🔁 ถูกเปลี่ยนออก (ดาวรุ่ง)'})}else tk(M,'💪 ฟอร์มดี โค้ชให้คุณเล่นต่อ!');return drawLive()}return moment(s.id)}
  drawLive()}
 function moment(id){const M=LIVE.M;const e=EVM[id];if(e.c&&!e.fm&&!e.c(M)&&!['pen','celebrate','refWarn','subOff','redReact'].includes(id)){const alt=EV.filter(x=>x.fm&&x.id!=='pen'&&x.c());if(!alt.length)return drawLive();return moment(pick(alt).id)}
@@ -880,3 +880,22 @@ function talkCoach(){const p=S.p;if(!S.club)return;if(talkCD()>0)return lifeMsg(
   if(k==='num'){if((p.tt||0)>=3&&p.trust>=45){closeM();p.talkD=dkey(now());numPick(false)}else{E('trust',-6);done(['โค้ช: "เบอร์นั้นเป็นของตัวจริงที่พิสูจน์ตัวเองแล้ว แกยังไม่ใช่!"'],null)}}
   if(k==='esc'){p.canEsc=0;const r=R();if(r<.4){p.listed=1;S.p.bonusOffer=1;done(['ประธาน: "เข้าใจ เราจะหาทีมใหม่ให้" 📋 ถูกประกาศขาย ข้อเสนอจะเริ่มเข้ามา'],`📋 ${p.name} ร้องเรียนผู้บริหาร — สโมสรประกาศขาย`)}else if(r<.75){p.promise={left:3};E('trust',4);done(['ผู้จัดการทีมสั่งโค้ช: "ให้โอกาสเด็กมันหน่อย"','🤝 สัญญาใหม่: ตัวจริง 3 นัด'],`🗣️ ผู้บริหาร ${club().n} เข้ามาแทรก หลัง ${p.name} ร้องเรียน`)}else{E('trust',-10);p.benched=1;done(['ประธานเข้าข้างโค้ช: "เคารพการตัดสินใจของโค้ช!" 🪑 ถูกดองนัดหน้า'],`🧊 ${p.name} ร้องเรียนไม่สำเร็จ ถูกดองข้างสนาม`)}}
  })}
+// ===== TACTICS =====
+// [name, goalsFor x, goalsAgainst x, stamina x, extra player chances, favoured moments, fit attrs, instruction]
+var TAC={att:['⚔️ บุกเต็มที่',1.3,1.25,1.1,1,['vol','1v1','cut','long','solo','head','tap'],['sho','dri'],'ดันขึ้นสูง ยิงทุกโอกาสที่มี'],
+ bal:['⚖️ สมดุล',1,1,1,0,[],['pas','phy'],'เล่นตามตำแหน่ง ช่วยทั้งรุกและรับ'],
+ def:['🛡️ ตั้งรับ',.75,.7,.9,-1,['blk','air','int','long'],['def','phy'],'ถอยลงต่ำ รักษาโครงสร้าง อย่าเสียบอลง่าย'],
+ cnt:['⚡ สวนกลับ',1.05,.9,1,0,['1v1','cnt','thru','solo'],['pac','pas'],'รอจังหวะ เมื่อได้บอลให้วิ่งทะลุเร็วที่สุด'],
+ pos:['🎯 ครองบอล',1.05,.85,.95,0,['thru','crs','cnt','fk'],['pas','dri'],'จ่ายสั้น ครองบอล หาช่องจ่ายทะลุ'],
+ prs:['🔥 เพรสสูง',1.15,1.05,1.35,0,['int','blk','tap','cnt'],['phy','pac'],'ไล่บอลทันทีที่เสีย บีบคู่แข่งในแดนเขา']};
+function pickTac(nx){const d=club().s-nx.opp.s+(nx.home?2:0),w=d>5?['att','pos','prs','bal']:d<-5?['def','cnt','cnt','bal']:['bal','pos','cnt','prs','att','def'];return pick(w)}
+function tacFitV(k){const T=TAC[k],a=S.p.a;return Math.round(((a[T[6][0]]+a[T[6][1]])/2-ovr())/2)}
+function tacFit(at){const M=LIVE&&LIVE.M;if(!M||!M.tac)return 0;const T=TAC[M.tac];return T[6].includes(at)?3+Math.max(0,tacFitV(M.tac)):0}
+function tacCard(k){const T=TAC[k],f=tacFitV(k);return `<div class="card" style="margin:8px 0"><div class="row sp"><b>📋 แท็กติกทีม: ${T[0]}</b><span class="tag ${f>0?'g':f<0?'':'o'}">ความเข้ากัน ${f>0?'+':''}${f}</span></div><p class="mu" style="margin-top:4px">คำสั่งถึงคุณ: "${T[7]}"</p><p class="mu" style="font-size:12px">ประตูได้ ×${T[1]} · เสีย ×${T[2]} · สตามิน่า ×${T[3]} · ค่าพลังที่เข้ากัน: ${T[6].map(x=>ATS[x]).join(', ')}</p></div>`}
+function tacSwitch(M){if(M.tsw||M.half!==2||M.min<58||M.min>75||!chance(.06))return false;const df=M.gf-M.ga;let nt=null,why='';
+ if(df<0&&M.tac!=='att'){nt='att';why=`ตามหลัง ${M.gf}-${M.ga}`}else if(df>=2&&M.tac!=='def'){nt='def';why=`นำอยู่ ${M.gf}-${M.ga}`}else if(df===0&&chance(.3)&&M.tac!=='prs'){nt='prs';why='เสมอกันอยู่'}
+ if(!nt)return false;M.tsw=1;const o=M.tac;M.tac=nt;tk(M,`📋 โค้ชเปลี่ยนแท็กติก: ${TAC[nt][0]}`);M.tl.push({m:clock(M),t:`📋 ${TAC[o][0]} → ${TAC[nt][0]}`});
+ LIVE.paused=true;drawLive();sheet(`<span class="tag o">📋 เปลี่ยนแท็กติก · ${clock(M)}</span><div class="ev">โค้ชตะโกนจากข้างสนาม (${why}): "เปลี่ยนเป็น ${TAC[nt][0]}!"</div>${tacCard(nt)}<button class="btn" id="tsok">รับทราบ ▶</button>`);$('#tsok').onclick=()=>resume();return true}
+(function(){EV.push({id:'freelance',m:1,x:M=>{const T=TAC[M.tac||'bal'];return `📋 โค้ชสั่งให้คุณ "${T[7]}" แต่คุณเห็นช่องว่างที่จะเล่นนอกแผนได้...`},o:[
+ {l:'🫡 ทำตามคำสั่งโค้ช',f:M=>{M.r+=.1;E('trust',2);N('โค้ชพยักหน้า — วินัยดี')}},
+ {l:'🎨 ฟรีสไตล์ เล่นตามสัญชาตญาณ',f:M=>{const b=Math.max(...Object.values(S.p.a));if(chance(cl((b-40)/60,.2,.7))){M.r+=.6;E('trust',3);if(chance(.35))goal(M,'ฟรีสไตล์นอกแผน!',.5);else N('จังหวะนอกแผนสวยงาม! โค้ชยิ้มมุมปาก')}else{M.r-=.5;E('trust',-6);N('เล่นนอกแผนแล้วเสียบอล โค้ชโมโหข้างสนาม');if(chance(.3))M.ga++}}}]});EVM.freelance=EV[EV.length-1]})();
