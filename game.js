@@ -442,12 +442,12 @@ function miniGame(d,cb){setTimeout(()=>{const sh=document.querySelector('#modal 
  if(d==='sho'||d==='pas'){let n=0,tot=0,x=0,v=1.6,zx=40,zv=d==='pas'?0.7:0;const N2=d==='sho'?3:4;
   sheet(`<span class="tag o">🎮 ${DR[d][1]}</span><p class="mu">${DR[d][2]} · ${N2} ครั้ง</p><div class="mgbar"><div class="mgz" id="z"></div><div class="mgm" id="mk">⚽</div></div><p class="big" id="sc" style="text-align:center">0</p><button class="btn" id="tp">👆 แตะ!</button>`);
   const z=$('#z'),mk=$('#mk');const st=()=>{x+=v;if(x>96||x<0)v=-v;zx+=zv;if(zx>78||zx<2)zv=-zv;mk.style.left=x+'%';z.style.left=zx+'%';A=requestAnimationFrame(st)};st();
-  $('#tp').onclick=()=>{const c=zx+10,dd=Math.abs(x+2-c);const s=dd<3?100:dd<10?100-(dd-3)*8:Math.max(0,44-(dd-10)*3);tot+=s;n++;$('#sc').textContent=Math.round(tot/n);v*=1.25;if(n>=N2)setTimeout(()=>fin(tot/n),300)}}
+  $('#tp').onclick=()=>{const c=zx+10,dd=Math.abs(x+2-c);const s=dd<3?100:dd<10?100-(dd-3)*8:Math.max(0,44-(dd-10)*3);tot+=s;n++;SFX(s>=60?'hit':'miss');$('#sc').textContent=Math.round(tot/n);v*=1.25;if(n>=N2)setTimeout(()=>fin(tot/n),300)}}
  if(d==='pac'){let taps=0,t0=Date.now();sheet(`<span class="tag o">🎮 สปรินต์</span><p class="mu">แตะรัว ๆ 8 วินาที</p><div class="mgbar"><div class="mgm" id="mk" style="left:0">🏃</div></div><p class="big" id="sc" style="text-align:center">8.0</p><button class="btn" id="tp" style="padding:28px">👆 แตะ!</button>`);
   $('#tp').onclick=()=>{taps++;$('#mk').style.left=Math.min(94,taps/55*94)+'%'};T=setInterval(()=>{const l=8-(Date.now()-t0)/1000;$('#sc').textContent=Math.max(0,l).toFixed(1);if(l<=0)fin(taps/55*100)},100)}
  if(d==='dri'){let lane=1,hit=0,pass=0,cones=[],t0=Date.now();sheet(`<span class="tag o">🎮 เลี้ยงหลบกรวย</span><p class="mu">แตะซ้าย/ขวาเปลี่ยนเลน · 12 วินาที</p><div class="mgf" id="f"></div><div class="row"><button class="btn s" id="L" style="flex:1;text-align:center">⬅️</button><button class="btn s" id="Rr" style="flex:1;text-align:center">➡️</button></div><p class="mu" id="sc">หลบได้ 0 · ชน 0</p>`);
   const f=$('#f');$('#L').onclick=()=>lane=Math.max(0,lane-1);$('#Rr').onclick=()=>lane=Math.min(2,lane+1);
-  T=setInterval(()=>{const el=(Date.now()-t0)/1000;if(chance(.09+el*.006))cones.push({l:rnd(0,2),y:0});cones.forEach(c=>c.y+=3+el*.25);cones=cones.filter(c=>{if(c.y>=82&&!c.h){c.h=1;if(c.l===lane)hit++;else pass++}return c.y<100});
+  T=setInterval(()=>{const el=(Date.now()-t0)/1000;if(chance(.09+el*.006))cones.push({l:rnd(0,2),y:0});cones.forEach(c=>c.y+=3+el*.25);cones=cones.filter(c=>{if(c.y>=82&&!c.h){c.h=1;if(c.l===lane){hit++;SFX('miss')}else pass++}return c.y<100});
    f.innerHTML=cones.map(c=>`<span style="left:${c.l*33+12}%;top:${c.y}%">🔶</span>`).join('')+`<span style="left:${lane*33+12}%;top:84%">⚽</span>`;$('#sc').textContent=`หลบได้ ${pass} · ชน ${hit}`;if(el>=12)fin(pass+hit?100*pass/(pass+hit)-hit*5:50)},60)}}
 // ===== PITCH =====
 function pitch(M,focus){const W2=300,H2=190;let s=`<svg viewBox="0 0 ${W2} ${H2}" class="pitch"><rect width="${W2}" height="${H2}" rx="10" fill="#123d22"/>${[0,1,2,3,4,5].map(i=>i%2?`<rect x="${i*50}" width="50" height="${H2}" fill="#15452a"/>`:'').join('')}
@@ -777,3 +777,33 @@ function fanCard(){const p=S.p;p.fms=p.fms||0;const nx=FMS[p.fms],pv=p.fms?FMS[p
 var SPM=[['tg',[1,5,10,25,50,100],'ประตูอาชีพ'],['app',[1,10,25,50,100],'นัดอาชีพ']];
 function msChk(){const p=S.p;p.msd=p.msd||{};p.capp=(p.capp||0)+1;const v={tg:p.tg,app:p.capp};SPM.forEach(([k,L,n])=>L.forEach(x=>{const id=k+x;if(v[k]>=x&&!p.msd[id]){p.msd[id]=1;const sp=Math.max(2,Math.round(Math.sqrt(x)*1.5));addSP(sp,`ไมล์สโตน ${x} ${n}`);toast(`🏅 ไมล์สโตน: ${x} ${n}! ⭐+${sp} SP`)}}))}
 function toast(t){let d=document.getElementById('toast');if(!d){d=document.createElement('div');d.id='toast';document.body.appendChild(d)}const e=document.createElement('div');e.className='tst';e.textContent=t;d.appendChild(e);setTimeout(()=>e.classList.add('out'),2600);setTimeout(()=>e.remove(),3200)}
+// ===== SOUND (Web Audio synth) =====
+var AC=null,SND=localStorage.getItem('fl_snd')!=='0',AMB=null;
+function acx(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d,type='sine',v=.15,t0=0,f2){const a=acx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.05)}
+function noise(d,v=.2,fq=1000,q=.7,t0=0,loop){const a=acx();if(!a)return null;const n=a.createBuffer(1,a.sampleRate*(loop?2:d),a.sampleRate),c=n.getChannelData(0);for(let i=0;i<c.length;i++)c[i]=Math.random()*2-1;const s=a.createBufferSource();s.buffer=n;s.loop=!!loop;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=fq;f.Q.value=q;const g=a.createGain(),t=a.currentTime+t0;
+ if(loop)g.gain.value=v;else{g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+d*.25);g.gain.exponentialRampToValueAtTime(.0001,t+d)}s.connect(f).connect(g).connect(a.destination);s.start(t);if(!loop)s.stop(t+d+.05);return{s,g}}
+function SFX(k){if(!SND)return;try{
+ if(k==='whistle'){tone(2800,.35,'square',.06,0,2700);tone(3000,.35,'sine',.05)}
+ else if(k==='whistle3'){[0,.45,.9].forEach((t,i)=>{tone(2800,i<2?.3:.7,'square',.06,t);tone(3000,i<2?.3:.7,'sine',.05,t)})}
+ else if(k==='cheer'){noise(2.2,.35,900,.5);noise(1.8,.2,2200,.8,.1);tone(523,.15,'triangle',.08,.05);tone(659,.15,'triangle',.08,.18);tone(784,.3,'triangle',.08,.31)}
+ else if(k==='groan'){noise(1.2,.22,350,.6);tone(300,.7,'sawtooth',.03,0,180)}
+ else if(k==='card'){tone(1800,.08,'square',.06);tone(900,.25,'triangle',.08,.08)}
+ else if(k==='tap'){tone(1200,.04,'sine',.04)}
+ else if(k==='hit'){tone(660,.08,'triangle',.12);tone(990,.12,'triangle',.1,.06)}
+ else if(k==='miss'){tone(220,.18,'sawtooth',.06,0,140)}
+ else if(k==='jingle'){[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.1,i*.1))}
+ else if(k==='chime'){[1319,1568,2093].forEach((f,i)=>tone(f,.6,'sine',.08,i*.12))}
+}catch(e){}}
+function amb(on){if(on&&SND&&!AMB){AMB=noise(1,.035,600,.4,0,true)}else if(!on&&AMB){try{AMB.s.stop()}catch(e){}AMB=null}}
+document.addEventListener('pointerdown',e=>{acx();if(e.target.closest&&e.target.closest('button,.chip,.opt,[data-ai],[data-ag]')&&!e.target.closest('.mg'))SFX('tap')},{capture:true});
+(function(){const _tk=tk;tk=function(M,t){if(/^⚽ ประตู/.test(t))SFX('cheer');else if(/ยิงได้$/.test(t))SFX('groan');else if(/^🟨 ป้าย/.test(t)){}else if(/^🟥/.test(t))SFX('card');else if(/^⏸️/.test(t)||/^▶ เริ่มครึ่งหลัง/.test(t)||/^🗓️/.test(t))SFX('whistle');else if(/^🏁/.test(t))SFX('whistle3');return _tk(M,t)};
+ const _y=yellow;yellow=function(M){SFX('card');return _y(M)};
+ const _sh=sheet;sheet=function(h){if(h.includes('class="res no"'))SFX('miss');else if(h.includes('class="res ok"')&&!h.includes('ประตู!'))SFX('hit');return _sh(h)};
+ const _to=toast;toast=function(t){SFX(/ผู้ติดตามครบ/.test(t)?'chime':/เลื่อนขั้น|ไมล์สโตน|ขึ้นเป็น/.test(t)?'jingle':'tap');return _to(t)};
+ const _ax=addXP;addXP=function(x){const l=S.p.tlv;const r=_ax(x);if(S.p.tlv>l)SFX('jingle');return r};
+ const _re=resume;resume=function(){const r=_re();amb(!!LIVE);return r};
+ const _ft=fulltime;fulltime=function(){amb(false);return _ft()};
+})();
+function sndBtn(){let b=document.getElementById('sndb');if(!b){b=document.createElement('button');b.id='sndb';document.body.appendChild(b);b.onclick=()=>{SND=!SND;localStorage.setItem('fl_snd',SND?'1':'0');if(!SND)amb(false);else{acx();SFX('tap');if(LIVE&&!LIVE.paused)amb(true)}sndBtn()}}b.textContent=SND?'🔊':'🔇'}
+sndBtn();

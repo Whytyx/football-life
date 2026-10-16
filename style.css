@@ -75,3 +75,4 @@ input,select,textarea{font-size:16px!important}
 .tladder{display:flex;gap:4px;margin:8px 0}.tladder span{flex:1;text-align:center;font-size:11px;padding:6px 2px;border-radius:8px;background:#ffffff0d;color:#9aa}.tladder span.done{background:#3ddc6a22;color:#8e8}.tladder span.on{background:#ff7a1a;color:#fff;font-weight:700}
 #toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:6px;width:min(92vw,420px);pointer-events:none}
 .tst{background:#1d3324;border:1px solid #3ddc6a;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;box-shadow:0 6px 20px #0008;transition:opacity .5s,transform .5s}.tst.out{opacity:0;transform:translateY(-10px)}
+#sndb{position:fixed;right:10px;bottom:76px;z-index:60;width:40px;height:40px;border-radius:50%;border:1px solid #ffffff22;background:#13261acc;font-size:18px;padding:0;-webkit-tap-highlight-color:transparent}
