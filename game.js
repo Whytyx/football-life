@@ -390,7 +390,8 @@ function autoRound(){const nx=nextFix();if(!nx){S.fix[S.week].forEach(([x,y])=>r
  const p=S.p,M={opp:nx.opp.n,gf:0,ga:0,g:0,as:0,r:5.0,played:false,tl:[]};if(!(p.ban||p.inj||p.benched))M.missed=1;p.benched=0;finish(nx,M,'',true)}
 function maybeDaily(){const t=now();if(LIVE||!S.club||S.evDay===dkey(t))return false;S.evDay=dkey(t);save();
  const due=S.chains.findIndex(c=>c.at<=S.abs);let ev=null;const summer=S.week===0&&S.ko[0]-t>10*DAY;
- if(due>=0){ev=EVM[S.chains[due].id];S.chains.splice(due,1)}else if(!summer&&chance(.3))ev=pick(EV.filter(e=>e.off&&(!e.c||e.c())));
+ if(due>=0){ev=EVM[S.chains[due].id];S.chains.splice(due,1)}else if(!summer&&chance(.42)){const pool=EV.filter(e=>e.off&&e.id!==S.lastOff&&!(S.recentOff||[]).includes(e.id)&&(!e.c||e.c()));ev=pool.length?pick(pool):null}
+ if(ev&&ev.off){S.lastOff=ev.id;S.recentOff=[ev.id,...(S.recentOff||[])].slice(0,6);S.offN=(S.offN||0)+1}
  if(ev){showEvent(ev,null,()=>{closeM();save();render()});return true}return false}
 function dailyEvent(){maybeDaily()}
 const needXP=l=>60+l*30,spCost=v=>v<60?1:v<70?2:v<80?3:v<90?4:5;
@@ -442,20 +443,34 @@ function tk(M,t){M.tick.unshift(`<b>${clock(M)}</b> ${t}`);M.tick=M.tick.slice(0
 function playMatch(){const nx=nextFix(),p=S.p;if(!nx||dkey(now())<dkey(S.ko[S.week]))return render();
  const base={opp:nx.opp.n,gf:0,ga:0,g:0,as:0,y:0,red:false,sub:0,r:6.0,queue:[],min:0,played:true,tl:[],tick:[],boost:0};
  if(p.ban||p.inj){base.played=false;return finish(nx,base,p.ban?'⛔ คุณติดแบน นั่งดูอยู่บนอัฒจันทร์':'🚑 คุณบาดเจ็บ พักรักษาตัว')}
- if(p.benched||(p.trust<25&&chance(.6))){p.benched=0;base.played=false;return finish(nx,base,'🪑 โค้ชไม่ส่งคุณลงสนาม นั่งปั้นหน้าบนม้านั่งสำรอง')}
- let subIn=0;if(p.role&&p.role!=='star'){const sc=cl((p.role==='kid'?.2:.35)+(p.trust-50)/100+(avgR()?(avgR()-6.5)*.2:0),.05,.9);if(!chance(sc)){if(chance(.5)){base.played=false;return finish(nx,base,`🪑 คุณเป็น${ROLE[p.role][0]} โค้ชไม่ได้ส่งลงสนามนัดนี้ — ต้องพิสูจน์ฟอร์มในซ้อมและได้ใจโค้ชก่อน`)}subIn=rnd(60,75)}}
+ const fr=avgR(),RN=p.role?ROLE[p.role][0]:'ตัวจริง',why=[`บทบาท: ${RN}`,`ความไว้ใจโค้ช ${Math.round(p.trust)}`,fr?`ฟอร์ม 5 นัดล่าสุด ${fr.toFixed(1)}`:'ยังไม่มีฟอร์มให้ดู'];
+ let st='start',subIn=0,unused=0,reason='';
+ if(p.benched||(p.trust<25&&chance(.6))){st='out';reason=p.benched?'โค้ชลงโทษจากเหตุการณ์ก่อนหน้า':'โค้ชไม่ไว้ใจคุณเลย'}
+ else if(p.role&&p.role!=='star'){const sc=cl((p.role==='kid'?.2:.35)+(p.trust-50)/100+(fr?(fr-6.5)*.2:0),.05,.9);if(!chance(sc)){if(chance(p.role==='kid'?.35:.25)){st='out';reason=`คุณเป็น${RN} โค้ชเลือกคนอื่นติดทีม`}else{st='bench';subIn=rnd(55,80);unused=chance(.25);reason=`คุณเป็น${RN} ยังไม่ได้ใจโค้ชพอจะเป็นตัวจริง`}}else reason=`ฟอร์ม/ความไว้ใจดีพอ โค้ชให้โอกาสตัวจริง!`}
+ else reason='คุณคือตัวหลักของทีม';
+ p.benched=0;return prematch(nx,base,{st,subIn,unused,reason,why})}
+function prematch(nx,base,o){const c=club(),p=S.p;const T={start:['✅ ตัวจริง','g','คุณลงสนามตั้งแต่นาทีแรก'],bench:['🪑 ม้านั่งสำรอง','o','อาจได้ถูกส่งลงในครึ่งหลัง'],out:['❌ ไม่ติดทีม','r','นัดนี้คุณไม่ได้อยู่ใน 18 คน']}[o.st];
+ sheet(`<span class="tag o">ก่อนเกม · ${LF()} ${nx.home?c.n:nx.opp.n} vs ${nx.home?nx.opp.n:c.n}</span><h2 style="margin:12px 0 4px" class="${T[1]==='g'?'gr':T[1]==='r'?'re':'or'}">${T[0]}</h2><p>${T[2]}</p><div class="card" style="margin:8px 0"><b>เหตุผล:</b> ${o.reason}<ul class="cons">${o.why.map(w=>`<li>${w}</li>`).join('')}</ul></div>
+ <details class="card" style="margin:8px 0"><summary>ℹ️ บทบาทหมายถึงอะไร?</summary><p class="mu"><b>ตัวจริง</b> = ตัวหลัก ลงสนามเกือบทุกนัด<br><b>สำรอง</b> = ตัวเสริม มักได้ลงท้ายเกม บางนัดได้เป็นตัวจริง<br><b>ดาวรุ่ง</b> = เยาวชน ไม่ค่อยได้ลงเป็นตัวจริง ต้องสะสมนาทีจากการซ้อม (ซ้อมแท็กติกเพิ่มความไว้ใจ) และฟอร์มดี ๆ ตอนได้ลง<br>เรตติ้งเฉลี่ย ≥7 ติดกัน 3 นัด + ความไว้ใจ ≥60 → ขึ้นเป็นตัวจริง</p></details>
+ ${o.st==='out'?`<button class="btn" id="pm">⏭ ข้ามไปดูผลการแข่งขัน</button>`:o.st==='bench'?`<button class="btn" id="pm">▶ นั่งข้างสนาม (ข้ามไปช่วงที่อาจได้ลง)</button>`:`<button class="btn" id="pm">▶ ลงสนาม</button>`}`);
+ $('#pm').onclick=()=>{closeM();if(o.st==='out'){base.played=false;return finish(nx,base,`❌ ไม่ติดทีม — ${o.reason}`)}startLive(nx,base,o)}}
+function startLive(nx,base,o){const p=S.p,subIn=o.subIn;
+ if(o.st==='bench'&&o.unused){base.played=false;return finish(nx,base,`🪑 นั่งสำรองทั้งเกม ไม่ได้ถูกส่งลง — ${o.reason}`)}
  const M=base,c=club();const d=c.s+(ovr()-c.s)*.2+(p.morale-50)/25+(nx.home?2:0)-nx.opp.s;M.lf=cl(1.0+d*.05,.2,3);M.la=cl(1.2-d*.05,.2,3);
- const fms=EV.filter(e=>e.fm&&e.id!=='pen'&&e.c()).sort(()=>R()-.5).slice(0,rnd(4,6));
- const dr=EV.filter(e=>e.m&&!e.fm&&!e.ht&&!['redReact','subOff','celebrate','refWarn'].includes(e.id)).sort(()=>R()-.5).slice(0,2);
- const ids=[...fms,...dr].map(e=>e.id);if(chance(.06))ids.push('pen');
- if(chance(.15+(60-p.trust)/150+(60-p.stamina)/200))ids.push('subOff');
- const used=new Set();if(ids.includes('subOff'))M.subChk=1;M.sched=ids.map(id=>{let m;do{m=id==='subOff'?rnd(56,75):rnd(4,88)}while(used.has(m)||m===45);used.add(m);return{m,id}}).sort((a,b)=>a.m-b.m);
- if(subIn){M.inMin=subIn;M.sched=M.sched.filter(x=>x.m>subIn&&x.id!=='subOff').slice(0,3);M.subChk=1}M.ht=pick(EV.filter(e=>e.ht)).id;M.st1=rnd(1,4);M.st2=rnd(2,6);M.half=1;M.ext=0;M.home=nx.home;
+ const tot=subIn?rnd(1,3):rnd(4,6),nf=Math.min(tot,cl(Math.round((ovr()-52)/8)+rnd(0,1),1,4)-(subIn?1:0)||1),nd=tot-nf;
+ const fms=EV.filter(e=>e.fm&&e.id!=='pen'&&e.c()).sort(()=>R()-.5).slice(0,nf);
+ const dr=EV.filter(e=>e.m&&!e.fm&&!e.ht&&!['redReact','subOff','celebrate','refWarn'].includes(e.id)).sort(()=>R()-.5).slice(0,nd);
+ const ids=[...fms,...dr].map(e=>e.id);if(!subIn&&chance(.06))ids.push('pen');
+ if(!subIn&&p.role==='kid')ids.push('kidSub');else if(!subIn&&chance(.08+(60-p.trust)/200+(60-p.stamina)/250))ids.push('subOff');
+ const used=new Set();if(ids.includes('subOff'))M.subChk=1;M.sched=ids.map(id=>{let m;do{m=id==='kidSub'?rnd(46,65):id==='subOff'?rnd(74,84):subIn?rnd(subIn+2,89):(ids.indexOf(id)%2?rnd(46,88):rnd(4,44))}while(used.has(m)||m===45);used.add(m);return{m,id}}).sort((a,b)=>a.m-b.m);
+ if(subIn){M.inMin=subIn;M.subChk=1}M.ht=pick(EV.filter(e=>e.ht)).id;M.st1=rnd(1,4);M.st2=rnd(2,6);M.half=1;M.ext=0;M.home=nx.home;
  tk(M,subIn?`🗓️ ${c.n} พบ ${M.opp} — คุณเริ่มเป็นตัวสำรอง (คาดว่าจะได้ลงช่วงนาที ${subIn})`:`🗓️ ${c.n} พบ ${M.opp} — คุณลงเป็นตัวจริง!`);LIVE={M,nx,speed:1,timer:null,paused:true};closeM();
+ if(subIn){ffTo(M);drawLive();return sheet(`<span class="tag o">🔁 นาทีที่ ${subIn}</span><div class="score"><div class="big">${M.gf} - ${M.ga}</div></div><p>โค้ชเรียกคุณวอร์มอัพ... คุณถูกส่งลงสนาม!</p><p class="mu">ข้ามช่วงที่นั่งดูให้แล้ว · เหลือเวลาเล่น ~${90-subIn} นาที</p><button class="btn" id="ko">▶ ลงสนาม</button>`),$('#ko').onclick=()=>{closeM();resume()}}
  drawLive();sheet(`<span class="tag o">KICK-OFF</span><div class="score"><div><b>${nx.home?c.n:M.opp}</b></div><div class="big or">VS</div><div><b>${nx.home?M.opp:c.n}</b></div></div><p class="mu">สตามิน่า ${Math.round(p.stamina)} · ขวัญ ${Math.round(p.morale)} · เกมจะหยุดทุกจังหวะสำคัญให้คุณตัดสินใจ</p><button class="btn" id="ko">▶ เริ่มเกม</button>`);$('#ko').onclick=()=>{closeM();resume()}}
+function ffTo(M){let n=0;while(n++<300&&!(M.half===2&&M.min>=M.inMin)){if(M.half===1&&M.min>=45&&M.ext>=M.st1){tk(M,'⏸️ หมดครึ่งแรก');M.half=2;M.min=45;M.ext=0;tk(M,'▶ เริ่มครึ่งหลัง');continue}adv(1)}}
 function loop(){clearInterval(LIVE.timer);LIVE.timer=setInterval(()=>{if(LIVE&&!LIVE.paused)adv()},650/LIVE.speed)}
 function resume(){closeM();if(!LIVE)return;LIVE.paused=false;drawLive();loop()}
-function adv(){const M=LIVE.M;
+function adv(ff){const M=LIVE.M;
  if(M.half===1){if(M.min<45)M.min++;else if(M.ext<M.st1){if(!M.ext)tk(M,`🟨 ป้ายทดเวลา +${M.st1}`);M.ext++}else return halftime()}
  else{if(M.min<90)M.min++;else if(M.ext<M.st2){if(!M.ext)tk(M,`🟨 ป้ายทดเวลา +${M.st2}`);M.ext++}else return fulltime()}
  if(M.inMin&&M.min===M.inMin&&M.half===2){tk(M,'🔁 คุณถูกส่งลงสนามเป็นตัวสำรอง!');M.tl.push({m:clock(M),t:'🔁 ลงสนาม (สำรอง)'})}
@@ -463,10 +478,10 @@ function adv(){const M=LIVE.M;
  if(chance(lf/92)){M.gf++;const w=pick(TM);tk(M,`⚽ ประตู! ${club().n} — ${w}`);M.tl.push({m:clock(M),t:`⚽ ${w} (เพื่อนร่วมทีม)`});if(!off)M.r+=.05}
  else if(chance(la/92)){M.ga++;tk(M,`⚽ ${M.opp} ยิงได้`);M.tl.push({m:clock(M),t:`🥅 ${M.opp} ยิง`});if(!off)M.r-=.1}
  else if(chance(.13))tk(M,pick(COMM));
- if(!off){S.p.stamina=cl(S.p.stamina-.12);const bad=(M.half===2&&M.r<=5.5)||(M.min>=60&&M.r<=5.8)||S.p.stamina<15;if(bad&&!M.subChk&&M.half===2&&chance(.07*(1+(55-S.p.trust)/50))){M.subChk=1;tk(M,'🔁 ป้ายเปลี่ยนตัวขึ้นเบอร์คุณ...');return moment('subOff')}}
- if(!off&&!M.ext&&M.sched.length&&M.sched[0].m<=M.min){const s=M.sched.shift();return moment(s.id)}
+ if(ff)return;if(!off){S.p.stamina=cl(S.p.stamina-.12);const bad=(M.half===2&&M.r<=5.5)||(M.min>=60&&M.r<=5.8)||S.p.stamina<15;if(bad&&!M.subChk&&M.half===2&&chance(.07*(1+(55-S.p.trust)/50))){M.subChk=1;tk(M,'🔁 ป้ายเปลี่ยนตัวขึ้นเบอร์คุณ...');return moment('subOff')}}
+ if(!off&&!M.ext&&M.sched.length&&M.sched[0].m<=M.min){const s=M.sched.shift();if(s.id==='kidSub'){if(M.r<7.2||(M.g+M.as===0&&M.r<7.6)){M.sub=1;M.subT=1;M.kidOff=M.min;M.sched=[];M.queue=[];tk(M,'🔁 โค้ชเปลี่ยนดาวรุ่งออก ให้พักตามแผน');M.tl.push({m:clock(M),t:'🔁 ถูกเปลี่ยนออก (ดาวรุ่ง)'})}else tk(M,'💪 ฟอร์มดี โค้ชให้คุณเล่นต่อ!');return drawLive()}return moment(s.id)}
  drawLive()}
-function moment(id){const M=LIVE.M;const e=EVM[id];if(e.c&&!e.fm&&!e.c(M)&&!['pen','celebrate','refWarn'].includes(id))return drawLive();
+function moment(id){const M=LIVE.M;const e=EVM[id];if(e.c&&!e.fm&&!e.c(M)&&!['pen','celebrate','refWarn','subOff','redReact'].includes(id)){const alt=EV.filter(x=>x.fm&&x.id!=='pen'&&x.c());if(!alt.length)return drawLive();return moment(pick(alt).id)}
  LIVE.paused=true;drawLive();showEvent(e,M,afterMoment)}
 function afterMoment(){const M=LIVE.M;closeM();
  if(M.red){M.red=false;M.redDone=1;M.sched=[];M.queue=[];tk(M,'🟥 ใบแดง! คุณถูกไล่ออกจากสนาม');M.tl.push({m:clock(M),t:'🟥 ใบแดง'});return showEvent(EVM.redReact,M,()=>{closeM();resume()})}
