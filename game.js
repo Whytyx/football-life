@@ -288,7 +288,7 @@ function makeSchedule(start,country){let[y,m]=ymd(start);if(m===5||m===6||(m===4
 // ===== FIXTURES / TABLE =====
 function rr(n){const t=[...Array(n).keys()],rounds=[];for(let r=0;r<n-1;r++){const m=[];for(let i=0;i<n/2;i++){m.push(r%2?[t[n-1-i],t[i]]:[t[i],t[n-1-i]])}rounds.push(m);t.splice(1,0,t.pop())}return rounds.concat(rounds.map(r=>r.map(([a,b])=>[b,a])))}
 function freshTable(){S.fix=rr(8).concat(rr(8));S.table=Array.from({length:8},(_,i)=>({i,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));S.log=[]}
-function newSeason(start){freshTable();S.ko=makeSchedule(start||now(),S.club?S.club.c:S.startC);S.N=NR;S.week=0;const y=ymd(S.ko[NR-1])[0];S.slabel=`${y-1}/${String(y).slice(2)}`;S.p.sg=0;S.p.sa=0;S.p.app=0;S.p.yc=0;S.p.called=0}
+function newSeason(start){freshTable();S.ko=makeSchedule(start||now(),S.club?S.club.c:S.startC);S.N=NR;S.week=0;const y=ymd(S.ko[NR-1])[0];S.slabel=`${y-1}/${String(y).slice(2)}`;S.p.sg=0;S.p.sa=0;S.p.app=0;S.p.sapp=0;S.p.yc=0;S.p.called=0}
 function newSeasonKeep(){const w=S.week;freshTable();for(let k=0;k<w;k++){S.fix[k].forEach(([x,y])=>rec(x,y,pois(1.3),pois(1.2)));S.log[k]='—'}}
 const pois=l=>{let L=Math.exp(-Math.max(.1,l)),k=0,p=1;do{k++;p*=R()}while(p>L);return k-1};
 function rec(a,b,ga,gb){const A=S.table[a],B=S.table[b];A.p++;B.p++;A.gf+=ga;A.ga+=gb;B.gf+=gb;B.ga+=ga;if(ga>gb){A.w++;A.pts+=3;B.l++}else if(ga<gb){B.w++;B.pts+=3;A.l++}else{A.d++;B.d++;A.pts++;B.pts++}}
@@ -322,15 +322,15 @@ function header(){const c=club(),L=S.club?LEAGUES[S.club.c]:null;AVI();return `<
 const COACH=[['🛡️ เน้นวินัย','ไม่ชอบนักเตะเกเร'],['🚀 บุกสุดตัว','ชอบนักเตะสร้างสรรค์'],['🧓 พ่อพระ','ใจดี ให้โอกาสเด็ก'],['🔥 เผด็จการ','เปลี่ยนตัวไว ด่าแรง'],['📊 สายแท็กติก','ชอบคนทำตามแผน']];
 const ROLE={star:['ตัวจริง','g',62],rot:['สำรอง','',38],kid:['ดาวรุ่ง','o',50]};
 function hue(n){let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))%360;return h}
-function genOffers(country){const o=ovr(),all=[];for(const c in S.world){if(country&&c!==country)continue;S.world[c].forEach((t,ti)=>all.push({c,ti,t}))}
- let fit=all.filter(x=>x.t.str<=o+4+Math.min(6,(S.p.sg+S.p.sa)*.4)+(S.p.fans>20000?2:0)+(S.p.fans>200000?3:0)+(avgR()>=7.5?3:avgR()>=7?1:0)&&x.t.str>=o-16&&!(S.club&&x.c===S.club.c&&x.ti===S.club.t&&!S.p.wantOut));
+function genOffers(country,end){const o=ovr(),all=[],PF=perfOf(end),cur=S.club?tierOf(S.club.c,S.club.t).str:null;for(const c in S.world){if(country&&c!==country)continue;S.world[c].forEach((t,ti)=>all.push({c,ti,t}))}
+ const allowF=PF.bump>=3&&chance(.3);const cap=cur!=null?cur+(PF.has?PF.bump:0):o+2;let fit=all.filter(x=>(x.t.str<=cap||(S.club&&PF.bump>=2&&x.c===S.club.c&&x.ti===S.club.t-1))&&x.t.str>=o-16&&!(S.club&&x.c===S.club.c&&x.ti===S.club.t&&!S.p.wantOut)&&(!S.club||x.c===S.club.c||allowF));if(!fit.length&&S.club)fit=[{c:S.club.c,ti:S.club.t,t:tierOf(S.club.c,S.club.t)}];
  let WK=null;if(country){const T=S.world[country];fit=[{c:country,ti:T.length-1,t:T.at(-1)}];WK=T.at(-1).clubs.map((c,i)=>[c.s,i]).sort((a,b)=>a[0]-b[0]).slice(0,4).map(x=>x[1])}
  const n=country?4:S.p.agent?4:rnd(2,3),res=[],used=new Set();
  for(let k=0;k<n*3&&res.length<n&&fit.length;k++){const x=country?fit[0]:pick(fit);const i=country?WK[res.length]:rnd(0,7),key=x.c+x.ti+'-'+i;if(used.has(key)||(S.club&&x.c===S.club.c&&x.ti===S.club.t&&i===S.club.i))continue;used.add(key);
-  const cb=x.t.clubs[i];if(country)cb.s=Math.min(cb.s,x.t.str-1);const gap=cb.s-o;let role=gap>8?(S.p.age<22?'kid':'rot'):gap>2?pick(['rot','kid','star']):'star';if(S.p.age<=18&&role==='star'&&chance(.6))role=pick(['kid','rot']);if(country)role=(res.length===0&&chance(.5))?'star':(chance(.6)?'kid':'rot');
+  const cb=x.t.clubs[i];if(country)cb.s=Math.min(cb.s,x.t.str-1);if(!country&&cur!=null&&cb.s>cap+3)continue;const gap=cb.s-o;let role=gap>8?(S.p.age<22?'kid':'rot'):gap>2?pick(['rot','kid','star']):'star';if(S.p.age<=19&&role==='star'&&!(PF.bump>=4&&gap<-3&&chance(.4)))role=chance(.6)?'kid':'rot';if(country)role=(res.length===0&&chance(.5))?'star':(chance(.6)?'kid':'rot');
   const w=Math.round(wage(x.c,x.ti)*(.7+R()*.6)*(country?({star:.75,kid:1,rot:1.05}[role]):(role==="star"?1.15:role==="kid"?.75:1))*(country?.6:1)/10)*10;
   res.push({c:x.c,t:x.ti,i,wage:w,yrs:rnd(1,4),role,coach:rnd(0,COACH.length-1),bonus:chance(.5)?Math.round(w*rnd(2,8)/100)*100:0,fans:Math.round(Math.pow(cb.s-30,2.6)*3)})}
- return res}
+ if(S.club&&!country){let f=0;for(let k=res.length-1;k>=0;k--)if(res[k].c!==S.club.c&&(++f>1||res.length>1&&k===0&&f===res.length))res.splice(k,1)}res.why=country?'':PF.why;return res}
 function offerCard(o,k){const t=tierOf(o.c,o.t),L=LEAGUES[o.c],cb=t.clubs[o.i],h=hue(cb.n),r=ROLE[o.role],co=COACH[o.coach];
  if(o.gone)return `<div class="card" style="opacity:.45"><b>${cb.n}</b><p class="re">❌ ถอนข้อเสนอแล้ว</p></div>`;
  return `<div class="card"><div class="row"><div style="width:46px;height:46px;border-radius:50%;flex:none;background:conic-gradient(hsl(${h},70%,45%) 0 50%,hsl(${(h+150)%360},70%,55%) 0);border:3px solid #fff2;display:grid;place-items:center;font-weight:800">${cb.n.replace(/^(Real|Atlético|CD|UD|Deportivo|SD|Racing|CF|AC|US|FC|SS|Calcio|Virtus|Sporting|Inter|SV|VfB|TSV|Borussia|Fortuna|SC|1\. FC|Olympique|AS|Stade|RC) /,'')[0]}</div>
@@ -340,10 +340,13 @@ function offerCard(o,k){const t=tierOf(o.c,o.t),L=LEAGUES[o.c],cb=t.clubs[o.i],h
  <p class="mu" style="margin-top:8px">โค้ช: <b style="color:var(--tx)">${co[0]}</b> · ${co[1]}${o.bonus?` · <span class="ye">เงินเซ็นสัญญา ฿${fmt(o.bonus)}</span>`:''}</p>
  <div class="row"><button class="btn" style="flex:2" data-of="${k}">✍️ เซ็นเลย</button>${o.neg?'':`<button class="btn s" style="flex:1;text-align:center" data-ng="${k}">💬 ต่อรอง</button>`}</div>${o.msg?`<p class="${o.msgc}" style="margin-top:6px">${o.msg}</p>`:''}</div>`}
 function avgR(){const r=S.p.rh||[];return r.length?r.reduce((a,b)=>a+b,0)/r.length:0}
-function earned(){const p=S.p,c=club();if(!c)return true;const r=p.rh||[];return (r.length>=3&&avgR()>=7.0)||ovr()>=c.s+6||(p.sg+p.sa)>=8||p.fans>=100000}
-function offers(auto,country,list){if(!list&&!country&&S.club&&!earned()&&!S.p.bonusOffer){if(auto){closeM();save();return render()}return sheet(`<h2>ข้อเสนอ</h2><p>ยังไม่มีสโมสรสนใจคุณ</p><p class="mu">ต้องทำผลงานให้โดดเด่นก่อน: เรตติ้งเฉลี่ย 7.0+ (5 นัดล่าสุด ตอนนี้ ${avgR().toFixed(1)}), OVR สูงกว่าระดับทีมชัดเจน, ยิง/แอสซิสต์รวม 8+ หรือผู้ติดตาม 100K+</p><button class="btn" onclick="closeM()">ปิด</button>`)}list=list||genOffers(country);const first=!!country;
+function earned(){const p=S.p,c=club();if(!c)return true;const r=p.rh||[];return (p.sapp||0)>=8&&((r.length>=5&&avgR()>=7.0)||(p.sg+p.sa)>=5)}
+function perfOf(end){const p=S.p,L=end&&p.lastS?p.lastS:{app:p.sapp||0,g:p.sg,a:p.sa,avg:avgR(),n:(p.rh||[]).length};const has=L.app>=8&&((L.n>=5&&L.avg>=7)||L.g+L.a>=5);
+ const bump=has?cl((L.avg-6.8)*6+(L.g+L.a)*.4,0,6):0;const why=[];if(L.n)why.push(`เรตติ้งเฉลี่ย ${L.avg.toFixed(1)} ใน ${Math.min(5,L.n)} นัด`);if(L.g)why.push(`${L.g} ประตู`);if(L.a)why.push(`${L.a} แอสซิสต์`);why.push(`ลงเล่น ${L.app} นัด`);
+ return{has,bump,why:has?'สนใจเพราะ: '+why.join(', '):'ยังไม่มีผลงานโดดเด่น — มีแค่ทีมระดับเดียวกันหรือต่ำกว่าที่สนใจ ('+why.join(', ')+')'}}
+function offers(auto,country,list){if(!list&&!country&&S.club&&!earned()){if(auto){closeM();save();return render()}return sheet(`<h2>ข้อเสนอ</h2><p>ยังไม่มีสโมสรสนใจคุณ</p><p class="mu">ต้องลงเล่น 8+ นัดในฤดูกาลนี้ (ตอนนี้ ${S.p.sapp||0}) และ เรตติ้งเฉลี่ย 7.0+ ใน 5 นัดล่าสุด (ตอนนี้ ${avgR().toFixed(1)}) หรือ ยิง+แอสซิสต์ 5+ (ตอนนี้ ${S.p.sg+S.p.sa})</p><button class="btn" onclick="closeM()">ปิด</button>`)}list=list||genOffers(country);const first=!!country;
  if(!list.length){if(auto){closeM();save();return render()}return sheet(`<h2>ข้อเสนอ</h2><p>ยังไม่มีสโมสรสนใจ พัฒนาฝีเท้าก่อนนะ</p><button class="btn" onclick="closeM()">ปิด</button>`)}
- sheet(`<span class="tag o">${first?'เริ่มต้นอาชีพ':'ตลาดซื้อขาย'}</span><div class="row">${avatarSVG(S.p.av,56)}<h2>สโมสรที่สนใจคุณ</h2></div><p class="mu" style="margin-bottom:10px">${first?'เลือกสโมสรแรกในชีวิตค้าแข้ง — ทีมใหญ่อาจได้นั่งสำรอง ทีมเล็กได้เป็นตัวจริง':'ต่อรองได้ครั้งเดียวต่อทีม แต่ระวังเขาถอนตัว!'}</p>${list.map(offerCard).join('')}${first?'':`<button class="btn s" id="stay" style="text-align:center">${S.club?'อยู่ทีมเดิม':'ปิด'}</button>`}`);
+ sheet(`<span class="tag o">${first?'เริ่มต้นอาชีพ':'ตลาดซื้อขาย'}</span><div class="row">${avatarSVG(S.p.av,56)}<h2>สโมสรที่สนใจคุณ</h2></div><p class="mu" style="margin-bottom:10px">${first?'เลือกสโมสรแรกในชีวิตค้าแข้ง — ทีมใหญ่อาจได้นั่งสำรอง ทีมเล็กได้เป็นตัวจริง':'ต่อรองได้ครั้งเดียวต่อทีม แต่ระวังเขาถอนตัว!'}</p>${list.why?`<p class="ye" style="margin-bottom:10px">📊 ${list.why}</p>`:''}${list.map(offerCard).join('')}${first?'':`<button class="btn s" id="stay" style="text-align:center">${S.club?'อยู่ทีมเดิม':'ปิด'}</button>`}`);
  document.querySelectorAll('[data-ng]').forEach(b=>b.onclick=()=>{const o=list[+b.dataset.ng];o.neg=1;
   if(chance(o.role==='star'?.3:.4)){o.gone=1;if(list.every(x=>x.gone))list.push(...genOffers(country))}else if(chance(.6)){o.wage=Math.round(o.wage*1.25/10)*10;o.bonus=Math.round((o.bonus||o.wage)*1.5/100)*100;o.msg='✅ ยอมขึ้นค่าเหนื่อย +25% และเพิ่มเงินเซ็นสัญญา!';o.msgc='gr'}else{o.msg='😐 "นี่คือข้อเสนอสุดท้ายแล้ว"';o.msgc='mu'}
   const y=$('.sheet').scrollTop;offers(auto,country,list);$('.sheet').scrollTop=y});
@@ -546,7 +549,7 @@ function drawLive(){const L=LIVE,M=L.M,c=club();$('#tabs').innerHTML='';const hn
 function finish(nx,M,msg,quiet){const p=S.p,c=club();let gf,ga;
  if(M.played&&M.tick){gf=M.gf;ga=M.ga}else{const d=c.s-nx.opp.s+(nx.home?2:0)-(M.missed?3:0);gf=pois(1.25+d*.06);ga=pois(1.2-d*.06)}
  if(M.missed){p.app++;CONS=[];E('trust',-6);E('morale',-4);msg='⏰ คุณไม่ได้ลงสนามตามเวลา ระบบจำลองผลให้ (ฟอร์มย่ำแย่)'}
- if(M.played){p.app++;p.stamina=cl(p.stamina-rnd(5,10));M.r+=(gf-ga)*.1;if(M.r>7.5)E('fans',0.03);p.ta+=M.as;CONS=[];const rr=cl(M.r,3,10);if(rr>=7)addSP(rr>=8?2:1,'เรตติ้ง');if(rr>=8){M.motm=1;addSP(1,'MOTM')}M.spc=CONS.slice()}
+ if(M.played){p.app++;p.sapp=(p.sapp||0)+1;p.stamina=cl(p.stamina-rnd(5,10));M.r+=(gf-ga)*.1;if(M.r>7.5)E('fans',0.03);p.ta+=M.as;CONS=[];const rr=cl(M.r,3,10);if(rr>=7)addSP(rr>=8?2:1,'เรตติ้ง');if(rr>=8){M.motm=1;addSP(1,'MOTM')}M.spc=CONS.slice()}
  else if(!M.missed){p.stamina=cl(p.stamina+10);if(p.ban)p.ban--;else if(p.inj)p.inj--}
  const [h,a]=nx.m;rec(h,a,nx.home?gf:ga,nx.home?ga:gf);
  S.fix[S.week].forEach(([x,y])=>{if(x===S.club.i||y===S.club.i)return;const cs=tierOf(S.club.c,S.club.t).clubs;rec(x,y,pois(1.3+(cs[x].s-cs[y].s)*.05+.15),pois(1.2-(cs[x].s-cs[y].s)*.05))});
@@ -561,7 +564,7 @@ function finish(nx,M,msg,quiet){const p=S.p,c=club();let gf,ga;
  $('#nx').onclick=()=>{if(p.terminate){p.terminate=0;news(`📄 ${c.n} ประกาศยกเลิกสัญญา ${p.name}`);S.club=null;p.wage=0;closeM();save();render();return sheet(`<span class="tag">สัญญาถูกยกเลิก</span><div class="ev">${c.n} ฉีกสัญญาคุณ! ตอนนี้คุณเป็นนักเตะไร้สังกัด</div><button class="btn" onclick="closeM();render()">เข้าใจแล้ว</button>`)}
   if(S.week>=S.N)return endSeason();postMatch()}}
 function postMatch(){const due=S.chains.findIndex(c=>c.at<=S.abs);let ev=null;if(due>=0){ev=EVM[S.chains[due].id];S.chains.splice(due,1)}
- const after=()=>{closeM();if(S.club&&(S.p.bonusOffer||(earned()&&chance(S.p.wantOut?.6:S.p.agent?.3:.18)))){const l=genOffers();S.p.bonusOffer=0;if(l.length)return offers(true,null,l)}save();TAB='home';render()};
+ const after=()=>{closeM();if(S.club&&earned()&&(S.p.bonusOffer||chance(S.p.wantOut?.6:S.p.agent?.3:.18))){const l=genOffers();S.p.bonusOffer=0;if(l.length)return offers(true,null,l)}save();TAB='home';render()};
  if(ev)showEvent(ev,null,after);else after()}
 function endSeason(){if(!S.club){S.season++;S.p.age++;newSeason(S.ko[S.N-1]+DAY);save();return}
  const st=sorted(),pos=st.findIndex(r=>r.i===S.club.i)+1,c=S.club,T=S.world[c.c],me=club();let msg=`จบฤดูกาล ${S.slabel}: ${me.n} จบอันดับ ${pos}`;
@@ -570,10 +573,10 @@ function endSeason(){if(!S.club){S.season++;S.p.age++;newSeason(S.ko[S.N-1]+DAY)
  if(pos===1)msg+=' 🏆 แชมป์ลีก!';news(msg+` · ${S.p.name} ${S.p.sg} ประตู ${S.p.sa} แอสซิสต์`);
  S.season++;S.p.age++;S.p.contract--;if(S.p.age>30)for(const k in S.p.a)S.p.a[k]=cl(S.p.a[k]-rnd(0,2),20,99);
  else if(S.p.age<25){PI();S.p.sp+=2}
- S.p.stamina=95;S.p.morale=cl(S.p.morale+5);newSeason(S.ko[S.N-1]+DAY);
+ S.p.lastS={app:S.p.sapp||0,g:S.p.sg,a:S.p.sa,avg:avgR(),n:(S.p.rh||[]).length};S.p.stamina=95;S.p.morale=cl(S.p.morale+5);newSeason(S.ko[S.N-1]+DAY);
  if(S.p.contract<=0){S.p.contract=rnd(1,3);S.p.wage=Math.round(S.p.wage*(1+(ovr()-60)/100));msg+=` · ต่อสัญญาอัตโนมัติ ฿${fmt(S.p.wage)}/สัปดาห์`}
  msg+=`<br><span class="mu">ฤดูกาลใหม่ ${S.slabel} เริ่ม ${fdt(S.ko[0])}</span>`;
- save();sheet(`<span class="tag g">สรุปฤดูกาล</span><div class="ev">${msg}</div><button class="btn" id="nx">ต่อไป ›</button>`);$('#nx').onclick=()=>{if(earned())offers(true);else{closeM();render()}}}
+ save();sheet(`<span class="tag g">สรุปฤดูกาล</span><div class="ev">${msg}</div><button class="btn" id="nx">ต่อไป ›</button>`);$('#nx').onclick=()=>{const l=genOffers(null,true);if(l.length&&(S.p.contract<=1||(S.p.lastS&&perfOf(true).has)))offers(true,null,l);else{closeM();render()}}}
 // ===== LIFESTYLE =====
 let LS='boost',LC='rec';
 const BST={
