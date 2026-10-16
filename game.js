@@ -753,3 +753,10 @@ load();if(S&&!S.ko)S=null;if(S&&!S.gameT){S.gameT=Math.min(Date.now()+(S.devOff|
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
 document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 let LTE=0;document.addEventListener('touchend',e=>{const t=Date.now();if(e.target.closest&&e.target.closest('.mg')){if(t-LTE<300){e.preventDefault();e.target.click&&e.target.closest('button')&&e.target.closest('button').click()}}LTE=t},{passive:false});
+// ===== PORTRAIT AVATARS (override SVG builder) =====
+function AGf(){return [['as','เอเชีย'],['bl','ผิวเข้ม'],['eu','ยุโรป'],['la','ละติน/อาหรับ']]}
+function avFix(av){if(!av)av={};if(av.g==null){const s=av.s==null?2:av.s;av.g=s<=1?'eu':s===2?'as':s===3?'la':'bl';av.i=(av.h||0)%8}return av}
+function avatarSVG(av,size=64){av=avFix(av);return `<div class="pav2" style="width:${size}px;height:${size}px;border-color:${kitCol()}"><img src="avatars/${av.g}${av.i}.webp" alt="" width="${size}" height="${size}"></div>`}
+function avEditor(av){avFix(av);return `<div class="row" style="justify-content:center">${avatarSVG(av,120)}</div><div class="chips" style="justify-content:center;margin:10px 0">${AGf().map(([k,l])=>`<div class="chip ${av.g===k?'on':''}" data-ag="${k}">${l}</div>`).join('')}</div>
+ <div class="avgrid">${[0,1,2,3,4,5,6,7].map(i=>`<img src="avatars/${av.g}${i}.webp" class="${av.i===i?'on':''}" data-ai="${i}" alt="">`).join('')}</div><button class="btn s" data-ar="1" style="text-align:center">🎲 สุ่มหน้าตา</button>`}
+function bindAe(av,redraw){document.querySelectorAll('[data-ag]').forEach(b=>b.onclick=()=>{av.g=b.dataset.ag;redraw()});document.querySelectorAll('[data-ai]').forEach(b=>b.onclick=()=>{av.i=+b.dataset.ai;redraw()});const r=document.querySelector('[data-ar]');if(r)r.onclick=()=>{av.g=pick(AGf())[0];av.i=rnd(0,7);redraw()}}
