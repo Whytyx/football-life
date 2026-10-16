@@ -612,7 +612,7 @@ const NATS={THA:['🇹🇭','ไทย',66],ENG:['🏴','อังกฤษ',80]
 const LF=()=>S&&S.club?LEAGUES[S.club.c].f:'';const NAT=()=>NATS[(S&&S.p.nat)||'THA'],NF=()=>NAT()[0],NN=()=>NAT()[1];
 const foreign=()=>S.club&&S.club.c!==S.p.nat;
 const SKIN=['#f6d3b3','#e9b98f','#c98d60','#a06a43','#74492b','#4b2e1b'],HC=['#1a1a1a','#4a2c17','#8b5a2b','#d9a441','#e8e0d0','#b8322a','#2a5bd7'];
-const AVO={s:['สีผิว',SKIN.map((_,i)=>'โทน '+(i+1))],h:['ทรงผม',['สั้นปัดข้าง','เฟด','แอฟโฟร','ยาวประบ่า','โมฮอว์ก','หนามแหลม','แมนบัน','หัวโล้น','อันเดอร์คัท','สลิคแบ็ค','เท็กซ์เจอร์ครอป','เคิร์ลลี่ท็อป']],hc:['สีผม',['ดำ','น้ำตาลเข้ม','น้ำตาล','บลอนด์','เทา/ขาว','แดง','น้ำเงิน']],f:['รูปหน้า',['กลม','รี','เหลี่ยม']],e:['ดวงตา',['คม','ยิ้มตา','ดุดัน','เหยี่ยว']],b:['หนวดเครา',['ไม่มี','เครางาม','หนวด','เคราแพะ','ไรหนวด']],a:['เครื่องประดับ',['ไม่มี','ผ้าคาดผม','ต่างหู','ผ้าคาด+ต่างหู']]};
+const AVO={s:['สีผิว',SKIN.map((_,i)=>'โทน '+(i+1))],h:['ทรงผม',['ปัดข้าง','สกินเฟด','แอฟโฟร','ยาวประบ่า','โมฮอว์ก','หนามแหลม','แมนบัน','บัซคัท','อันเดอร์คัท','สลิคแบ็ค','เท็กซ์เจอร์ครอป','เคิร์ลลี่ท็อป']],hc:['สีผม',['ดำ','น้ำตาลเข้ม','น้ำตาล','บลอนด์','เทา/ขาว','แดง','น้ำเงิน']],f:['รูปหน้า',['กลม','รี','เหลี่ยม']],e:['ดวงตา',['คม','ยิ้มตา','ดุดัน','เหยี่ยว']],b:['หนวดเครา',['ไม่มี','เครางาม','หนวด','เคราแพะ','ไรหนวด']],a:['เครื่องประดับ',['ไม่มี','ผ้าคาดผม','ต่างหู','ผ้าคาด+ต่างหู']]};
 const DAV={s:2,h:8,hc:0,f:0,e:0,b:0,a:0};
 function kitCol(){return S&&S.club&&club()?`hsl(${hue(club().n)},70%,45%)`:'#3a4a40'}
 let AVN=0;
@@ -624,25 +624,30 @@ function hairDefs(id,hc,hcL,hcD){return `<linearGradient id="${id}f" x1="0" y1="
 function mass(c,v,hy,fill){const{L,R}=c;return `<path d="M${L-1.2} 40 C${L-2.2} 24 ${L+3} ${14-v} 50 ${13.5-v} C${R-3} ${14-v} ${R+2.2} 24 ${R+1.2} 40 L${R-.6} 40 Q${R-.6} 31 ${R-4} ${hy+1} Q50 ${hy-3} ${L+4} ${hy+1} Q${L+.6} 31 ${L+.6} 40Z" fill="${fill||`url(#${c.id}m)`}" filter="url(#${c.id}b)"/>`}
 function sides(c,op=1){const{L,R}=c;return `<path d="M${L-1.4} 26 Q${L-2.2} 34 ${L-.8} 44 L${L+1.6} 44 Q${L+1} 34 ${L+3} 28Z M${R+1.4} 26 Q${R+2.2} 34 ${R+.8} 44 L${R-1.6} 44 Q${R-1} 34 ${R-3} 28Z" fill="url(#${c.id}f)" opacity="${op}" filter="url(#${c.id}b)"/>`}
 function buzz(c,op=.3){const{L,R}=c;return `<path d="M${L-.4} 38 C${L-.8} 22 ${L+5} 15 50 14.8 C${R-5} 15 ${R+.8} 22 ${R+.4} 38 L${R-1} 38 Q${R-2} 27 50 25.5 Q${L+2} 27 ${L+1} 38Z" fill="${c.hcD}" opacity="${op}" filter="url(#${c.id}b)"/>`}
-function hairBack(c){const{L,R,h,H}=c;
- if(h===2)return `<circle cx="50" cy="28" r="${c.w+9}" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`;
- if(h===3)return `<path d="M${L-2} 30 Q${L-6} 60 ${L-1} 76 Q${L+6} 72 ${L+4} 56 L${R-4} 56 Q${R-6} 72 ${R+1} 76 Q${R+6} 60 ${R+2} 30Z" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`;
- if(h===6)return `<ellipse cx="50" cy="8.5" rx="7.2" ry="6" fill="url(#${c.id}m)"/>`+locks([[45,10,48,5,54,4.5,3],[47,12,52,8,56,8,2.6]],c);
+function fadeS(c,top=27,op=1){const{L,R}=c;return `<path d="M${L-1.3} ${top} Q${L-2} 36 ${L-.6} 45 L${L+1.2} 45 Q${L+1} 36 ${L+3.5} ${top-1}Z M${R+1.3} ${top} Q${R+2} 36 ${R+.6} 45 L${R-1.2} 45 Q${R-1} 36 ${R-3.5} ${top-1}Z" fill="url(#${c.id}f)" opacity="${op}" filter="url(#${c.id}b)"/>`}
+function topM(c,v,hy,opt={}){const{L,R}=c;const T=14-v,sl=opt.sl||0,lx=L+(opt.lw||1),rx=R-(opt.rw||1),sy=opt.sy||30;
+ return `<path d="M${lx} ${sy} C${L-1} ${T+9} ${L+4+sl} ${T} ${50+sl} ${T} C${R-3+sl} ${T} ${R+1.5} ${T+7} ${rx} ${sy} Q${R-3} ${hy+1} ${R-6} ${hy} Q50 ${hy-(opt.dip||1.5)} ${L+6} ${hy} Q${L+2.5} ${hy+1} ${lx} ${sy}Z" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`}
+function strands(c,arr,col,op=.4,wd=.7){return arr.map(d=>`<path d="${d}" stroke="${col}" stroke-width="${wd}" fill="none" opacity="${op}" stroke-linecap="round"/>`).join('')}
+function curls(c,pts,r){return pts.map(([x,y,rr])=>{rr=rr||r;return `<circle cx="${x}" cy="${y}" r="${rr}" fill="url(#${c.id}m)"/><path d="M${x-rr*.55} ${y+rr*.1} a${rr*.55} ${rr*.55} 0 1 1 ${rr*.8} ${rr*.4}" stroke="${c.hcL}" stroke-width=".7" fill="none" opacity=".5"/>`}).join('')}
+function hairBack(c){const{L,R,h}=c;
+ if(h===2)return curls(c,[[L-2,30,5],[L-3,38,4.5],[R+2,30,5],[R+3,38,4.5],[L,22,5.5],[R,22,5.5]],5);
+ if(h===3)return `<path d="M${L-1} 26 Q${L-7} 40 ${L-5} 52 Q${L-7} 60 ${L-2} 66 Q${L+3} 62 ${L+1.5} 54 L${R-1.5} 54 Q${R-3} 62 ${R+2} 66 Q${R+7} 60 ${R+5} 52 Q${R+7} 40 ${R+1} 26Z" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`;
+ if(h===6)return `<circle cx="52" cy="9.5" r="5.6" fill="url(#${c.id}m)"/>${strands(c,[`M48 9.5 Q52 5 56 9.5`],c.hcL,.5)}`;
  return ''}
-function hairFront(c){const{L,R,h}=c;let o='';
+function hairFront(c){const{L,R,h,hcL,hcD}=c;let o='';
  switch(h){
- case 0: o+=mass(c,3.5,27.5)+sides(c)+locks([[L+8,18,44,13,R+1,27,6],[L+5,22,40,17,R-3,24,5.5],[L+11,15,52,9.5,R-1,20,5],[L+2,27,L+6,19,48,21,4.5],[44,14,56,10,R+1.5,31,3.5]],c);break;
- case 1: o+=buzz(c)+mass(c,1.6,26.5)+sides(c,.55)+locks([[40,16,46,13,54,15.5,4],[46,15,52,12.5,60,17,4],[L+5,22,L+8,16,46,18,3.6],[54,16,60,15,R-3,22,3.4]],c);break;
- case 2: o+=mass(c,6,26)+[[L,26],[L+3,19],[L+8,14],[44,11],[50,10],[56,11],[R-8,14],[R-3,19],[R,26],[L+6,22],[44,17],[50,16],[56,17],[R-6,22]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i>8?4:4.6}" fill="url(#${c.id}m)"/><path d="M${x-2.4} ${y} a2.4 2.4 0 1 1 3.4 1.7" stroke="${c.hcL}" stroke-width=".8" fill="none" opacity=".4"/>`).join('');break;
- case 3: o+=mass(c,3,26)+locks([[50,15,L+2,18,L-1,42,6],[50,15,R-2,18,R+1,42,6],[49,16,L+6,22,L+2,34,4.5],[51,16,R-6,22,R-2,34,4.5],[50,14,44,16,L+4,27,4],[50,14,56,16,R-4,27,4]],c);break;
- case 4: o+=buzz(c)+sides(c,.45)+`<path d="M44.5 27 Q44 16 47 12 Q50 10 53 12 Q56 16 55.5 27 Q50 25 44.5 27Z" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`+`<path d="M${L+1} 32 Q${L} 20 50 18 Q${R} 20 ${R-1} 32" stroke="url(#${c.id}f)" stroke-width="3" fill="none" opacity=".45"/>`+locks([[50,27,47,14,44,3,7],[50,27,52,15,55,4.5,6],[50,22,49,10,50,1,5],[47,27,45,19,42,10,4],[53,27,55,19,58,11,4]],c);break;
- case 5: o+=mass(c,1.5,27)+sides(c,.8)+locks([[L+4,26,L+2,18,L+1,10,5],[L+9,22,L+8,12,L+10,3,5.5],[46,20,46,10,48,1,6],[54,20,55,10,58,2,6],[R-9,22,R-7,12,R-5,4,5.5],[R-4,26,R-2,18,R+1,11,5]],c);break;
- case 6: o+=mass(c,1,26.5)+sides(c,.9)+locks([[L+3,28,L+5,16,48,12,5],[R-3,28,R-5,16,52,12,5],[42,26,44,16,49,12.5,4],[58,26,56,16,51,12.5,4]],c);break;
- case 7: o+=`<path d="M${L-.4} 36 C${L-.8} 22 ${L+5} 15 50 14.8 C${R-5} 15 ${R+.8} 22 ${R+.4} 36 L${R-1} 36 Q${R-2} 27 50 25.5 Q${L+2} 27 ${L+1} 36Z" fill="${c.hcD}" opacity=".16" filter="url(#${c.id}b)"/><ellipse cx="45" cy="19" rx="7" ry="2.6" fill="#fff" opacity=".12"/>`;break;
- case 8: o+=buzz(c)+sides(c,.5)+mass(c,4,26.5,`url(#${c.id}m)`).replace(`C${L-2.2} 24`,`C${L+1} 24`)+locks([[L+4,26,L+6,12,R-2,14,6.5],[L+8,25,44,10,R+1,19,6],[44,24,52,11,R+2,24,5],[L+3,28,L+4,18,52,14,4.5]],c);break;
- case 9: o+=mass(c,5,26.5)+sides(c,.85)+locks([[L+4,28,L+5,10,R-6,14,6],[44,27,46,9,R-1,20,6],[53,27,56,11,R+1,27,5],[L+2,31,L+2,20,L+12,13,4]],c);break;
- case 10: o+=buzz(c)+sides(c,.5)+mass(c,2.5,25)+locks([[L+6,15,L+4,22,L+5,29,5],[44,13,42,21,42,29.5,5.5],[52,13,51,21,50,28.5,5.5],[R-8,15,R-6,22,R-6,28.5,5],[R-3,18,R-1,24,R-1,30,4],[L+2,19,L+1,25,L+2,31,4]],c);break;
- case 11: o+=buzz(c)+sides(c,.5)+mass(c,1,27,c.hcD)+[[L+5,22],[L+10,16],[50,13.5],[R-10,16],[R-5,22],[L+9,24],[44,19],[56,19],[R-9,24],[50,24.5]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.3" fill="url(#${c.id}m)"/><path d="M${x-2.2} ${y+.4} a2.3 2.3 0 1 1 3.3 1.6" stroke="${c.hcL}" stroke-width=".9" fill="none" opacity=".55"/><path d="M${x-1.8} ${y+2.8} a3.4 3.4 0 0 0 4.6 -1" stroke="${c.hcD}" stroke-width=".7" fill="none" opacity=".6"/>`).join('');break;
+ case 0: o+=fadeS(c,27,.8)+topM(c,7,26,{sl:2,dip:3})+strands(c,[`M${L+4} 24 Q46 11 ${R} 18`,`M${L+8} 25 Q50 13 ${R-1} 24`,`M${L+12} 26 Q52 16 ${R-2} 27`],hcL,.4);break;
+ case 1: o+=fadeS(c,26,1)+topM(c,4,25.5,{lw:2.5,rw:2.5,sy:27,dip:.5})+strands(c,[`M${L+6} 22 Q50 15 ${R-6} 21`,`M${L+8} 18 Q50 12.5 ${R-8} 17`],hcL,.35);break;
+ case 2: o+=curls(c,[[L+1,25,5.5],[L+5,17,6],[L+12,12,6],[50,10,6.5],[R-12,12,6],[R-5,17,6],[R-1,25,5.5],[L+9,21,5],[50,18,5],[R-9,21,5],[44,23,4],[56,23,4]],5.5);break;
+ case 3: o+=topM(c,4,26,{dip:4})+`<path d="M50 15 Q${L+3} 17 ${L-3} 34 Q${L-2} 26 ${L+2} 24 Q${L+6} 20 50 19Z" fill="url(#${c.id}m)"/><path d="M50 15 Q${R-3} 17 ${R+3} 34 Q${R+2} 26 ${R-2} 24 Q${R-6} 20 50 19Z" fill="url(#${c.id}m)"/>`+strands(c,[`M${L-2} 30 Q${L-5} 42 ${L-3} 58`,`M${R+2} 30 Q${R+5} 42 ${R+3} 58`,`M48 16 Q${L+6} 17 ${L} 26`,`M52 16 Q${R-6} 17 ${R} 26`],hcL,.35,.8);break;
+ case 4: o+=fadeS(c,25,1)+buzz(c,.22)+`<path d="M43 27 Q42 18 44 12 L46 15 L47 7 L49.5 11 L51 3 L53 10 L55 6 L56 13 L58 11 Q58.5 20 57 27 Q50 25 43 27Z" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`+strands(c,[`M46 25 Q46 14 50 5`,`M54 25 Q55 15 55 8`],hcL,.45);break;
+ case 5: o+=fadeS(c,26,1)+topM(c,3.5,25.5,{lw:2.5,rw:2.5,sy:27})+`<path d="M${L+3} 25 L${L+3} 16 L${L+7} 18 L${L+8} 9 L${L+12} 14 L46 6 L49 12 L52 5 L55 12 L${R-11} 7 L${R-9} 14 L${R-5} 10 L${R-4} 18 L${R-2} 17 L${R-2} 25 Q50 21 ${L+3} 25Z" fill="url(#${c.id}m)" filter="url(#${c.id}b)"/>`+strands(c,[`M${L+8} 21 L${L+9} 12`,`M47 20 L47.5 9`,`M53 20 L53 9`,`M${R-8} 21 L${R-8} 12`],hcL,.45);break;
+ case 6: o+=topM(c,1.5,26,{dip:1})+strands(c,[`M${L+4} 27 Q${L+6} 15 ${R-6} 11`,`M${L+9} 25 Q48 14 ${R-5} 13`,`M46 25 Q52 15 ${R-4} 15`,`M${R-2} 28 Q${R-1} 18 ${R-5} 13`],hcL,.4,.8);break;
+ case 7: o+=fadeS(c,26,.6)+`<path d="M${L+.4} 33 C${L-.6} 21 ${L+5} 13.6 50 13.4 C${R-5} 13.6 ${R+.6} 21 ${R-.4} 33 Q${R-3} 26.5 ${R-6} 25.8 Q50 24.6 ${L+6} 25.8 Q${L+3} 26.5 ${L+.4} 33Z" fill="url(#${c.id}m)" opacity=".92" filter="url(#${c.id}b)"/>`;break;
+ case 8: o+=fadeS(c,24,1)+topM(c,8,25.5,{lw:3,rw:3,sy:25,sl:1})+strands(c,[`M${L+5} 23 Q${L+4} 10 50 8 Q${R-4} 8 ${R-4} 16`,`M${L+9} 24 Q${L+10} 13 52 11`,`M48 24 Q52 13 ${R-5} 13`,`M${L+4} 19 Q${L+8} 13 ${L+13} 13`],hcL,.45,.8)+strands(c,[`M44 22 Q47 15 54 13`],hcD,.5,.7);break;
+ case 9: o+=fadeS(c,25,1)+topM(c,6,25.5,{lw:2.5,rw:2.5,sy:26,dip:.8})+strands(c,[`M${L+5} 24 Q${L+6} 11 ${R-4} 11`,`M${L+9} 25 Q${L+12} 12 ${R-2} 15`,`M46 25 Q50 13 ${R-1} 19`,`M53 25 Q58 16 ${R-1} 23`],hcL,.5,.9);break;
+ case 10: o+=fadeS(c,25,1)+topM(c,4,26.5,{lw:2.5,rw:2.5,sy:26,dip:-1})+curls(c,[[L+6,18,3.4],[L+12,14.5,3.6],[50,13.5,3.6],[R-12,14.5,3.6],[R-6,18,3.4],[L+9,23,3.2],[46,20,3.2],[54,20,3.2],[R-9,23,3.2]],3.4);break;
+ case 11: o+=fadeS(c,24,1)+topM(c,6,25.5,{lw:2.5,rw:2.5,sy:26})+curls(c,[[L+4,21,4.3],[L+8,14,4.6],[L+14,9.5,4.6],[50,8,4.8],[R-14,9.5,4.6],[R-8,14,4.6],[R-4,21,4.3],[L+10,20,4.2],[50,15,4.4],[R-10,20,4.2],[44,22.5,3.6],[56,22.5,3.6]],4.4);break;
  }return o}
 function avatarSVG(av,size=64,kit){av=Object.assign({},DAV,av||{});const id='a'+(AVN++),sk=SKIN[av.s],hc=HC[av.hc];kit=kit||kitCol();
  const skD=shade(sk,-.16),skL=shade(sk,.14),hcL=shade(hc,.3),hcD=shade(hc,-.3),h=av.h;
