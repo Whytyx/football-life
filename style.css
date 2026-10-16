@@ -62,3 +62,7 @@ tr.me{background:#2a1c0f;color:var(--or);font-weight:600}
 .mgm{position:absolute;top:8px;font-size:24px}
 .mgf{position:relative;height:260px;background:repeating-linear-gradient(90deg,#123d22 0 33.3%,#15452a 33.3% 66.6%);border-radius:12px;margin:10px 0;overflow:hidden}
 .mgf span{position:absolute;font-size:26px;transform:translate(-50%,-50%);margin-left:5%}
+html,body{touch-action:manipulation;overscroll-behavior:none}
+button,.btn,.chip,.opt,[data-o],[data-tr],[data-dr],[data-in]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input,select,textarea{font-size:16px!important}
+.mg,.mg *{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}

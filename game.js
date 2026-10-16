@@ -435,7 +435,7 @@ const TEV=[
  ['📱 เพื่อนร่วมทีมแอบถ่ายคลิปคุณล้มคะมำแล้วโพสต์ลงโซเชียล',[['😂 รีโพสต์ขำ ๆ',()=>{E('fans',0.02);E('morale',2)}],['😠 ไปต่อว่า',()=>{E('morale',-3);E('trust',-2)}]]],
  ['🌧️ ฝนตกหนักกลางซ้อม โค้ชให้เลือกว่าจะซ้อมต่อไหม',[['💪 ซ้อมต่อกลางฝน',()=>{addXP(15);E('stamina',-6);E('trust',3)}],['🏃 เข้าร่ม',()=>{E('stamina',4)}]]],
  ['🧒 ดาวรุ่งตำแหน่งเดียวกับคุณเล่นดีมาก โค้ชชมเขาต่อหน้าทุกคน',[['🤝 ชมเขาด้วย',()=>{E('trust',3);E('morale',1)}],['😤 ซ้อมเพิ่มคนเดียวจนมืด',()=>{addXP(20);E('stamina',-10)}]]]];
-function miniGame(d,cb){let end=false;const fin=sc=>{if(end)return;end=true;clearInterval(T);cancelAnimationFrame(A);cb(Math.round(cl(sc,0,100)))};let T=0,A=0;
+function miniGame(d,cb){setTimeout(()=>{const sh=document.querySelector('#modal .sheet');if(sh)sh.classList.add('mg')},0);let end=false;const fin=sc=>{if(end)return;end=true;clearInterval(T);cancelAnimationFrame(A);cb(Math.round(cl(sc,0,100)))};let T=0,A=0;
  if(d==='sho'||d==='pas'){let n=0,tot=0,x=0,v=1.6,zx=40,zv=d==='pas'?0.7:0;const N2=d==='sho'?3:4;
   sheet(`<span class="tag o">🎮 ${DR[d][1]}</span><p class="mu">${DR[d][2]} · ${N2} ครั้ง</p><div class="mgbar"><div class="mgz" id="z"></div><div class="mgm" id="mk">⚽</div></div><p class="big" id="sc" style="text-align:center">0</p><button class="btn" id="tp">👆 แตะ!</button>`);
   const z=$('#z'),mk=$('#mk');const st=()=>{x+=v;if(x>96||x<0)v=-v;zx+=zv;if(zx>78||zx<2)zv=-zv;mk.style.left=x+'%';z.style.left=zx+'%';A=requestAnimationFrame(st)};st();
@@ -749,3 +749,7 @@ function editAvatar(){const av=Object.assign({},DAV,S.p.av);const d=()=>{sheet(`
 function AVI(){const p=S.p;if(!S.hist&&S.club)S.hist=[{f:LEAGUES[S.club.c].f,n:club().n,d:tierOf(S.club.c,S.club.t).n,y:S.slabel||''}];if(!p.nat)p.nat='THA';if(!p.av)p.av=Object.assign({},DAV)}
 window.closeM=closeM;window.render=render;
 load();if(S&&!S.ko)S=null;if(S&&!S.gameT){S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}render();
+
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+let LTE=0;document.addEventListener('touchend',e=>{const t=Date.now();if(e.target.closest&&e.target.closest('.mg')){if(t-LTE<300){e.preventDefault();e.target.click&&e.target.closest('button')&&e.target.closest('button').click()}}LTE=t},{passive:false});
