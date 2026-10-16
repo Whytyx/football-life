@@ -57,3 +57,8 @@ tr.me{background:#2a1c0f;color:var(--or);font-weight:600}
 .myrep{margin-top:8px;padding:8px 10px;border-left:3px solid var(--or);background:var(--card2);border-radius:8px;font-size:14px}
 .avs{border-radius:50%;flex:none;border:2px solid var(--line)}
 .aer{padding:5px 0;border-bottom:1px solid var(--line)}.ab{background:var(--card);border:1px solid var(--line);color:var(--or);border-radius:9px;width:34px;height:30px;font-size:13px;cursor:pointer}
+.mgbar{position:relative;height:46px;background:#0d1a12;border:1px solid #ffffff22;border-radius:12px;margin:12px 0;overflow:hidden}
+.mgz{position:absolute;top:0;bottom:0;width:20%;background:#3ddc6a44;border:2px solid #3ddc6a;border-radius:10px}
+.mgm{position:absolute;top:8px;font-size:24px}
+.mgf{position:relative;height:260px;background:repeating-linear-gradient(90deg,#123d22 0 33.3%,#15452a 33.3% 66.6%);border-radius:12px;margin:10px 0;overflow:hidden}
+.mgf span{position:absolute;font-size:26px;transform:translate(-50%,-50%);margin-left:5%}
