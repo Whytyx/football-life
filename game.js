@@ -22,8 +22,16 @@ function genWorld(){const w={};for(const[c,L]of Object.entries(LEAGUES)){let ci=
 const club=()=>S.club?S.world[S.club.c][S.club.t].clubs[S.club.i]:null;
 const tierOf=(c,t)=>S.world[c][t];
 const wage=(c,t)=>Math.round(Math.pow(tierOf(c,t).str-42,2)*85/10)*10;
-function save(){localStorage.setItem('fl_save3',JSON.stringify(S))}
-function load(){try{S=JSON.parse(localStorage.getItem('fl_save3'))}catch(e){S=null}}
+const SK='fl_save3',SKB='fl_save3_bak';let SVN=0,SVW=0;
+function save(){if(!S)return;let j;try{j=JSON.stringify(S)}catch(e){return saveWarn('แปลงข้อมูลไม่ได้')}try{localStorage.setItem(SK,j);if(++SVN%5===1)localStorage.setItem(SKB,j)}catch(e){saveWarn('พื้นที่เก็บข้อมูลเต็ม/ถูกบล็อก')}idbPut(j)}
+function saveWarn(m){const t=Date.now();if(t-SVW<15000)return;SVW=t;try{toast('⚠️ บันทึกเซฟไม่สำเร็จ: '+m+' — กด "สำรองเซฟ" ในแท็บอาชีพ')}catch(e){}}
+function parseSave(j){try{const o=JSON.parse(j);return o&&o.p&&o.ko?o:null}catch(e){return null}}
+function load(){let a=null,b=null;try{a=localStorage.getItem(SK);b=localStorage.getItem(SKB)}catch(e){}S=parseSave(a)||parseSave(b)}
+function idb(cb){try{const r=indexedDB.open('fl',1);r.onupgradeneeded=()=>r.result.createObjectStore('s');r.onsuccess=()=>cb(r.result);r.onerror=()=>{}}catch(e){}}
+let IDBT=0;function idbPut(j){clearTimeout(IDBT);IDBT=setTimeout(()=>idb(d=>{try{d.transaction('s','readwrite').objectStore('s').put(j,'save')}catch(e){}}),400)}
+function idbGet(cb){idb(d=>{try{const q=d.transaction('s').objectStore('s').get('save');q.onsuccess=()=>cb(q.result);q.onerror=()=>cb(null)}catch(e){cb(null)}})}
+function exportSave(){save();const code=btoa(unescape(encodeURIComponent(JSON.stringify(S))));sheet(`<span class="tag o">สำรองเซฟ</span><p class="mu">คัดลอกโค้ดนี้เก็บไว้ (เช่นในโน้ต) แล้วนำไปวางใน "นำเข้าเซฟ" บนอุปกรณ์/เบราว์เซอร์อื่น</p><textarea id="exc" readonly style="width:100%;height:140px;font-size:16px;background:#0d1a12;color:#fff;border-radius:10px">${code}</textarea><button class="btn" id="cpy">📋 คัดลอก</button><button class="btn s" onclick="closeM()" style="text-align:center">ปิด</button>`);$('#cpy').onclick=()=>{const t=$('#exc');t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}toast('คัดลอกแล้ว')}}
+function importSave(){sheet(`<span class="tag o">นำเข้าเซฟ</span><p class="mu">วางโค้ดเซฟ (จะเขียนทับเซฟปัจจุบัน)</p><textarea id="imc" style="width:100%;height:140px;font-size:16px;background:#0d1a12;color:#fff;border-radius:10px"></textarea><button class="btn" id="imb">📥 นำเข้า</button><button class="btn s" onclick="closeM()" style="text-align:center">ยกเลิก</button>`);$('#imb').onclick=()=>{let o=null;try{o=parseSave(decodeURIComponent(escape(atob($('#imc').value.trim()))))}catch(e){}if(!o)return toast('⚠️ โค้ดไม่ถูกต้อง');try{if(S)localStorage.setItem(SKB,JSON.stringify(S))}catch(e){}S=o;save();closeM();LIVE=null;render();toast('✅ นำเข้าเซฟแล้ว')}}
 function news(t){S.news.unshift({w:`${S.slabel||''} · ${new Date(now()).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`,t});S.news=S.news.slice(0,60)}
 // ===== consequence helpers =====
 const LBL={morale:'ขวัญกำลังใจ',trust:'ความเชื่อใจโค้ช',ref:'ชื่อเสียงกับกรรมการ',stamina:'สตามิน่า',media:'ภาพลักษณ์สื่อ'};
@@ -376,11 +384,11 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();c
  if(TAB==='life')h+=lifeHTML();
  if(TAB==='news')h+=`<h2>โซเชียล</h2>${(S.feed||[]).length?S.feed.map(postCard).join(''):'<div class="card mu">ยังไม่มีโพสต์ — ลงสนามแล้วโลกโซเชียลจะพูดถึงคุณ</div>'}<div class="card feed"><h2>ข่าวสโมสร</h2>${S.news.map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`;
  if(TAB==='career')h+=`<div class="card"><h2>สัญญา</h2><p>${club()?club().n:'-'} · เหลือ ${p.contract} ฤดูกาล · ฿${fmt(p.wage)}/สัปดาห์</p><p class="mu">${p.agent?'มีเอเยนต์ดูแล':'ไม่มีเอเยนต์'}${p.wantOut?' · ยื่นขอย้ายแล้ว':''}</p><button class="btn o" id="offers">🔎 ดูข้อเสนอย้ายทีม</button></div>
-  <div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
+  <div class="card"><h2>💾 เซฟเกม</h2><p class="mu">เซฟอัตโนมัติ · ถ้าเล่นทั้งใน Safari และไอคอนหน้าจอโฮม ข้อมูลแยกกัน ใช้สำรอง/นำเข้าเพื่อย้าย</p><div class="row"><button class="btn s" style="flex:1;text-align:center" onclick="exportSave()">📤 สำรองเซฟ</button><button class="btn s" style="flex:1;text-align:center" onclick="importSave()">📥 นำเข้าเซฟ</button></div></div><div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
  $('#app').innerHTML=h;
  if(TAB==='life')lifeBind();$('#eav')&&($('#eav').onclick=editAvatar);document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.rp.split(':').map(Number);replyPost(i,k)});document.querySelectorAll('[data-sp]').forEach(b=>{if(b.classList.contains('spb'))b.onclick=()=>{const k=b.dataset.sp;if(p.sp<1||p.a[k]>=99)return;p.sp--;p.ap=p.ap||{};p.ap[k]=(p.ap[k]||0)+1;if(p.ap[k]>=pipN(p.a[k])){p.ap[k]=0;p.a[k]++;toast(`📈 ${AT[k]} ขึ้นเป็น ${p.a[k]}!`)}save();render()}});$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));trainBind();
- $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');S=null;render()}});
+ $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');localStorage.removeItem('fl_save3_bak');idb(d=>{try{d.transaction('s','readwrite').objectStore('s').delete('save')}catch(e){}});S=null;render()}});
  $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);
  if(!$('#modal.show'))dailyEvent()}
 // ===== REAL-TIME TICK =====
@@ -751,7 +759,7 @@ function bindAe(av,redraw){document.querySelectorAll('[data-ae]').forEach(b=>b.o
 function editAvatar(){const av=Object.assign({},DAV,S.p.av);const d=()=>{sheet(`<span class="tag o">แก้ไขอวตาร</span>${avEditor(av)}<button class="btn" id="avs">💾 บันทึก</button>`);bindAe(av,d);$('#avs').onclick=()=>{S.p.av=av;save();closeM();render()}};d()}
 function AVI(){const p=S.p;if(!S.hist&&S.club)S.hist=[{f:LEAGUES[S.club.c].f,n:club().n,d:tierOf(S.club.c,S.club.t).n,y:S.slabel||''}];if(!p.nat)p.nat='THA';if(!p.av)p.av=Object.assign({},DAV)}
 window.closeM=closeM;window.render=render;
-load();if(S&&!S.ko)S=null;if(S&&!S.gameT){S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}render();
+
 
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
 document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
@@ -807,3 +815,13 @@ document.addEventListener('pointerdown',e=>{acx();if(e.target.closest&&e.target.
 })();
 function sndBtn(){let b=document.getElementById('sndb');if(!b){b=document.createElement('button');b.id='sndb';document.body.appendChild(b);b.onclick=()=>{SND=!SND;localStorage.setItem('fl_snd',SND?'1':'0');if(!SND)amb(false);else{acx();SFX('tap');if(LIVE&&!LIVE.paused)amb(true)}sndBtn()}}b.textContent=SND?'🔊':'🔇'}
 sndBtn();
+
+// ===== BOOT (after all definitions) =====
+function boot(){load();if(S&&!S.gameT){try{S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}catch(e){}}
+ try{render()}catch(e){console.error(e);toast('⚠️ โหลดหน้าจอผิดพลาด แต่เซฟยังอยู่: '+e.message)}
+ if(!S)idbGet(j=>{const o=j&&parseSave(j);if(o&&!S){S=o;save();render();toast('♻️ กู้เซฟจากที่เก็บสำรองแล้ว')}});
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});
+window.addEventListener('pagehide',()=>save());
+setInterval(()=>{if(S)save()},20000);
+boot();
