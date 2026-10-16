@@ -588,55 +588,69 @@ function endSeason(){if(!S.club){S.season++;S.p.age++;newSeason(S.ko[S.N-1]+DAY)
 // ===== LIFESTYLE =====
 let LS='boost',LC='rec';
 const BST={
- ice:{c:'rec',ic:'🧊',n:'อ่างแช่น้ำแข็ง',d:'บำบัดความเย็น ฟื้นฟูกล้ามเนื้อ',days:3,p:8000,k:'stamina',v:[5,8]},
- chair:{c:'rec',ic:'💆',n:'เก้าอี้นวดไฟฟ้า',d:'นวดผ่อนคลายระดับมืออาชีพที่บ้าน',days:5,p:15000,k:'stamina',v:[8,12]},
- cryo:{c:'rec',ic:'❄️',n:'ห้องไครโอเทอราพี',d:'เทคโนโลยีฟื้นฟูระดับยุโรป',days:7,p:45000,k:'stamina',v:[12,18]},
- bike:{c:'trn',ic:'🚴',n:'จักรยานซ้อมที่บ้าน',d:'คาร์ดิโอเสริมทุกเช้า',days:4,p:12000,k:'trust',v:[2,3]},
- gym:{c:'trn',ic:'🏋️',n:'โฮมยิมส่วนตัว',d:'เวทเทรนนิ่ง ได้สกิลพอยต์',days:5,p:30000,k:'xp',v:[1,2]},
- coachp:{c:'trn',ic:'🧑‍🏫',n:'โค้ชส่วนตัว',d:'วิเคราะห์เกมตัวต่อตัว',days:7,p:60000,k:'trust',v:[3,5]},
- chef:{c:'life',ic:'👨‍🍳',n:'เชฟส่วนตัว',d:'อาหารอร่อยถูกหลักโภชนาการ',days:5,p:20000,k:'morale',v:[4,6]},
- nutri:{c:'life',ic:'🥗',n:'นักโภชนาการ',d:'วางแผนอาหาร เพิ่มพลังทุกด้าน',days:7,p:35000,k:'both',v:[3,5]},
- spa:{c:'life',ic:'🧖',n:'สปาวันหยุด',d:'พักใจ คลายเครียดจากดราม่า',days:3,p:10000,k:'morale',v:[5,8]}};
+ ice:{c:'rec',ic:'🧊',n:'อ่างแช่น้ำแข็ง',d:'บำบัดความเย็น ฟื้นฟูกล้ามเนื้อ',days:3,p:8000,k:'stamina',v:[5]},
+ sauna:{c:'rec',ic:'🧖‍♂️',n:'ซาวน่าอินฟราเรด',d:'ขับเหงื่อ คลายกล้ามเนื้อ',days:4,p:12000,k:'stamina',v:[6]},
+ chair:{c:'rec',ic:'💆',n:'เก้าอี้นวดไฟฟ้า',d:'นวดผ่อนคลายระดับมืออาชีพที่บ้าน',days:5,p:15000,k:'stamina',v:[8]},
+ physio:{c:'rec',ic:'🩺',n:'นักกายภาพส่วนตัว',d:'ดูแลกล้ามเนื้อทุกวัน',days:7,p:40000,k:'stamina',v:[11]},
+ cryo:{c:'rec',ic:'❄️',n:'ห้องไครโอเทอราพี',d:'เทคโนโลยีฟื้นฟูระดับยุโรป',days:7,p:45000,k:'stamina',v:[12]},
+ hyper:{c:'rec',ic:'🫧',n:'ห้องออกซิเจนแรงดันสูง',d:'ฟื้นตัวไวแบบนักกีฬาระดับโลก',days:10,p:150000,k:'both',v:[8]},
+ med:{c:'rec',ic:'🏥',n:'ทีมแพทย์ส่วนตัว',d:'หมอ นักกายภาพ นักวิทย์การกีฬาครบชุด',days:14,p:600000,k:'both',v:[14]},
+ bike:{c:'trn',ic:'🚴',n:'จักรยานซ้อมที่บ้าน',d:'คาร์ดิโอเสริมทุกเช้า',days:4,p:12000,k:'trust',v:[2]},
+ gym:{c:'trn',ic:'🏋️',n:'โฮมยิมส่วนตัว',d:'เวทเทรนนิ่ง ได้สกิลพอยต์',days:5,p:30000,k:'xp',v:[1]},
+ sprint:{c:'trn',ic:'⚡',n:'โค้ชสปรินต์',d:'เทคนิคออกตัว ได้สกิลพอยต์',days:5,p:55000,k:'xp',v:[1]},
+ coachp:{c:'trn',ic:'🧑‍🏫',n:'โค้ชส่วนตัว',d:'วิเคราะห์เกมตัวต่อตัว',days:7,p:60000,k:'trust',v:[3]},
+ finish:{c:'trn',ic:'🎯',n:'โค้ชจบสกอร์',d:'ยิงวันละ 200 ลูก',days:7,p:120000,k:'xp',v:[2]},
+ psych:{c:'trn',ic:'🧠',n:'นักจิตวิทยาการกีฬา',d:'ใจนิ่งในเกมใหญ่',days:10,p:200000,k:'morale',v:[6]},
+ ground:{c:'trn',ic:'🏟️',n:'สนามซ้อมส่วนตัว',d:'ซ้อมได้ทุกเวลา ไม่มีใครกวน',days:14,p:1500000,k:'xp',v:[3]},
+ spa:{c:'life',ic:'🧖',n:'สปาวันหยุด',d:'พักใจ คลายเครียดจากดราม่า',days:3,p:10000,k:'morale',v:[5]},
+ chef:{c:'life',ic:'👨‍🍳',n:'เชฟส่วนตัว',d:'อาหารอร่อยถูกหลักโภชนาการ',days:5,p:20000,k:'morale',v:[4]},
+ nutri:{c:'life',ic:'🥗',n:'นักโภชนาการ',d:'วางแผนอาหาร เพิ่มพลังทุกด้าน',days:7,p:35000,k:'both',v:[3]},
+ pr:{c:'life',ic:'📸',n:'ทีม PR & โซเชียล',d:'คอนเทนต์ปัง ผู้ติดตามเพิ่ม',days:7,p:90000,k:'fans',v:[200]},
+ butler:{c:'life',ic:'🤵',n:'พ่อบ้านส่วนตัว',d:'ไม่ต้องกังวลเรื่องจุกจิก',days:10,p:250000,k:'morale',v:[7]},
+ retreat:{c:'life',ic:'🏝️',n:'รีทรีตส่วนตัวมัลดีฟส์',d:'ชาร์จพลังเต็มร้อย',days:5,p:900000,k:'both',v:[12]}};
 const BCAT={rec:'ฟื้นฟู',trn:'ซ้อม',life:'ไลฟ์สไตล์'};
-const KL={stamina:'สตามิน่า',trust:'ความเชื่อใจโค้ช',morale:'ขวัญกำลังใจ',xp:'สกิลพอยต์',both:'ขวัญ+สตามิน่า'};
+const KL={stamina:'สตามิน่า',trust:'ความเชื่อใจโค้ช',morale:'ขวัญกำลังใจ',xp:'สกิลพอยต์',both:'ขวัญ+สตามิน่า',fans:'ผู้ติดตาม'};
 const ASSETS=[
- ['scooter','🛵','สกู๊ตเตอร์ไฟฟ้า','รถ',25000,1,300],['civic','🚗','รถเก๋งซิ่ง','รถ',900000,2,3000],['benz','🚙','SUV หรู','รถ',4500000,3,15000],['super','🏎️','ซูเปอร์คาร์อิตาลี','รถ',18000000,5,80000],
- ['condo','🏢','คอนโดใกล้สนาม','บ้าน',2500000,2,2000],['villa','🏡','พูลวิลล่า','บ้าน',15000000,4,40000],['mansion','🏰','คฤหาสน์ริมทะเล','บ้าน',60000000,5,150000],
- ['casio','⌚','นาฬิกาสปอร์ต','นาฬิกา',8000,1,100],['rolex','⌚','นาฬิกาสวิสทองคำ','นาฬิกา',800000,3,8000],['apm','💎','นาฬิกาเพชรลิมิเต็ด','นาฬิกา',6000000,5,50000],
- ['chain','📿','สร้อยทองเส้นใหญ่','เครื่องประดับ',120000,2,1500],['shoes','👟','สนีกเกอร์แรร์','เครื่องประดับ',45000,1,800],['ring','💍','แหวนเพชร','เครื่องประดับ',1500000,3,12000],
- ['paint','🖼️','ภาพวาดศิลปินไทย','ศิลปะ',300000,2,2000],['nft','🐒','NFT ลิงเบื่อโลก','ศิลปะ',2000000,3,20000],['sculpt','🗿','ประติมากรรมยุโรป','ศิลปะ',9000000,4,40000]];
+ ['casio','⌚','นาฬิกาสปอร์ต','นาฬิกา',8000,1,100],['shoes','👟','สนีกเกอร์แรร์','แฟชั่น',45000,1,800],['scooter','🛵','สกู๊ตเตอร์ไฟฟ้า','รถ',25000,1,300],['gaming','🎮','ห้องเกมมิ่งจัดเต็ม','บ้าน',150000,1,1200],
+ ['chain','📿','สร้อยทองเส้นใหญ่','แฟชั่น',120000,2,1500],['paint','🖼️','ภาพวาดศิลปินไทย','ศิลปะ',300000,2,2000],['tag','⌚','นาฬิกาสวิสสปอร์ต','นาฬิกา',250000,2,2500],['civic','🚗','รถเก๋งซิ่ง','รถ',900000,2,3000],
+ ['rolex','⌚','นาฬิกาสวิสทองคำ','นาฬิกา',800000,3,8000],['ring','💍','แหวนเพชร','แฟชั่น',1500000,3,12000],['condo','🏢','คอนโดใกล้สนาม','บ้าน',2500000,2,2000],['nft','🐒','NFT ลิงเบื่อโลก','ศิลปะ',2000000,3,20000],['benz','🚙','SUV หรู','รถ',4500000,3,15000],
+ ['apm','💎','นาฬิกาเพชรลิมิเต็ด','นาฬิกา',6000000,5,50000],['sculpt','🗿','ประติมากรรมยุโรป','ศิลปะ',9000000,4,40000],['villa','🏡','พูลวิลล่า','บ้าน',15000000,4,40000],['super','🏎️','ซูเปอร์คาร์อิตาลี','รถ',18000000,5,80000],
+ ['mansion','🏰','คฤหาสน์ริมทะเล','บ้าน',60000000,5,150000],['hyper','🚀','ไฮเปอร์คาร์ลิมิเต็ด','รถ',90000000,5,250000],['yacht','🛥️','ซูเปอร์ยอทช์','ยานพาหนะ',300000000,5,500000],['jet','✈️','เครื่องบินส่วนตัว','ยานพาหนะ',800000000,5,900000],['island','🏝️','เกาะส่วนตัว','บ้าน',2000000000,5,2000000]].sort((a,b)=>a[4]-b[4]);
 const AM=Object.fromEntries(ASSETS.map(a=>[a[0],a]));
-const INV={sav:['🏦','บัญชีออมทรัพย์','ความเสี่ยงต่ำมาก',7,1,2],idx:['📈','กองทุนดัชนี','ความเสี่ยงกลาง',14,-5,12],reit:['🏘️','กองทุนอสังหาฯ','ความเสี่ยงกลาง',30,-3,15],cry:['🪙','คริปโต','ความเสี่ยงสูงมาก!',7,-45,70]};
-function LI(){S.boost=S.boost||[];S.blv=S.blv||{};S.assets=S.assets||[];S.inv=S.inv||[]}
-const portVal=()=>{LI();return S.assets.reduce((s,id)=>s+AM[id][4]*.7,0)+S.inv.reduce((s,x)=>s+x.amt,0)};
-function lifeHTML(){LI();const p=S.p,today=dkey(now());S.boost=S.boost.filter(b=>b.end>=today);
+const INV={sav:['🏦','บัญชีออมทรัพย์','ความเสี่ยงต่ำมาก',7,1,2,1000],bond:['📜','พันธบัตรรัฐบาล','ความเสี่ยงต่ำ',14,1,4,10000],gold:['🥇','ทองคำ','ความเสี่ยงต่ำ-กลาง',21,-4,9,20000],idx:['📈','กองทุนดัชนี','ความเสี่ยงกลาง',14,-5,12,10000],stock:['💹','หุ้นเทคโนโลยี','ความเสี่ยงสูง',14,-15,28,50000],reit:['🏘️','กองทุนอสังหาฯ','ความเสี่ยงกลาง',30,-3,15,100000],cry:['🪙','คริปโต','ความเสี่ยงสูงมาก!',7,-45,70,5000],rest:['🍜','เปิดร้านอาหาร','ธุรกิจ เสี่ยงกลาง-สูง',45,-30,45,1000000],brand:['👕','แบรนด์เสื้อผ้าของตัวเอง','ธุรกิจ เสี่ยงสูง',60,-40,90,5000000],club:['⚽','ซื้อหุ้นสโมสรฟุตบอล','ความเสี่ยงสูงมาก!',90,-50,120,50000000]};
+const MAXLV=10,bVal=(B,lv)=>Math.max(1,Math.round(B.v[0]*(1+(lv-1)*.35))),bUp=(B,lv)=>Math.round(B.p*2*Math.pow(1.6,lv-1)/100)*100,aUp=(a,lv)=>Math.round(a[4]*.25*Math.pow(1.45,lv-1)/100)*100,iUp=(I,lv)=>Math.round(Math.max(20000,I[6]*.5)*Math.pow(1.7,lv-1)/100)*100,iRng=(I,lv)=>[I[4]+(lv-1)*Math.abs(I[4])*.05,I[5]*(1+(lv-1)*.06)];
+function LI(){S.boost=S.boost||[];S.blv=S.blv||{};S.assets=S.assets||[];S.inv=S.inv||[];S.alv=S.alv||{};S.ilv=S.ilv||{}}
+const portVal=()=>{LI();return S.assets.reduce((s,id)=>s+(AM[id]?AM[id][4]*.7:0),0)+S.inv.reduce((s,x)=>s+x.amt,0)};
+const lvTag=lv=>`<span class="tag o">LV${lv}/${MAXLV}</span>`,upBtn=(attr,id,lv,c)=>`<button class="btn s ${lv>=MAXLV||S.p.money<c?'dis':''}" style="flex:1;text-align:center" data-${attr}="${id}" ${lv>=MAXLV?'disabled':''}>${lv>=MAXLV?'✅ LV สูงสุด':`⬆️ LV${lv+1} ฿${fmt(c)}`}</button>`;
+function lifeHTML(){LI();const p=S.p,today=dkey(now());S.boost=S.boost.filter(b=>b.end>=today&&BST[b.id]);
  let h=`<div class="card row sp" style="border-left:5px solid var(--or)"><div><div class="big or" style="font-size:34px">฿${fmt(p.money)}</div><div class="mu">ยอดเงินคงเหลือ</div></div><div style="text-align:right"><b class="ye" style="font-size:20px">฿${fmt(portVal())}</b><div class="mu">มูลค่าพอร์ต</div></div></div>
  <div class="seg">${[['boost','บูสเตอร์'],['asset','ทรัพย์สิน'],['inv','ลงทุน']].map(([k,l])=>`<div class="${LS===k?'on':''}" data-ls="${k}">${l}</div>`).join('')}</div>`;
  if(LS==='boost'){h+=`<div class="row sp"><h2>บูสเตอร์ที่ใช้งาน</h2><span class="tag">${S.boost.length}/4 ช่อง</span></div>`;
-  h+=S.boost.length?S.boost.map((b,i)=>{const B=BST[b.id],v=B.v[b.lv-1],can=b.last!==today;return `<div class="card" style="border-color:var(--gr)"><div class="row sp"><b>${B.ic} ${B.n} <span class="tag o">LV${b.lv}</span></b><span class="mu">เหลือ ${b.end-today+1} วัน</span></div>${bar((b.end-today+1)/B.days*100)}<button class="btn o ${can?'':'dis'}" data-cl="${i}" ${can?'':'disabled'}>${can?`รับ +${v} ${KL[B.k]}`:'รับแล้ววันนี้ — กลับมาพรุ่งนี้'}</button></div>`}).join(''):`<div class="card mu">ยังไม่มีบูสเตอร์ ซื้อด้านล่างได้เลย</div>`;
+  h+=S.boost.length?S.boost.map((b,i)=>{const B=BST[b.id],lv=S.blv[b.id]||1,v=bVal(B,lv),can=b.last!==today;return `<div class="card" style="border-color:var(--gr)"><div class="row sp"><b>${B.ic} ${B.n} ${lvTag(lv)}</b><span class="mu">เหลือ ${b.end-today+1} วัน</span></div>${bar((b.end-today+1)/B.days*100)}<button class="btn o ${can?'':'dis'}" data-cl="${i}" ${can?'':'disabled'}>${can?`รับ +${fmt(v)} ${KL[B.k]}`:'รับแล้ววันนี้ — กลับมาพรุ่งนี้'}</button></div>`}).join(''):`<div class="card mu">ยังไม่มีบูสเตอร์ ซื้อด้านล่างได้เลย</div>`;
   h+=`<div class="chips" style="margin:10px 0">${Object.entries(BCAT).map(([k,l])=>`<div class="chip ${LC===k?'on':''}" data-lc="${k}">${l}</div>`).join('')}</div>`;
-  h+=Object.entries(BST).filter(([,B])=>B.c===LC).map(([id,B])=>{const lv=S.blv[id]||1,act=S.boost.some(b=>b.id===id),full=S.boost.length>=4,up=Math.round(B.p*2.5);
-   return `<div class="card"><div class="row sp"><div class="row"><span style="font-size:30px">${B.ic}</span><div><b>${B.n}</b><div class="mu">${B.d}</div></div></div><span class="tag o">LV${lv}</span></div>
-   <div class="row" style="margin:8px 0"><span class="chip">${B.days} วัน</span><span class="chip gr">+${B.v[lv-1]} ${KL[B.k]}/วัน</span></div>
-   <div class="mini mu">LV1 +${B.v[0]} · <span class="gr">LV2 +${B.v[1]}</span></div>
-   <div class="row"><button class="btn s" style="flex:1;text-align:center" data-up="${id}" ${lv>1?'disabled':''}>${lv>1?'✅ LV สูงสุด':`⬆️ อัปเกรด ฿${fmt(up)}`}</button><button class="btn ${act||full?'dis':''}" style="flex:1" data-bb="${id}" ${act||full?'disabled':''}>${act?'ใช้งานอยู่':full?'ช่องเต็ม':`ซื้อ ฿${fmt(B.p)}`}</button></div></div>`}).join('')}
- if(LS==='asset'){h+=`<h2>ของที่คุณมี (${S.assets.length})</h2><div class="card">${S.assets.length?S.assets.map(id=>`<span class="chip" style="display:inline-block;margin:3px">${AM[id][1]} ${AM[id][2]}</span>`).join(''):'<span class="mu">ยังไม่มีทรัพย์สิน</span>'}</div><h2>ร้านค้า</h2>`;
-  h+=ASSETS.map(([id,ic,n,cat,pr,st,f])=>{const own=S.assets.includes(id);return `<div class="card row sp"><div class="row"><span style="font-size:30px">${ic}</span><div><b>${n}</b><div class="mu">${cat} · <span class="ye">${'★'.repeat(st)}${'☆'.repeat(5-st)}</span> · +${fmt(f)} ผู้ติดตาม</div></div></div><button class="btn ${own?'dis':''}" style="width:auto;padding:10px 12px;font-size:14px" data-as="${id}" ${own?'disabled':''}>${own?'มีแล้ว':'฿'+fmt(pr)}</button></div>`}).join('')}
+  h+=Object.entries(BST).filter(([,B])=>B.c===LC).sort((a,b)=>a[1].p-b[1].p).map(([id,B])=>{const lv=S.blv[id]||1,act=S.boost.some(b=>b.id===id),full=S.boost.length>=4,up=bUp(B,lv),lock=p.money<B.p;
+   return `<div class="card ${lock?'lock':''}"><div class="row sp"><div class="row"><span style="font-size:30px">${B.ic}</span><div><b>${lock?'🔒 ':''}${B.n}</b><div class="mu">${B.d}</div></div></div>${lvTag(lv)}</div>
+   <div class="row" style="margin:8px 0;flex-wrap:wrap"><span class="chip">${B.days} วัน</span><span class="chip gr">+${fmt(bVal(B,lv))} ${KL[B.k]}/วัน</span>${lv<MAXLV?`<span class="chip">LV${lv+1}: +${fmt(bVal(B,lv+1))}</span>`:''}</div>
+   <div class="row">${upBtn('up',id,lv,up)}<button class="btn ${act||full||lock?'dis':''}" style="flex:1" data-bb="${id}" ${act||full?'disabled':''}>${act?'ใช้งานอยู่':full?'ช่องเต็ม':`ซื้อ ฿${fmt(B.p)}`}</button></div></div>`}).join('')}
+ if(LS==='asset'){h+=`<h2>ของที่คุณมี (${S.assets.length})</h2>`+(S.assets.length?S.assets.filter(id=>AM[id]).map(id=>{const a=AM[id],lv=S.alv[id]||1;return `<div class="card"><div class="row sp"><b>${a[1]} ${a[2]}</b>${lvTag(lv)}</div><p class="mu">แต่ง/อัปเกรด: ${lv<MAXLV?`LV${lv+1} ได้ +${fmt(Math.round(a[6]*.4))} ผู้ติดตาม · ขวัญ +${a[5]}`:'สูงสุดแล้ว'}</p><div class="row">${upBtn('au',id,lv,aUp(a,lv))}</div></div>`}).join(''):'<div class="card mu">ยังไม่มีทรัพย์สิน</div>')+`<h2>ร้านค้า (เรียงตามราคา)</h2>`;
+  h+=ASSETS.map(([id,ic,n,cat,pr,st,f])=>{const own=S.assets.includes(id),lock=!own&&p.money<pr;return `<div class="card row sp ${lock?'lock':''}"><div class="row"><span style="font-size:30px">${ic}</span><div><b>${lock?'🔒 ':''}${n}</b><div class="mu">${cat} · <span class="ye">${'★'.repeat(st)}${'☆'.repeat(5-st)}</span> · +${fmt(f)} ผู้ติดตาม</div></div></div><button class="btn ${own||lock?'dis':''}" style="width:auto;padding:10px 12px;font-size:14px" data-as="${id}" ${own?'disabled':''}>${own?'มีแล้ว':'฿'+fmt(pr)}</button></div>`}).join('')}
  if(LS==='inv'){h+=`<h2>พอร์ตลงทุน</h2>${S.inv.length?S.inv.map((x,i)=>{const I=INV[x.id],done=today>=x.end;return `<div class="card"><div class="row sp"><b>${I[0]} ${I[1]}</b><b>฿${fmt(x.amt)}</b></div>${bar(Math.min(100,(today-x.start)/(x.end-x.start)*100))}<button class="btn ${done?'':'dis'}" data-ic="${i}" ${done?'':'disabled'}>${done?'💰 รับผลตอบแทน':`ครบกำหนดอีก ${x.end-today} วัน`}</button></div>`}).join(''):'<div class="card mu">ยังไม่มีการลงทุน</div>'}
-  <h2>ผลิตภัณฑ์</h2><div class="card"><span class="mu">จำนวนเงินลงทุน</span><input id="amt" type="number" inputmode="numeric" value="${Math.max(1000,Math.round(p.money*.25/1000)*1000)}"><div class="mu">ภาษี 15% จากกำไร · ขาดทุนได้!</div></div>`+
-  Object.entries(INV).map(([id,[ic,n,r,d,mn,mx]])=>`<div class="card"><div class="row sp"><b>${ic} ${n}</b><span class="tag ${mn<-10?'':mn<0?'o':'g'}">${r}</span></div><div class="row sp mu" style="margin:6px 0"><span>${d} วัน</span><span>ผลตอบแทน <span class="${mn<0?'re':'gr'}">${mn}%</span> ถึง <span class="gr">+${mx}%</span></span></div><button class="btn s" style="text-align:center" data-iv="${id}">ลงทุน</button></div>`).join('')}
+  <h2>ผลิตภัณฑ์</h2><div class="card"><span class="mu">จำนวนเงินลงทุน</span><input id="amt" type="number" inputmode="numeric" value="${Math.max(1000,Math.round(p.money*.25/1000)*1000)}"><div class="mu">ภาษี 15% จากกำไร · ขาดทุนได้! · อัป LV = ที่ปรึกษาเก่งขึ้น ผลตอบแทนดีขึ้น</div></div>`+
+  Object.entries(INV).sort((a,b)=>a[1][6]-b[1][6]).map(([id,I])=>{const [ic,n,r,d,,,min]=I,lv=S.ilv[id]||1,[mn,mx]=iRng(I,lv),[mn2,mx2]=iRng(I,lv+1),lock=p.money<min;return `<div class="card ${lock?'lock':''}"><div class="row sp"><b>${lock?'🔒 ':''}${ic} ${n}</b><span class="row" style="gap:4px"><span class="tag ${mn<-10?'':mn<0?'o':'g'}">${r}</span>${lvTag(lv)}</span></div><div class="row sp mu" style="margin:6px 0"><span>${d} วัน · ขั้นต่ำ ฿${fmt(min)}</span><span>ผลตอบแทน <span class="${mn<0?'re':'gr'}">${mn.toFixed(1)}%</span> ถึง <span class="gr">+${mx.toFixed(1)}%</span></span></div>${lv<MAXLV?`<div class="mu" style="font-size:12px">LV${lv+1}: ${mn2.toFixed(1)}% ถึง +${mx2.toFixed(1)}%</div>`:''}<div class="row">${upBtn('iu',id,lv,iUp(I,lv))}<button class="btn s ${lock?'dis':''}" style="flex:1;text-align:center" data-iv="${id}">ลงทุน</button></div></div>`}).join('')}
  return h}
 function lifeMsg(t){sheet(`<span class="tag g">ไลฟ์สไตล์</span><ul class="cons">${(Array.isArray(t)?t:[t]).map(c=>`<li>${c}</li>`).join('')}</ul><button class="btn" onclick="closeM();render()">ตกลง</button>`)}
 function pay(x){if(S.p.money<x){lifeMsg('💸 เงินไม่พอ!');return false}S.p.money-=x;return true}
 function lifeBind(){const q=(s,f)=>document.querySelectorAll(s).forEach(b=>b.onclick=()=>f(b));const today=dkey(now());
  q('[data-ls]',b=>{LS=b.dataset.ls;render()});q('[data-lc]',b=>{LC=b.dataset.lc;render()});
  q('[data-bb]',b=>{const id=b.dataset.bb,B=BST[id];if(!pay(B.p))return;S.boost.push({id,lv:S.blv[id]||1,end:today+B.days-1,last:null});save();lifeMsg(`${B.ic} เปิดใช้ ${B.n} ${B.days} วัน`)});
- q('[data-up]',b=>{const id=b.dataset.up,B=BST[id];if(!pay(Math.round(B.p*2.5)))return;S.blv[id]=2;S.boost.forEach(x=>{if(x.id===id)x.lv=2});save();lifeMsg(`⬆️ ${B.n} อัปเกรดเป็น LV2`)});
- q('[data-cl]',b=>{const x=S.boost[+b.dataset.cl],B=BST[x.id],v=B.v[x.lv-1];x.last=today;CONS=[];
-  if(B.k==='xp'){addSP(v,'โฮมยิม')}else if(B.k==='both'){E('morale',v);E('stamina',v)}else E(B.k,v);save();lifeMsg(CONS)});
+ q('[data-up]',b=>{const id=b.dataset.up,B=BST[id],lv=S.blv[id]||1;if(lv>=MAXLV||!pay(bUp(B,lv)))return;S.blv[id]=lv+1;save();lifeMsg(`⬆️ ${B.n} อัปเกรดเป็น LV${lv+1} (+${fmt(bVal(B,lv+1))} ${KL[B.k]}/วัน)`)});
+ q('[data-au]',b=>{const id=b.dataset.au,a=AM[id],lv=S.alv[id]||1;if(lv>=MAXLV||!pay(aUp(a,lv)))return;S.alv[id]=lv+1;CONS=[];E('fans',Math.round(a[6]*.4));E('morale',a[5]);save();lifeMsg([`⬆️ ${a[2]} LV${lv+1}`,...CONS])});
+ q('[data-iu]',b=>{const id=b.dataset.iu,I=INV[id],lv=S.ilv[id]||1;if(lv>=MAXLV||!pay(iUp(I,lv)))return;S.ilv[id]=lv+1;save();const[mn,mx]=iRng(I,lv+1);lifeMsg(`⬆️ ที่ปรึกษา${I[1]} LV${lv+1}: ผลตอบแทน ${mn.toFixed(1)}% ถึง +${mx.toFixed(1)}%`)});
+ q('[data-cl]',b=>{const x=S.boost[+b.dataset.cl],B=BST[x.id],v=bVal(B,S.blv[x.id]||1);x.last=today;CONS=[];
+  if(B.k==='xp'){addSP(v,B.n)}else if(B.k==='both'){E('morale',v);E('stamina',v)}else if(B.k==='fans')E('fans',v);else E(B.k,v);save();lifeMsg(CONS)});
  q('[data-as]',b=>{const a=AM[b.dataset.as];if(!pay(a[4]))return;S.assets.push(a[0]);CONS=[];E('fans',a[6]);E('morale',a[5]*2);if(a[5]>=4){E('media',-3);N('สื่อเริ่มวิจารณ์ความฟุ้งเฟ้อ')}news(`🛍️ ${S.p.name} ถอย${a[2]}ราคา ฿${fmt(a[4])}`);save();lifeMsg(CONS)});
- q('[data-iv]',b=>{const id=b.dataset.iv,amt=Math.round(+$('#amt').value);if(!(amt>=1000))return lifeMsg('ขั้นต่ำ ฿1,000');if(!pay(amt))return;S.inv.push({id,amt,start:today,end:today+INV[id][3]});save();lifeMsg(`${INV[id][0]} ลงทุน ${INV[id][1]} ฿${fmt(amt)} ครบกำหนดใน ${INV[id][3]} วัน`)});
- q('[data-ic]',b=>{const i=+b.dataset.ic,x=S.inv[i],I=INV[x.id];const r=I[4]+R()*(I[5]-I[4]);let pr=Math.round(x.amt*r/100);const tax=pr>0?Math.round(pr*.15):0;S.inv.splice(i,1);S.p.money+=x.amt+pr-tax;save();
+ q('[data-iv]',b=>{const id=b.dataset.iv,I=INV[id],amt=Math.round(+$('#amt').value);if(!(amt>=I[6]))return lifeMsg(`ขั้นต่ำ ฿${fmt(I[6])}`);if(!pay(amt))return;S.inv.push({id,amt,start:today,end:today+I[3]});save();lifeMsg(`${I[0]} ลงทุน ${I[1]} ฿${fmt(amt)} ครบกำหนดใน ${I[3]} วัน`)});
+ q('[data-ic]',b=>{const i=+b.dataset.ic,x=S.inv[i],I=INV[x.id],[mn,mx]=iRng(I,S.ilv[x.id]||1);const r=mn+R()*(mx-mn);let pr=Math.round(x.amt*r/100);const tax=pr>0?Math.round(pr*.15):0;S.inv.splice(i,1);S.p.money+=x.amt+pr-tax;save();
   lifeMsg([`${I[0]} ${I[1]} ผลตอบแทน ${r>=0?'+':''}${r.toFixed(1)}%`,`${pr>=0?'📈 กำไร':'📉 ขาดทุน'} ฿${fmt(pr)}`,tax?`🧾 ภาษี 15%: -฿${fmt(tax)}`:'ไม่มีภาษี (ไม่มีกำไร)',`💰 ได้รับคืน ฿${fmt(x.amt+pr-tax)}`])})}
 // ===== SOCIAL FEED =====
 const FT={fan:['แฟนบอล','g'],media:['สื่อ','o'],pundit:['กูรู',''],rival:['คู่แข่ง','']};

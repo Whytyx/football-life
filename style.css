@@ -1,7 +1,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0b120e;--card:#14201a;--card2:#1b2b22;--line:#24382c;--or:#ff7a1a;--gr:#3ddc6a;--ye:#ffd21f;--re:#ff4d4d;--tx:#eaf3ec;--mu:#8aa596}
 body{background:var(--bg);color:var(--tx);font-family:Kanit,system-ui,sans-serif;max-width:480px;margin:0 auto;padding-bottom:84px;min-height:100vh}
-#app{padding:14px}
+#app{padding:14px;padding-top:calc(14px + env(safe-area-inset-top))}
 h1{font-weight:800;font-size:26px;letter-spacing:.5px;text-transform:uppercase;line-height:1.1}
 h2{font-weight:800;font-size:18px;text-transform:uppercase;margin:16px 0 8px;color:var(--or)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
@@ -73,6 +73,8 @@ input,select,textarea{font-size:16px!important}
 .avgrid img.on{border-color:var(--or,#ff7a1a);opacity:1}
 .pips{display:flex;gap:2px;margin-top:3px}.pips i{flex:1;height:4px;border-radius:2px;background:#ffffff1a}.pips i.on{background:#ffd21f}
 .tladder{display:flex;gap:4px;margin:8px 0}.tladder span{flex:1;text-align:center;font-size:11px;padding:6px 2px;border-radius:8px;background:#ffffff0d;color:#9aa}.tladder span.done{background:#3ddc6a22;color:#8e8}.tladder span.on{background:#ff7a1a;color:#fff;font-weight:700}
-#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:6px;width:min(92vw,420px);pointer-events:none}
+#toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:6px;width:min(92vw,420px);pointer-events:none}
 .tst{background:#1d3324;border:1px solid #3ddc6a;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;box-shadow:0 6px 20px #0008;transition:opacity .5s,transform .5s}.tst.out{opacity:0;transform:translateY(-10px)}
 #sndb{position:fixed;right:10px;bottom:76px;z-index:60;width:40px;height:40px;border-radius:50%;border:1px solid #ffffff22;background:#13261acc;font-size:18px;padding:0;-webkit-tap-highlight-color:transparent}
+.card.lock{opacity:.55}
+#modal .sheet{max-height:calc(100vh - env(safe-area-inset-top) - 20px)}
