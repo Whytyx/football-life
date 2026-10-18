@@ -1,4 +1,4 @@
-const APP_VER=40;
+const APP_VER=41;
 // ===== AUTO UPDATE (PWA) =====
 function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{typeof save==='function'&&S&&save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
@@ -805,7 +805,7 @@ var FMS=[[1000,20000,2,5,3],[5000,50000,3,5,4],[10000,100000,4,6,5],[50000,30000
 function fanMS(){const p=S.p;p.fms=p.fms||0;while(p.fms<FMS.length&&p.fans>=FMS[p.fms][0]){const[f,m,sp,mo,tr]=FMS[p.fms];p.fms++;p.money+=m;PI();p.sp+=sp;p.morale=cl(p.morale+mo);p.trust=cl(p.trust+tr);const t=`🎉 ผู้ติดตามครบ ${fmt(f)}! รางวัล ฿${fmt(m)} · ⭐${sp} SP · ขวัญ +${mo} · ความไว้ใจ +${tr}`;CONS.push(t);toast(t);news(t)}}
 function fanCard(){const p=S.p;p.fms=p.fms||0;const nx=FMS[p.fms],pv=p.fms?FMS[p.fms-1][0]:0;return `<div class="card"><div class="row sp"><b>👥 ผู้ติดตาม ${fmt(p.fans)}</b><span class="mu">${nx?'เป้าหมายถัดไป '+fmt(nx[0]):'ครบทุกเป้าแล้ว!'}</span></div>${nx?bar((p.fans-pv)/(nx[0]-pv)*100,'o')+`<p class="mu" style="margin-top:4px">รางวัล: ฿${fmt(nx[1])} · ⭐${nx[2]} SP · ขวัญ +${nx[3]} · ความไว้ใจ +${nx[4]}</p>`:''}<div class="chips" style="margin-top:6px;flex-wrap:wrap">${FMS.map((x,i)=>`<span class="chip ${i<p.fms?'on':''}">${fmt(x[0])}</span>`).join('')}</div></div>`}
 var SPM=[['tg',[1,5,10,25,50,100],'ประตูอาชีพ'],['app',[1,10,25,50,100],'นัดอาชีพ']];
-function msChk(){const p=S.p;p.msd=p.msd||{};p.capp=(p.capp||0)+1;const v={tg:p.tg,app:p.capp};SPM.forEach(([k,L,n])=>L.forEach(x=>{const id=k+x;if(v[k]>=x&&!p.msd[id]){p.msd[id]=1;const sp=Math.max(2,Math.round(Math.sqrt(x)*1.5));addSP(sp,`ไมล์สโตน ${x} ${n}`);toast(`🏅 ไมล์สโตน: ${x} ${n}! ⭐+${sp} SP`)}}))}
+function msChk(){const p=S.p;p.capp=(p.capp||0)+1} // old milestones merged into ACH (achievements)
 function toast(t){let d=document.getElementById('toast');if(!d){d=document.createElement('div');d.id='toast';document.body.appendChild(d)}const e=document.createElement('div');e.className='tst';e.textContent=t;d.appendChild(e);setTimeout(()=>e.classList.add('out'),2600);setTimeout(()=>e.remove(),3200)}
 // ===== SOUND (Web Audio synth) =====
 var AC=null,SND=localStorage.getItem('fl_snd')!=='0',AMB=null;
@@ -996,12 +996,16 @@ const TOP5=['ENG','ESP','ITA','GER','FRA'];
 const ACH=[
  ['debut','🎽','นัดเดบิวต์','ลงสนามนัดแรกในอาชีพ',p=>[p.capp||0,1],{sp:1}],
  ['g1','⚽','ประตูแรก','ยิงประตูแรกในอาชีพ',p=>[p.tg||0,1],{sp:2,f:.05}],
+ ['g5','⚽','5 ประตู','ยิงครบ 5 ประตูในอาชีพ',p=>[p.tg||0,5],{sp:3}],
  ['g10','⚽','10 ประตู','ยิงครบ 10 ประตูในอาชีพ',p=>[p.tg||0,10],{sp:3,m:20000}],
+ ['g25','⚽','25 ประตู','ยิงครบ 25 ประตูในอาชีพ',p=>[p.tg||0,25],{sp:5,m:60000}],
  ['g50','🔥','50 ประตู','ยิงครบ 50 ประตูในอาชีพ',p=>[p.tg||0,50],{sp:6,m:150000,f:.1}],
  ['g100','💯','100 ประตู','ยิงครบ 100 ประตูในอาชีพ',p=>[p.tg||0,100],{sp:10,m:600000,f:.15}],
  ['g250','👑','250 ประตู','ตำนานดาวยิง 250 ประตู',p=>[p.tg||0,250],{sp:20,m:3000000,f:.25}],
  ['a10','🅰️','10 แอสซิสต์','จ่ายให้เพื่อนยิงครบ 10 ครั้ง',p=>[p.ta||0,10],{sp:3,m:20000}],
  ['a50','🎯','50 แอสซิสต์','จ่ายให้เพื่อนยิงครบ 50 ครั้ง',p=>[p.ta||0,50],{sp:6,m:150000}],
+ ['p10','👟','10 นัด','ลงสนามครบ 10 นัดในอาชีพ',p=>[p.capp||0,10],{sp:3}],
+ ['p25','👟','25 นัด','ลงสนามครบ 25 นัดในอาชีพ',p=>[p.capp||0,25],{sp:4,m:10000}],
  ['p50','👟','50 นัด','ลงสนามครบ 50 นัดในอาชีพ',p=>[p.capp||0,50],{sp:3,m:30000}],
  ['p100','🏟️','100 นัด','ลงสนามครบ 100 นัดในอาชีพ',p=>[p.capp||0,100],{sp:6,m:120000,tr:5}],
  ['p250','🎖️','250 นัด','ลงสนามครบ 250 นัดในอาชีพ',p=>[p.capp||0,250],{sp:12,m:800000}],
@@ -1021,6 +1025,7 @@ const ACH=[
  ['ballon','🌍','ลูกฟุตบอลทองคำโลก','คว้ารางวัลนักเตะยอดเยี่ยมของโลก',p=>[(S.cab||[]).filter(x=>x.k==='ballon').length,1],{sp:25,m:5000000,f:.3}]];
 function AWI(){const p=S.p;if(!S.cab)S.cab=[];if(!S.ach)S.ach={};if(!p.mst)p.mst={hat:0,brace:0,poker:0,motm:0,cs:0,a3:0};if(p.capp==null){p.capp=(p.app||0)+((p.lastS&&p.lastS.app)||0)+Math.max(0,((S.season||1)-2))*10;if(p.tg>0||p.capp>0)p.capp=Math.max(p.capp,1)}
  if(p.srn==null){p.srs=0;p.srn=0;p.smotm=0;p.scs=0}
+ const MM={tg1:'g1',tg5:'g5',tg10:'g10',tg25:'g25',tg50:'g50',tg100:'g100',app1:'debut',app10:'p10',app25:'p25',app50:'p50',app100:'p100'};if(p.msd)for(const k in p.msd)if(MM[k])S.ach[MM[k]]=1;
  if(!S.achInit){S.achInit=1;ACH.forEach(a=>{const [c,g]=a[4](p);if(c>=g)S.ach[a[0]]=1})}}
 function rewTxt(r){const p=S.p,o=[];if(r.m){p.money+=r.m;o.push(`💰 +฿${fmt(r.m)}`)}if(r.sp){PI();p.sp+=r.sp;o.push(`⭐ +${r.sp} สกิลพอยต์`)}if(r.f){const v=Math.round(p.fans*r.f)+Math.round(500*r.f*10);p.fans+=v;o.push(`📈 +${fmt(v)} ผู้ติดตาม`)}if(r.mo){p.morale=cl(p.morale+r.mo);o.push(`😊 ขวัญ +${r.mo}`)}if(r.tr){p.trust=cl(p.trust+r.tr);o.push(`🤝 โค้ช +${r.tr}`)}return o}
 function cabAdd(o){AWI();S.cab.push(Object.assign({s:S.slabel||'',c:club()?club().n:'',f:S.club?LEAGUES[S.club.c].f:''},o))}
@@ -1038,11 +1043,11 @@ function monthEval(){const p=S.p,m=p.mo;if(!m||m.app<3){return}const avg=m.rs/m.
 const _fnA=finish;finish=function(nx,M,msg,quiet){const p=S.p;AWI();const tg0=p.tg||0;const r=_fnA(nx,M,msg,quiet);
  try{if(M.played){const res=(S.log[S.week-1]||'0-0').split('-').map(Number),ga=res[1],rr=cl(M.r,3,10),mk=(()=>{const y=ymd(now());return y[0]*12+y[1]})();
   if(p.mo&&p.mo.k!==mk)monthEval();if(!p.mo||p.mo.k!==mk)p.mo={k:mk,app:0,g:0,a:0,rs:0};p.mo.app++;p.mo.g+=M.g||0;p.mo.a+=M.as||0;p.mo.rs+=rr;
-  p.capp=(p.capp||0)+1;p.srs+=rr;p.srn++;const mst=p.mst,cn=club()?club().n:'',vs=M.opp;
-  if(p.capp===1){const rw=rewTxt({sp:1,mo:5});cabAdd({t:'ms',k:'debut',ic:'🎽',n:'เสื้อนัดเดบิวต์',d:`vs ${vs}`});news(`🎽 ${p.name} ลงเดบิวต์อาชีพกับ ${cn}!`);celeb('🎽','นัดเดบิวต์อาชีพ!',`ก้าวแรกบนเส้นทางแข้ง vs ${vs}`,rw)}
-  if(M.g>0&&tg0===0){const rw=rewTxt({sp:2,f:.06,mo:8});cabAdd({t:'ms',k:'fg',ic:'⚽',n:'ประตูแรกในอาชีพ',d:`vs ${vs}`});news(`⚽ ประวัติศาสตร์ส่วนตัว! ${p.name} ยิงประตูแรกในอาชีพใส่ ${vs}`);celeb('⚽','ประตูแรกในอาชีพ!',`จะจดจำวันนี้ไปตลอดชีวิต vs ${vs}`,rw)}
-  if(M.g>=4){mst.poker++;mst.hat++;const rw=rewTxt({sp:8,f:.18,mo:15,tr:8,m:30000});cabAdd({t:'ball',k:'poker',ic:'⚽',n:'ลูกบอลโปกเกอร์ (4 ประตู)',d:`${M.g} ประตู vs ${vs}`});news(`🤯 โปกเกอร์!! ${p.name} ถล่ม ${vs} คนเดียว ${M.g} ประตู! เก็บลูกบอลกลับบ้าน`);celeb('⚽⚽⚽⚽',`โปกเกอร์ตำนาน! ${M.g} ประตู`,`คุณเก็บลูกบอลนัดนี้กลับบ้าน · vs ${vs}`,rw);CQ[CQ.length-1].big=1}
-  else if(M.g===3){mst.hat++;const rw=rewTxt({sp:5,f:.12,mo:12,tr:6,m:15000});cabAdd({t:'ball',k:'hat',ic:'⚽',n:'ลูกบอลแฮตทริก',d:`vs ${vs}`});news(`🎩 แฮตทริกฮีโร่! ${p.name} ซัด 3 ประตูใส่ ${vs} พร้อมเก็บลูกบอลไว้เป็นที่ระลึก`);celeb('⚽⚽⚽','แฮตทริกฮีโร่!',`คุณเก็บลูกบอลนัดนี้ไว้ในตู้รางวัล · vs ${vs}`,rw)}
+  p.srs+=rr;p.srn++;const mst=p.mst,cn=club()?club().n:'',vs=M.opp;
+  if(p.capp===1){S.ach.debut=1;const rw=rewTxt({sp:1,mo:5});cabAdd({t:'ms',k:'debut',ic:'🎽',n:'เสื้อนัดเดบิวต์',d:`vs ${vs}`});news(`🎽 ${p.name} ลงเดบิวต์อาชีพกับ ${cn}!`);celeb('🎽','นัดเดบิวต์อาชีพ!',`ก้าวแรกบนเส้นทางแข้ง vs ${vs}`,rw)}
+  if(M.g>0&&tg0===0){S.ach.g1=1;const rw=rewTxt({sp:2,f:.06,mo:8});cabAdd({t:'ms',k:'fg',ic:'⚽',n:'ประตูแรกในอาชีพ',d:`vs ${vs}`});news(`⚽ ประวัติศาสตร์ส่วนตัว! ${p.name} ยิงประตูแรกในอาชีพใส่ ${vs}`);celeb('⚽','ประตูแรกในอาชีพ!',`จะจดจำวันนี้ไปตลอดชีวิต vs ${vs}`,rw)}
+  if(M.g>=4){mst.poker++;mst.hat++;S.ach.hat=1;const rw=rewTxt({sp:8,f:.18,mo:15,tr:8,m:30000});cabAdd({t:'ball',k:'poker',ic:'⚽',n:'ลูกบอลโปกเกอร์ (4 ประตู)',d:`${M.g} ประตู vs ${vs}`});news(`🤯 โปกเกอร์!! ${p.name} ถล่ม ${vs} คนเดียว ${M.g} ประตู! เก็บลูกบอลกลับบ้าน`);celeb('⚽⚽⚽⚽',`โปกเกอร์ตำนาน! ${M.g} ประตู`,`คุณเก็บลูกบอลนัดนี้กลับบ้าน · vs ${vs}`,rw);CQ[CQ.length-1].big=1}
+  else if(M.g===3){mst.hat++;S.ach.hat=1;const rw=rewTxt({sp:5,f:.12,mo:12,tr:6,m:15000});cabAdd({t:'ball',k:'hat',ic:'⚽',n:'ลูกบอลแฮตทริก',d:`vs ${vs}`});news(`🎩 แฮตทริกฮีโร่! ${p.name} ซัด 3 ประตูใส่ ${vs} พร้อมเก็บลูกบอลไว้เป็นที่ระลึก`);celeb('⚽⚽⚽','แฮตทริกฮีโร่!',`คุณเก็บลูกบอลนัดนี้ไว้ในตู้รางวัล · vs ${vs}`,rw)}
   else if(M.g===2){mst.brace++;const rw=rewTxt({sp:2,f:.04,mo:5});toast('⚽⚽ เบรซ! ยิง 2 ประตู · '+rw.join(' '));news(`⚽⚽ ${p.name} ยิงเบรซใส่ ${vs}`)}
   if(M.as>=3){mst.a3++;const rw=rewTxt({sp:3,f:.06,tr:4});cabAdd({t:'ms',k:'a3',ic:'🎯',n:`จอมแอสซิสต์ ${M.as} ลูก`,d:`vs ${vs}`});news(`🎯 ${p.name} จ่ายให้เพื่อนยิง ${M.as} ลูกในเกมเดียว!`);celeb('🎯',`แอสซิสต์ ${M.as} ลูกในเกมเดียว!`,'เพลย์เมกเกอร์ไฟลุก',rw)}
   if(M.motm){mst.motm++;p.smotm++}
