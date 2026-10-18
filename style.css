@@ -100,3 +100,6 @@ details.fold>summary{list-style:none;cursor:pointer;font-weight:600;display:flex
 .abm{flex:1.4;background:var(--ye,#ffd21f);color:#111}.abm.go{background:linear-gradient(90deg,#ff7a1a,#ffd21f);font-size:18px}
 .abs{width:52px;background:#1d3324;color:#fff;font-size:20px!important}
 #sndb{bottom:calc(132px + env(safe-area-inset-bottom))!important;width:34px!important;height:34px!important;font-size:15px!important;opacity:.8}
+.hb{flex-direction:column;align-items:stretch;gap:3px;min-width:0}.hbl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden}.hbl span{overflow:hidden;text-overflow:ellipsis}.hbl b{color:var(--tx);font-size:12px;margin-left:4px}
+.abs{width:64px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}.abs small{font-size:10px;font-weight:400;color:#cfd}
+.hb .bar{flex:none;width:100%;height:6px}
