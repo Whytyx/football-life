@@ -1,7 +1,13 @@
-const APP_VER=36;
+const APP_VER=37;
+// ===== AUTO UPDATE (PWA) =====
+function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{typeof save==='function'&&S&&save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
+setTimeout(checkUpdate,1500);
 'use strict';
 // ===== เส้นทางแข้ง: Football Life =====
 const R=Math.random,rnd=(a,b)=>a+Math.floor(R()*(b-a+1)),pick=a=>a[Math.floor(R()*a.length)],cl=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const INJT=[[1,'🦵','กล้ามเนื้อตึง'],[2,'🦵','ต้นขาหลังฉีกเล็กน้อย'],[4,'🦶','ข้อเท้าแพลง'],[6,'🦿','เอ็นหัวเข่าอักเสบ'],[99,'🦴','กระดูกเท้าร้าว']];
+const INJP={ice:.03,sauna:.03,chair:.04,physio:.12,cryo:.1,hyper:.15,med:.25};
 const chance=p=>R()<p, $=s=>document.querySelector(s);
 const fmt=n=>n<0?'-'+fmt(-n):n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n)+'';
 const LEAGUES={
@@ -840,7 +846,6 @@ function boot(){load();if(S&&!S.gameT){try{S.gameT=Math.min(Date.now()+(S.devOff
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});
 window.addEventListener('pagehide',()=>save());
 setInterval(()=>{if(S)save()},20000);
-boot();
 // ===== SHIRT NUMBERS =====
 var KEYN=[1,7,9,10];
 function hsh(t){let h=7;for(const ch of t)h=(h*131+ch.charCodeAt(0))%1000003;return h}
@@ -929,14 +934,8 @@ function leagueInfo(){const rows=[];for(const c in S.world)S.world[c].forEach((t
  $('#lib').onclick=()=>{if(rebindOffers){rebindOffers();if($('.sheet'))$('.sheet').scrollTop=y}else closeM()}}
 var rebindOffers=null;
 
-// ===== AUTO UPDATE (PWA) =====
-function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
-setTimeout(checkUpdate,1500);
 
 // ===== INJURY TREATMENT =====
-const INJT=[[1,'🦵','กล้ามเนื้อตึง'],[2,'🦵','ต้นขาหลังฉีกเล็กน้อย'],[4,'🦶','ข้อเท้าแพลง'],[6,'🦿','เอ็นหัวเข่าอักเสบ'],[99,'🦴','กระดูกเท้าร้าว']];
-const INJP={ice:.03,sauna:.03,chair:.04,physio:.12,cryo:.1,hyper:.15,med:.25};
 function injProt(){if(!S||!S.boost)return 0;const t=dkey(now());let v=0;S.boost.filter(b=>b.end>=t&&INJP[b.id]).forEach(b=>v+=INJP[b.id]*(1+((S.blv&&S.blv[b.id])||1)*.08-.08));return Math.min(.5,v)}
 function injProtSrc(){const t=dkey(now());return (S.boost||[]).filter(b=>b.end>=t&&INJP[b.id]).map(b=>BST[b.id].ic+' '+BST[b.id].n)}
 const injCost=k=>{const w=S.p.wage||0;return k==='rh'?Math.round((5000+w*1.5)/500)*500:Math.round((40000+w*6)/1000)*1000};
@@ -991,3 +990,5 @@ const _fnI=finish;finish=function(nx,M,msg,quiet){const p=S.p,pk=p.pkInj;p.pkInj
  if(pk){if(chance(.4)){p.inj=Math.max(p.inj,pk+rnd(1,3));p.injMax=p.inj;E('trust',-5);E('morale',-8);E('fans',-0.02);news(`🚑 ยาแก้ปวดหมดฤทธิ์ อาการ${p.name}หนักขึ้น! ต้องพัก ${p.inj} นัด · แฟนบอลวิจารณ์ทีมแพทย์`);toast(`🚑 อาการหนักขึ้น! พัก ${p.inj} นัด`)}
   else{p.inj=Math.max(p.inj,pk-1);E('trust',3);E('fans',0.02);news(`💪 ${p.name} ฝืนเจ็บลงเล่น แฟนบอลชื่นชมความทุ่มเท${p.inj?` (ยังเหลือพัก ${p.inj} นัด)`:''}`);toast(p.inj?`💪 รอดมาได้ ยังเหลือพัก ${p.inj} นัด`:'💪 รอด! อาการไม่กำเริบ')}
   if(!p.inj){p.injT=null;p.injMax=0}save()}return r};
+
+try{boot()}catch(e){console.error('boot failed',e);checkUpdate()}
