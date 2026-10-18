@@ -1,4 +1,4 @@
-const APP_VER=45;
+const APP_VER=46;
 // ===== AUTO UPDATE (PWA) =====
 function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{typeof save==='function'&&S&&save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
@@ -398,12 +398,12 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();injChk()
  if(TAB==='life')h+=lifeHTML();
  if(TAB==='news')h+=`<h2>โซเชียล</h2>${(S.feed||[]).length?S.feed.map(postCard).join(''):'<div class="card mu">ยังไม่มีโพสต์ — ลงสนามแล้วโลกโซเชียลจะพูดถึงคุณ</div>'}<div class="card feed"><h2>ข่าวสโมสร</h2>${S.news.map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`;
  if(TAB==='career')h+=`<div class="card"><h2>สัญญา</h2><p>${club()?club().n:'-'} · เหลือ ${p.contract} ฤดูกาล · ฿${fmt(p.wage)}/สัปดาห์</p><p class="mu">${p.agent?'มีเอเยนต์ดูแล':'ไม่มีเอเยนต์'}${p.wantOut?' · ยื่นขอย้ายแล้ว':''}</p><button class="btn o" id="offers">🔎 ดูข้อเสนอย้ายทีม</button></div>
-  <button class="card trow" id="cabb"><span>🏆 ตู้รางวัล & ความสำเร็จ</span><span class="ye">${(S.cab||[]).length} รางวัล ›</span></button><div class="card"><h2>💾 เซฟเกม <span class="mu" style="font-size:12px;float:right;text-transform:none">เวอร์ชัน v${APP_VER}</span></h2><p class="mu">เซฟอัตโนมัติ · ถ้าเล่นทั้งใน Safari และไอคอนหน้าจอโฮม ข้อมูลแยกกัน ใช้สำรอง/นำเข้าเพื่อย้าย</p><div class="row"><button class="btn s" style="flex:1;text-align:center" onclick="exportSave()">📤 สำรองเซฟ</button><button class="btn s" style="flex:1;text-align:center" onclick="importSave()">📥 นำเข้าเซฟ</button></div></div><div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
+  <button class="card trow" id="cabb"><span>🏆 ตู้รางวัล & ความสำเร็จ</span><span class="ye">${(S.cab||[]).length} รางวัล ›</span></button>${undoOk()?`<button class="card trow" id="undotx"><span>↩️ ยกเลิกการย้ายล่าสุด (กลับทีมเดิม)</span><span class="mu">${undoOk().n} ›</span></button>`:''}<div class="card"><h2>💾 เซฟเกม <span class="mu" style="font-size:12px;float:right;text-transform:none">เวอร์ชัน v${APP_VER}</span></h2><p class="mu">เซฟอัตโนมัติ · ถ้าเล่นทั้งใน Safari และไอคอนหน้าจอโฮม ข้อมูลแยกกัน ใช้สำรอง/นำเข้าเพื่อย้าย</p><div class="row"><button class="btn s" style="flex:1;text-align:center" onclick="exportSave()">📤 สำรองเซฟ</button><button class="btn s" style="flex:1;text-align:center" onclick="importSave()">📥 นำเข้าเซฟ</button></div></div><div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
  h+=abar();$('#app').innerHTML=h;$('#ab-tr')&&($('#ab-tr').onclick=openTrain);$('#ab-tr2')&&($('#ab-tr2').onclick=openTrain);
  if(TAB==='life')lifeBind();$('#eav')&&($('#eav').onclick=editAvatar);document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.rp.split(':').map(Number);replyPost(i,k)});document.querySelectorAll('[data-sp]').forEach(b=>{if(b.classList.contains('spb'))b.onclick=()=>{const k=b.dataset.sp;if(p.sp<1||p.a[k]>=99)return;p.sp--;p.ap=p.ap||{};p.ap[k]=(p.ap[k]||0)+1;if(p.ap[k]>=pipN(p.a[k])){p.ap[k]=0;p.a[k]++;toast(`📈 ${AT[k]} ขึ้นเป็น ${p.a[k]}!`)}save();render()}});$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));trainBind();
  $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');localStorage.removeItem('fl_save3_bak');idb(d=>{try{d.transaction('s','readwrite').objectStore('s').delete('save')}catch(e){}});S=null;render()}});
- $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);$('#psk')&&($('#psk').onclick=preSkip);$('#bsk')&&($('#bsk').onclick=brkSkip);$('#cabb')&&($('#cabb').onclick=openCab);injBind();
+ $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);$('#psk')&&($('#psk').onclick=preSkip);$('#bsk')&&($('#bsk').onclick=brkSkip);$('#cabb')&&($('#cabb').onclick=openCab);$('#undotx')&&($('#undotx').onclick=undoTx);injBind();
  if(!$('#modal.show'))dailyEvent()}
 // ===== REAL-TIME TICK =====
 function tick(){const t=now(),p=S.p;const d=dkey(t)-dkey(S.lastT||t);if(d>0){p.stamina=cl(p.stamina+12*d);p.morale=cl(p.morale+(65-p.morale)*Math.min(1,d/5))}S.lastT=t;
@@ -850,7 +850,7 @@ sndBtn();
 
 // ===== BOOT (after all definitions) =====
 // ===== TRANSFER WINDOWS =====
-function doMove(o,first){const old=club(),oldF=S.club?LEAGUES[S.club.c].f:'';S.club={c:o.c,t:o.t,i:o.i};S.hist=S.hist||[];S.hist.push({f:LEAGUES[o.c].f,n:club().n,d:tierOf(o.c,o.t).n,y:S.slabel||''});const p=S.p;p.wage=o.wage;p.contract=o.yrs;p.role=o.role;p.tt={kid:0,rot:1,star:3}[o.role];p.trust=cl(Math.round(42+(ovr()-tierOf(o.c,o.t).clubs[o.i].s)*1.5),15,55);p.coach=o.coach;p.wantOut=0;p.benched=0;p.listed=0;p.promise=null;p.canEsc=0;p.trained=0;if(o.bonus)p.money+=o.bonus;
+function doMove(o,first){const old=club(),oldF=S.club?LEAGUES[S.club.c].f:'';try{const p0=S.p;S.lastMv=S.club?{at:now(),c:S.club.c,t:S.club.t,i:S.club.i,n:old.n,wage:p0.wage,contract:p0.contract,role:p0.role,tt:p0.tt,trust:p0.trust,coach:p0.coach,num:p0.num,numL:p0.numL}:null}catch(e){}S.club={c:o.c,t:o.t,i:o.i};S.hist=S.hist||[];S.hist.push({f:LEAGUES[o.c].f,n:club().n,d:tierOf(o.c,o.t).n,y:S.slabel||'',v46:1});const p=S.p;p.wage=o.wage;p.contract=o.yrs;p.role=o.role;p.tt={kid:0,rot:1,star:3}[o.role];p.trust=cl(Math.round(42+(ovr()-tierOf(o.c,o.t).clubs[o.i].s)*1.5),15,55);p.coach=o.coach;p.wantOut=0;p.benched=0;p.listed=0;p.promise=null;p.canEsc=0;p.trained=0;if(o.bonus)p.money+=o.bonus;
   news(first?`✍️ ${p.name} เซ็นสัญญาอาชีพฉบับแรกกับ ${LEAGUES[o.c].f} ${club().n} (${LEAGUES[o.c].n} · ${tierOf(o.c,o.t).n} · ${ltxt(o.c,o.t)}) ในบทบาท${ROLE[o.role][0]}${o.c!==p.nat?` 🌍 นักเตะต่างชาติจาก${NN()} ${NF()}`:''}`:`✈️ ย้ายทีม! ${p.name} ${old?'จาก '+oldF+' '+old.n:''} สู่ ${LEAGUES[o.c].f} ${club().n} (${LEAGUES[o.c].n} · ${ltxt(o.c,o.t)}) บทบาท${ROLE[o.role][0]}`);p.num=0;p.numL='';newSeasonKeep();}
 function winOpen(t){const m=ymd(t)[1];return m===0||(m>=5&&m<=7)}
 function winClose(t){const[y,m]=ymd(t);return m===0?bk(y,0,31,23):bk(y,7,31,23)}
@@ -871,6 +871,20 @@ function txTick(){const x=S.ptx,t=now();if(!x||!x.o||t<x.at)return;if($('#modal.
   if(chance(.1)){S.ptx=null;news(`💔 ดีลย้ายไป ${x.n} ล่ม! เจรจาไม่ลงตัว — ${p.name} อยู่กับ ${club().n} ต่อ`);save();sheet(`<span class="tag">ดีลล่ม</span><h2 style="margin:10px 0">💔 ดีลย้ายไป ${x.n} ล่ม</h2><p class="mu">เจรจาไม่ลงตัวในนาทีสุดท้าย คุณยังอยู่กับ ${club().n}</p><button class="btn" onclick="closeM();render()">ตกลง</button>`);return}}
  if(x.st==='pre'&&!winOpen(t))return;S.ptx=null;const o=txFind(x);doMove(o,false);save();
  sheet(`<span class="tag g">ย้ายทีมสำเร็จ</span><h2 style="margin:10px 0">✈️ ยินดีต้อนรับสู่ ${LEAGUES[o.c].f} ${club().n}!</h2><p class="mu">${x.st==='pre'?'ตลาดเปิดแล้ว ข้อตกลงล่วงหน้ามีผล':'ผ่านการตรวจร่างกาย เซ็นสัญญาเรียบร้อย'} · ${tierOf(o.c,o.t).n} · บทบาท${ROLE[o.role][0]}</p><button class="btn" id="txn">👕 เลือกเบอร์เสื้อ</button>`);$('#txn').onclick=()=>{closeM();render();numPick(true)}}
+// ===== UNDO LAST (instant) MOVE =====
+function undoFind(){const h=S.hist||[];if(!S.club||h.length<2)return null;const L=S.lastMv,nm=L&&L.n?L.n:h[h.length-2].n,cur=club();if(!nm||!cur||nm===cur.n)return null;
+ if(L&&L.c&&S.world[L.c]&&S.world[L.c][L.t]&&S.world[L.c][L.t].clubs[L.i]&&S.world[L.c][L.t].clubs[L.i].n===nm)return {c:L.c,t:L.t,i:L.i,n:nm};
+ for(const c in S.world)for(let t=0;t<S.world[c].length;t++){const i=S.world[c][t].clubs.findIndex(x=>x.n===nm);if(i>=0)return {c,t,i,n:nm}}return null}
+function undoOk(){try{if(!S||S.undoTx||S.ptx)return null;if(S.lastMv&&now()-S.lastMv.at>30*DAY)return null;if(!S.lastMv&&S.hist&&S.hist.length&&S.hist[S.hist.length-1].v46)return null;return undoFind()}catch(e){return null}}
+function undoTx(){const o=undoOk();if(!o)return;if(!confirm(`ยกเลิกการย้ายล่าสุด แล้วกลับไปอยู่กับ ${o.n}?\n(ใช้ได้ครั้งเดียว · เงิน สถิติ ผู้ติดตาม ไอเท็มยังอยู่ครบ)`))return;
+ const p=S.p,L=S.lastMv,newN=club().n;S.club={c:o.c,t:o.t,i:o.i};
+ if(L&&L.n===o.n){p.wage=L.wage;p.contract=L.contract;p.role=L.role;p.tt=L.tt;p.trust=Math.max(L.trust||0,15);p.coach=L.coach}
+ else{p.wage=Math.max(wage(o.c,o.t),Math.round((p.wage||0)*.8/10)*10);p.contract=Math.max(p.contract||0,2);if(!p.role||p.role==='kid'&&p.age>21)p.role='rot';p.tt=Math.max(p.tt||0,1);p.trust=Math.max(50,Math.min(p.trust||0,60))}
+ p.wantOut=0;p.listed=0;p.benched=0;p.promise=null;p.num=0;p.numL='';
+ if(S.hist&&S.hist.length&&S.hist[S.hist.length-1].n===newN)S.hist.pop();
+ freshTable();newSeasonKeep();
+ try{const C=S.cup;if(C&&C.cn===o.n){if(C.tied&&!(C.rounds||[]).some(r=>r.res&&r.win===false)){C.out=0;C.tied=0}}else if(!C||C.cn){S.cup=makeCup(S.week)}}catch(e){console.error('undoCup',e)}
+ S.undoTx=1;S.lastMv=null;news(`↩️ ${p.name} ตัดสินใจอยู่ต่อกับ ${LEAGUES[o.c].f} ${o.n}`);save();render();numPick(true)}
 function boot(){load();if(S&&!S.gameT){try{S.gameT=Math.min(Date.now()+(S.devOff||0),S.ko[Math.min(S.week,S.N-1)]);delete S.dev}catch(e){}}
  try{render()}catch(e){console.error(e);toast('⚠️ โหลดหน้าจอผิดพลาด แต่เซฟยังอยู่: '+e.message)}
  if(!S)idbGet(j=>{const o=j&&parseSave(j);if(o&&!S){S=o;save();render();toast('♻️ กู้เซฟจากที่เก็บสำรองแล้ว')}});
