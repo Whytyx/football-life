@@ -1,3 +1,4 @@
+const APP_VER=34;
 'use strict';
 // ===== เส้นทางแข้ง: Football Life =====
 const R=Math.random,rnd=(a,b)=>a+Math.floor(R()*(b-a+1)),pick=a=>a[Math.floor(R()*a.length)],cl=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
@@ -383,7 +384,7 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();c
  if(TAB==='life')h+=lifeHTML();
  if(TAB==='news')h+=`<h2>โซเชียล</h2>${(S.feed||[]).length?S.feed.map(postCard).join(''):'<div class="card mu">ยังไม่มีโพสต์ — ลงสนามแล้วโลกโซเชียลจะพูดถึงคุณ</div>'}<div class="card feed"><h2>ข่าวสโมสร</h2>${S.news.map(n=>`<div>${n.t}<div class="mu">${n.w}</div></div>`).join('')}</div>`;
  if(TAB==='career')h+=`<div class="card"><h2>สัญญา</h2><p>${club()?club().n:'-'} · เหลือ ${p.contract} ฤดูกาล · ฿${fmt(p.wage)}/สัปดาห์</p><p class="mu">${p.agent?'มีเอเยนต์ดูแล':'ไม่มีเอเยนต์'}${p.wantOut?' · ยื่นขอย้ายแล้ว':''}</p><button class="btn o" id="offers">🔎 ดูข้อเสนอย้ายทีม</button></div>
-  <div class="card"><h2>💾 เซฟเกม</h2><p class="mu">เซฟอัตโนมัติ · ถ้าเล่นทั้งใน Safari และไอคอนหน้าจอโฮม ข้อมูลแยกกัน ใช้สำรอง/นำเข้าเพื่อย้าย</p><div class="row"><button class="btn s" style="flex:1;text-align:center" onclick="exportSave()">📤 สำรองเซฟ</button><button class="btn s" style="flex:1;text-align:center" onclick="importSave()">📥 นำเข้าเซฟ</button></div></div><div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
+  <div class="card"><h2>💾 เซฟเกม <span class="mu" style="font-size:12px;float:right">เวอร์ชัน v${APP_VER}</span></h2><p class="mu">เซฟอัตโนมัติ · ถ้าเล่นทั้งใน Safari และไอคอนหน้าจอโฮม ข้อมูลแยกกัน ใช้สำรอง/นำเข้าเพื่อย้าย</p><div class="row"><button class="btn s" style="flex:1;text-align:center" onclick="exportSave()">📤 สำรองเซฟ</button><button class="btn s" style="flex:1;text-align:center" onclick="importSave()">📥 นำเข้าเซฟ</button></div></div><div class="card"><h2>เป้าหมาย</h2><p>🏆 เล่นลีกสูงสุดของยุโรป · ${NF()} ติดทีมชาติ${NN()} (OVR ${NAT()[2]}+) · 💰 เศรษฐีลูกหนัง</p></div><button class="btn s" id="reset">🗑️ เริ่มอาชีพใหม่</button>`;
  h+=abar();$('#app').innerHTML=h;$('#ab-tr')&&($('#ab-tr').onclick=openTrain);$('#ab-tr2')&&($('#ab-tr2').onclick=openTrain);
  if(TAB==='life')lifeBind();$('#eav')&&($('#eav').onclick=editAvatar);document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.rp.split(':').map(Number);replyPost(i,k)});document.querySelectorAll('[data-sp]').forEach(b=>{if(b.classList.contains('spb'))b.onclick=()=>{const k=b.dataset.sp;if(p.sp<1||p.a[k]>=99)return;p.sp--;p.ap=p.ap||{};p.ap[k]=(p.ap[k]||0)+1;if(p.ap[k]>=pipN(p.a[k])){p.ap[k]=0;p.a[k]++;toast(`📈 ${AT[k]} ขึ้นเป็น ${p.a[k]}!`)}save();render()}});$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));trainBind();
@@ -924,3 +925,8 @@ function leagueInfo(){const rows=[];for(const c in S.world)S.world[c].forEach((t
  ${rows.map(({c,ti,t})=>{const ss=t.clubs.map(x=>x.s),w=wage(c,ti);return `<div class="lrow"><div style="flex:1;min-width:0"><b>${LEAGUES[c].f} ${t.n}</b><div class="mu" style="font-size:12px">${LEAGUES[c].n} · ${ti===0?'ลีกสูงสุด':'ดิวิชัน '+(ti+1)+'/'+S.world[c].length} · พลังทีม ${Math.min(...ss)}–${Math.max(...ss)}</div></div><div style="text-align:right"><div style="font-size:12px">${'⭐'.repeat(lstars(t.str))}</div><div class="ye" style="font-size:12px">฿${fmt(w*.7)}–${fmt(w*1.3)}</div></div></div>`}).join('')}`);
  $('#lib').onclick=()=>{if(rebindOffers){rebindOffers();if($('.sheet'))$('.sheet').scrollTop=y}else closeM()}}
 var rebindOffers=null;
+
+// ===== AUTO UPDATE (PWA) =====
+function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
+setTimeout(checkUpdate,1500);
