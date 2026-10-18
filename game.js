@@ -1,4 +1,4 @@
-const APP_VER=35;
+const APP_VER=36;
 'use strict';
 // ===== เส้นทางแข้ง: Football Life =====
 const R=Math.random,rnd=(a,b)=>a+Math.floor(R()*(b-a+1)),pick=a=>a[Math.floor(R()*a.length)],cl=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
@@ -364,13 +364,14 @@ function offers(auto,country,list){if(!list&&!country&&S.club&&!earned()){if(aut
  $('#stay')&&($('#stay').onclick=()=>{closeM();save();render()})}
 // ===== RENDER =====
 let LIVE=null;
-function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();const p=S.p;let h=header();
+function render(){if(!S)return setup();if(LIVE)return drawLive();tick();injChk();tabs();const p=S.p;let h=header();
  if(TAB==='home'){const nx=nextFix(),t=now(),trained=p.trainDay===dkey(t);PI();
   if(nx){const ko=S.ko[S.week],ready=dkey(t)>=dkey(ko),dd=dkey(ko)-dkey(t);
    h+=`<div class="card mcard"><div class="row sp mu" style="font-size:13px"><span>📅 ${new Date(t).toLocaleDateString('th-TH',{timeZone:'Asia/Bangkok',weekday:'short',day:'numeric',month:'short'})}</span><span>นัดที่ ${S.week+1}/${S.N} · ${S.slabel}</span></div>
    <div class="row sp" style="margin:10px 0 4px;align-items:center"><div style="flex:1;min-width:0"><div class="mu" style="font-size:12px">${nx.home?'🏠 เหย้า':'✈️ เยือน'} · คู่แข่งพลัง ${nx.opp.s}</div><div class="mu" style="font-size:12px">${tierOf(S.club.c,S.club.t).n} ${ltag(S.club.c,S.club.t)}</div><b style="font-size:18px">vs ${LF()} ${nx.opp.n}</b><div class="mu" style="font-size:12px">🗓️ ${fdt(ko)}</div></div><div class="cdn ${ready?'live':''}">${ready?'วันแข่ง!':`<b>${dd}</b><span>วัน</span>`}</div></div>
    ${p.ban?`<div class="re">⛔ ติดแบน ${p.ban} นัด</div>`:p.inj?`<div class="re">🚑 บาดเจ็บ ${p.inj} นัด</div>`:p.benched?`<div class="ye">🪑 โค้ชอาจไม่ส่งคุณลงสนาม</div>`:''}</div>`}
   else if(!S.club)h+=`<div class="card"><h2>ไร้สังกัด</h2><p class="mu">คุณไม่มีสโมสร รอข้อเสนอ หรือไปวันถัดไป</p></div>`;
+  h+=injCard();
   h+=`<button class="card trow" id="ab-tr2"><span>🏋️ การซ้อมวันนี้</span><span class="${trained?'gr':'ye'}">${trained?'✅ ซ้อมแล้ว':'ยังไม่ได้ซ้อม ›'}</span></button>`;
   if(S.club)h+=tierCard();
   const wm=WM(),wd=wm.l.filter(m=>m.d).length;
@@ -389,7 +390,7 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();tabs();c
  if(TAB==='life')lifeBind();$('#eav')&&($('#eav').onclick=editAvatar);document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.rp.split(':').map(Number);replyPost(i,k)});document.querySelectorAll('[data-sp]').forEach(b=>{if(b.classList.contains('spb'))b.onclick=()=>{const k=b.dataset.sp;if(p.sp<1||p.a[k]>=99)return;p.sp--;p.ap=p.ap||{};p.ap[k]=(p.ap[k]||0)+1;if(p.ap[k]>=pipN(p.a[k])){p.ap[k]=0;p.a[k]++;toast(`📈 ${AT[k]} ขึ้นเป็น ${p.a[k]}!`)}save();render()}});$('#play')&&($('#play').onclick=playMatch);$('#wait')&&($('#wait').onclick=()=>{if(S.news.length)S.abs++;offers(true,S.news.length?null:S.startC)});
  document.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>train(b.dataset.tr));trainBind();
  $('#offers')&&($('#offers').onclick=()=>offers(false));$('#reset')&&($('#reset').onclick=()=>{if(confirm('ลบเซฟแล้วเริ่มใหม่?')){localStorage.removeItem('fl_save3');localStorage.removeItem('fl_save3_bak');idb(d=>{try{d.transaction('s','readwrite').objectStore('s').delete('save')}catch(e){}});S=null;render()}});
- $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);
+ $('#nd')&&($('#nd').onclick=()=>advance());$('#sk')&&($('#sk').onclick=skipToMatch);injBind();
  if(!$('#modal.show'))dailyEvent()}
 // ===== REAL-TIME TICK =====
 function tick(){const t=now(),p=S.p;const d=dkey(t)-dkey(S.lastT||t);if(d>0){p.stamina=cl(p.stamina+12*d);p.morale=cl(p.morale+(65-p.morale)*Math.min(1,d/5))}S.lastT=t;
@@ -902,7 +903,9 @@ function tacSwitch(M){if(M.tsw||M.half!==2||M.min<58||M.min>75||!chance(.06))ret
  {l:'🎨 ฟรีสไตล์ เล่นตามสัญชาตญาณ',f:M=>{const b=Math.max(...Object.values(S.p.a));if(chance(cl((b-40)/60,.2,.7))){M.r+=.6;E('trust',3);if(chance(.35))goal(M,'ฟรีสไตล์นอกแผน!',.5);else N('จังหวะนอกแผนสวยงาม! โค้ชยิ้มมุมปาก')}else{M.r-=.5;E('trust',-6);N('เล่นนอกแผนแล้วเสียบอล โค้ชโมโหข้างสนาม');if(chance(.3))M.ga++}}}]});EVM.freelance=EV[EV.length-1]})();
 // ===== STICKY ACTION BAR + TRAINING SHEET =====
 function abar(){const p=S.p,nx=nextFix(),t=now(),trained=p.trainDay===dkey(t);let main;
- if(nx&&dkey(t)>=dkey(S.ko[S.week]))main=`<button class="abm go" id="play">⚽ ไปแข่ง!</button>`;
+ const IJ=p.inj>0&&!p.pk&&S.club&&nx;
+ if(nx&&dkey(t)>=dkey(S.ko[S.week]))main=`<button class="abm go" id="play">${IJ?'🚑 ดูผลนัดนี้':'⚽ ไปแข่ง!'}</button>${IJ?'<button class="abs" id="isk" title="ข้ามจนหายเจ็บ">⏩<small>หายเจ็บ</small></button>':''}`;
+ else if(IJ)main=`<button class="abm" id="isk">⏩ ข้ามจนหายเจ็บ</button><button class="abs" id="nd" title="วันถัดไป">☀️<small>วันถัดไป</small></button>`;
  else main=`<button class="abm" id="nd">☀️ วันถัดไป</button>${nx?`<button class="abs" id="sk" title="ข้ามไปวันแข่ง">⏩<small>วันแข่ง</small></button>`:`<button class="abs" id="wait" title="ข้อเสนอ">📨<small>ข้อเสนอ</small></button>`}`;
  return `<div id="abar"><button class="abt ${trained?'done':''}" id="ab-tr">${trained?'✅ ซ้อมแล้ว':'🏋️ ซ้อม'}</button>${main}</div>`}
 function openTrain(){const t=now(),trained=S.p.trainDay===dkey(t);PI();
@@ -930,3 +933,61 @@ var rebindOffers=null;
 function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(checkUpdate,1500);
+
+// ===== INJURY TREATMENT =====
+const INJT=[[1,'🦵','กล้ามเนื้อตึง'],[2,'🦵','ต้นขาหลังฉีกเล็กน้อย'],[4,'🦶','ข้อเท้าแพลง'],[6,'🦿','เอ็นหัวเข่าอักเสบ'],[99,'🦴','กระดูกเท้าร้าว']];
+const INJP={ice:.03,sauna:.03,chair:.04,physio:.12,cryo:.1,hyper:.15,med:.25};
+function injProt(){if(!S||!S.boost)return 0;const t=dkey(now());let v=0;S.boost.filter(b=>b.end>=t&&INJP[b.id]).forEach(b=>v+=INJP[b.id]*(1+((S.blv&&S.blv[b.id])||1)*.08-.08));return Math.min(.5,v)}
+function injProtSrc(){const t=dkey(now());return (S.boost||[]).filter(b=>b.end>=t&&INJP[b.id]).map(b=>BST[b.id].ic+' '+BST[b.id].n)}
+const injCost=k=>{const w=S.p.wage||0;return k==='rh'?Math.round((5000+w*1.5)/500)*500:Math.round((40000+w*6)/1000)*1000};
+function injChk(){if(!S||!S.p)return;const p=S.p;
+ if(!(p.inj>0)){if(p.injT&&!p.pkInj){p.injT=null;p.injMax=0;p.injU={};p.pk=0}return}
+ if(!p.injT){const P=injProt();let msg='';
+  if(P>0&&p.inj<=2&&chance(P*.6)){p.inj=0;news('🛡️ ทีมฟื้นฟูส่วนตัวตรวจพบเร็ว อาการบาดเจ็บไม่หนัก ไม่ต้องพักเลย!');toast('🛡️ ไลฟ์สไตล์ฟื้นฟูช่วยไว้ ไม่ต้องพัก!');save();return}
+  const red=P>0?Math.min(p.inj-1,Math.round(p.inj*P)):0;if(red>0){p.inj-=red;msg=` (ไลฟ์สไตล์ฟื้นฟูช่วยลด ${red} นัด)`}
+  const T=INJT.find(x=>p.inj<=x[0]);p.injT=T[1]+' '+T[2];p.injMax=p.inj;p.injU={};p.pk=0;
+  news(`🚑 ${p.name} บาดเจ็บ: ${T[2]} คาดพัก ${p.inj} นัด${msg}`);if(msg)toast('🩺'+msg);save()}}
+function injCard(){const p=S.p;if(!(p.inj>0)||!p.injT)return '';const U=p.injU||{},P=injProt(),tr=p.trust>=35,nx=nextFix(),md=nx&&dkey(now())>=dkey(S.ko[S.week]);
+ const opt=(id,ic,t,d,cost,ok,why)=>`<button class="card trow" data-it="${id}" ${ok?'':'disabled style="opacity:.45"'}><span style="text-align:left">${ic} <b>${t}</b><br><small class="mu">${ok?d:why}</small></span><span class="${cost?'ye':'gr'}">${cost?'฿'+fmt(cost):'ฟรี'}</span></button>`;
+ return `<div class="card" style="border-color:var(--re,#e55)"><div class="row sp"><h2>🚑 บาดเจ็บ</h2><span class="tag">เหลือ ${p.inj} นัด</span></div>
+ <p><b>${p.injT}</b> · ${p.pk?'<span class="ye">💉 วางแผนฉีดยาลงเล่นนัดหน้า</span>':`คาดกลับมาได้ในอีก ${p.inj} นัด`}</p>${bar(100-p.inj/Math.max(1,p.injMax)*100)}
+ ${P?`<p class="mu" style="font-size:12px">🛡️ ไลฟ์สไตล์ฟื้นฟูช่วยลดโอกาส/ระยะเจ็บ ${Math.round(P*100)}% (${injProtSrc().join(', ')})</p>`:`<p class="mu" style="font-size:12px">💡 บูสเตอร์ฟื้นฟูในไลฟ์สไตล์ (นักกายภาพ, ไครโอ, ทีมแพทย์) ช่วยลดโอกาสและระยะบาดเจ็บ</p>`}
+ <details class="fold" open><summary>ตัวเลือกการรักษา</summary>
+ ${opt('ph','🩺','หมอทีม (กายภาพสโมสร)','ลด 1 นัด · ใช้ได้ 1 ครั้งต่อการเจ็บ',0,tr&&!U.ph,U.ph?'ใช้ไปแล้วสำหรับอาการนี้':'ต้องมีความไว้ใจโค้ช 35+')}
+ ${opt('rh','🏊','ฟื้นฟูแบบเข้มข้น','มีโอกาสลด 1–2 นัด',injCost('rh'),!U.rh,'ทำไปแล้วสำหรับอาการนี้')}
+ ${opt('cl','🏥','คลินิกผู้เชี่ยวชาญเอกชน','ลดระยะพัก 50%',injCost('cl'),!U.cl&&p.inj>=2,U.cl?'ใช้ไปแล้ว':'อาการเบาเกินไปที่จะใช้')}
+ ${opt('pk','💉','ฉีดยาแก้ปวด ลงเล่นนัดหน้า','เสี่ยงอาการหนักขึ้น · โค้ช/แฟนชื่นชมความทุ่มเท',0,!p.pk,'วางแผนไว้แล้ว')}
+ </details></div>`}
+function injBind(){document.querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>injDo(b.dataset.it));$('#isk')&&($('#isk').onclick=injSkip)}
+function injDo(k){const p=S.p;p.injU=p.injU||{};CONS=[];let t='';
+ if(k==='ph'){p.injU.ph=1;p.inj--;E('trust',-2);t='🩺 หมอทีมดูแลพิเศษ ลดระยะพัก 1 นัด';CONS.push('⏱️ ระยะพัก -1 นัด')}
+ if(k==='rh'||k==='cl'){const c=injCost(k);if(p.money<c){sheet(`<p>💸 เงินไม่พอ (ต้องใช้ ฿${fmt(c)})</p><button class="btn" onclick="closeM()">ตกลง</button>`);return}p.money-=c;p.injU[k]=1;CONS.push(`💸 -฿${fmt(c)}`);
+  if(k==='rh'){const r=chance(.25)?2:chance(.75)?1:0;p.inj=Math.max(0,p.inj-r);E('morale',r?3:-3);t=r?`🏊 ฟื้นฟูเข้มข้นได้ผล! ลดระยะพัก ${r} นัด`:'🏊 ฟื้นฟูเต็มที่ แต่ร่างกายยังไม่ตอบสนอง';CONS.push(r?`⏱️ ระยะพัก -${r} นัด`:'⏱️ ระยะพักเท่าเดิม')}
+  else{const r=Math.ceil(p.inj/2);p.inj-=r;t=`🏥 ผู้เชี่ยวชาญรักษาตรงจุด ลดระยะพัก ${r} นัด`;CONS.push(`⏱️ ระยะพัก -${r} นัด`);E('morale',4)}}
+ if(k==='pk'){p.pk=1;t='💉 คุณบอกหมอว่าจะฉีดยาแก้ปวดลงเล่นนัดหน้า';CONS.push('⚠️ มีโอกาสอาการหนักขึ้นหลังเกม')}
+ news(t);if(p.inj<=0){CONS.push('✅ หายเจ็บแล้ว! พร้อมลงสนาม');news(`✅ ${p.name} หายจากอาการบาดเจ็บ`)}
+ save();sheet(`<span class="tag g">🚑 การรักษา</span><p>${t}</p><ul class="cons">${CONS.map(c=>`<li>${c}</li>`).join('')}</ul><button class="btn" onclick="closeM();render()">ตกลง</button>`)}
+function injSkip(){let n=0;const p=S.p;while(n++<200&&S.club){const nx=nextFix();if(!nx)break;const md=dkey(now())>=dkey(S.ko[S.week]);if(md&&(!(p.inj>0)||p.pk))break;
+  S.gameT=bday(S.gameT)+DAY+9*HR;const st=p.inj;tick();if(!S.club||$('#modal.show'))break;
+  if(p.inj>0){if(chance(.15)&&rehabEv())return}else if(st>0){toast('✅ หายเจ็บแล้ว!');news(`✅ ${p.name} หายจากอาการบาดเจ็บ กลับมาซ้อมกับทีม`)}
+  S.evDay=dkey(now())}
+ save();render()}
+function rehabEv(){const ev=pick(EV.filter(e=>e.rehab&&e.id!==S.lastOff));if(!ev)return false;S.lastOff=ev.id;S.evDay=dkey(now());save();showEvent(ev,null,()=>{closeM();save();render()});return true}
+EV.push(
+{id:'rehabA',off:1,rehab:1,c:()=>S.p.inj>0,x:()=>`🏋️ ห้องฟื้นฟู: นักกายภาพยื่นโปรแกรมที่น่าเบื่อสุด ๆ ให้ "ทำตามนี้ทุกวัน อย่าใจร้อน"`,o:[
+ {l:'📋 ทำตามโปรแกรมเคร่งครัด',f:()=>{E('trust',3);if(chance(.35)){S.p.inj=Math.max(0,S.p.inj-1);CONS.push('⏱️ ฟื้นตัวเร็วกว่ากำหนด -1 นัด')}else CONS.push('ร่างกายค่อย ๆ ดีขึ้น')}},
+ {l:'🔥 แอบซ้อมหนักเพื่อกลับเร็ว',f:()=>{if(chance(.45)){S.p.inj=Math.max(0,S.p.inj-1);CONS.push('⏱️ เสี่ยงแต่ได้ผล -1 นัด')}else{S.p.inj++;S.p.injMax++;E('trust',-4);CONS.push('🚑 อาการกำเริบ! +1 นัด')}}},
+ {l:'📺 พักเต็มที่ ดูวิดีโอแท็กติก',f:()=>{E('morale',4);addXP(15)}}]},
+{id:'rehabB',off:1,rehab:1,c:()=>S.p.inj>0,x:()=>`📱 ระหว่างพักเจ็บ แฟน ๆ ถามไถ่อาการคุณเต็มคอมเมนต์ เพื่อนชวนไปปาร์ตี้คืนนี้ด้วย`,o:[
+ {l:'🎥 โพสต์คลิปทำกายภาพ',f:()=>{E('fans',0.04);E('morale',2)}},
+ {l:'🏥 ไปเยี่ยมเด็ก ๆ ที่โรงพยาบาล',f:()=>{E('fans',0.05);E('morale',5);E('media',4)}},
+ {l:'🎉 ไปปาร์ตี้คลายเครียด',f:()=>{E('morale',6);E('trust',-5);if(chance(.3)){S.p.inj++;S.p.injMax++;CONS.push('🚑 เต้นจนเจ็บซ้ำ +1 นัด')}}}]},
+{id:'rehabC',off:1,rehab:1,c:()=>S.p.inj>0,x:()=>`🩺 หมอทีมบอกว่า "สแกนล่าสุดดีขึ้นมาก ถ้าอยากลองซ้อมกับทีมเบา ๆ ก็ได้นะ"`,o:[
+ {l:'⚽ ลองซ้อมกับทีมเบา ๆ',f:()=>{if(chance(.6)){S.p.inj=Math.max(0,S.p.inj-1);E('trust',2);CONS.push('⏱️ ขาโอเค! -1 นัด')}else{E('morale',-4);CONS.push('ยังรู้สึกตึง ๆ ต้องพักต่อ')}}},
+ {l:'🛌 ขอพักให้หายสนิท',f:()=>{E('morale',2);E('stamina',10)}}]});
+const _mdI=maybeDaily;maybeDaily=function(){const p=S&&S.p;if(p&&p.inj>0&&!LIVE&&S.club&&S.evDay!==dkey(now())&&S.lastOff!=='rehabA'&&chance(.3))return rehabEv();return _mdI()};
+const _pmI=playMatch;playMatch=function(){const p=S.p,nx=nextFix();if(nx&&dkey(now())>=dkey(S.ko[S.week])&&p.inj>0&&p.pk&&!p.ban){p.pkInj=p.inj;p.inj=0;p.pk=0;E('stamina',-12);news(`💉 ${p.name} ฉีดยาแก้ปวดเพื่อลงเล่นทั้งที่ยังเจ็บ`)}return _pmI()};
+const _fnI=finish;finish=function(nx,M,msg,quiet){const p=S.p,pk=p.pkInj;p.pkInj=0;const r=_fnI(nx,M,msg,quiet);
+ if(pk){if(chance(.4)){p.inj=Math.max(p.inj,pk+rnd(1,3));p.injMax=p.inj;E('trust',-5);E('morale',-8);E('fans',-0.02);news(`🚑 ยาแก้ปวดหมดฤทธิ์ อาการ${p.name}หนักขึ้น! ต้องพัก ${p.inj} นัด · แฟนบอลวิจารณ์ทีมแพทย์`);toast(`🚑 อาการหนักขึ้น! พัก ${p.inj} นัด`)}
+  else{p.inj=Math.max(p.inj,pk-1);E('trust',3);E('fans',0.02);news(`💪 ${p.name} ฝืนเจ็บลงเล่น แฟนบอลชื่นชมความทุ่มเท${p.inj?` (ยังเหลือพัก ${p.inj} นัด)`:''}`);toast(p.inj?`💪 รอดมาได้ ยังเหลือพัก ${p.inj} นัด`:'💪 รอด! อาการไม่กำเริบ')}
+  if(!p.inj){p.injT=null;p.injMax=0}save()}return r};
