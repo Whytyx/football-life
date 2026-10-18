@@ -1,4 +1,4 @@
-const APP_VER=46;
+const APP_VER=47;
 // ===== AUTO UPDATE (PWA) =====
 function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{typeof save==='function'&&S&&save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
@@ -408,7 +408,7 @@ function render(){if(!S)return setup();if(LIVE)return drawLive();tick();injChk()
 // ===== REAL-TIME TICK =====
 function tick(){const t=now(),p=S.p;const d=dkey(t)-dkey(S.lastT||t);if(d>0){p.stamina=cl(p.stamina+12*d);p.morale=cl(p.morale+(65-p.morale)*Math.min(1,d/5))}S.lastT=t;
  if(S.schedV!==3)schedMig();let n=0;while(n++<NR+10){const lk=S.week<S.N?S.ko[S.week]:Infinity,ck=cupNext()?cupAt():Infinity;if(!(dkey(t)>dkey(Math.min(lk,ck))))break;if(ck<lk)autoCup();else autoRound()}
- try{txTick()}catch(e){console.error('txTick',e)}if(S.week>=S.N&&!$('#modal.show'))endSeason();save()}
+ try{undoMig();cgRole()}catch(e){console.error('undoMig',e)} try{txTick()}catch(e){console.error('txTick',e)}if(S.week>=S.N&&!$('#modal.show'))endSeason();save()}
 function advance(){S.gameT=bday(S.gameT)+DAY+9*HR;render()}
 function skipToMatch(){let n=0;while(n++<400){const nx=nextFix();if(nx&&dkey(now())>=dkey(nextKO()))break;if(!nx&&S.club)break;S.gameT=bday(S.gameT)+DAY+9*HR;tick();if(!S.club)break;if(!$('#modal.show')&&maybeDaily())break;if($('#modal.show'))break}render()}
 function autoRound(){const nx=leagueFix();if(!nx){S.fix[S.week].forEach(([x,y])=>rec(x,y,pois(1.3),pois(1.2)));S.week++;return}
@@ -871,6 +871,11 @@ function txTick(){const x=S.ptx,t=now();if(!x||!x.o||t<x.at)return;if($('#modal.
   if(chance(.1)){S.ptx=null;news(`💔 ดีลย้ายไป ${x.n} ล่ม! เจรจาไม่ลงตัว — ${p.name} อยู่กับ ${club().n} ต่อ`);save();sheet(`<span class="tag">ดีลล่ม</span><h2 style="margin:10px 0">💔 ดีลย้ายไป ${x.n} ล่ม</h2><p class="mu">เจรจาไม่ลงตัวในนาทีสุดท้าย คุณยังอยู่กับ ${club().n}</p><button class="btn" onclick="closeM();render()">ตกลง</button>`);return}}
  if(x.st==='pre'&&!winOpen(t))return;S.ptx=null;const o=txFind(x);doMove(o,false);save();
  sheet(`<span class="tag g">ย้ายทีมสำเร็จ</span><h2 style="margin:10px 0">✈️ ยินดีต้อนรับสู่ ${LEAGUES[o.c].f} ${club().n}!</h2><p class="mu">${x.st==='pre'?'ตลาดเปิดแล้ว ข้อตกลงล่วงหน้ามีผล':'ผ่านการตรวจร่างกาย เซ็นสัญญาเรียบร้อย'} · ${tierOf(o.c,o.t).n} · บทบาท${ROLE[o.role][0]}</p><button class="btn" id="txn">👕 เลือกเบอร์เสื้อ</button>`);$('#txn').onclick=()=>{closeM();render();numPick(true)}}
+function undoWage(c,t){return Math.round(wage(c,t)*1.15/10)*10}
+function undoTT(c,t){const g=ovr()-tierOf(c,t).str;return (S.ach&&S.ach.capt&&g>=10)?4:3}
+function undoMig(){if(!S||!S.p||!S.club||S.undoFix||!S.undoTx)return;const p=S.p;const leg=S.undoLegacy||((S.news||[]).some(x=>x&&x.t&&x.t.includes('ตัดสินใจอยู่ต่อ'))&&(p.tt||0)<3);if(!leg)return;S.undoFix=1;
+ if((p.tt||0)<3){p.tt=undoTT(S.club.c,S.club.t);syncRole();p.trust=Math.max(p.trust||0,65);p.wage=Math.max(p.wage||0,undoWage(S.club.c,S.club.t));news(`⬆️ ${p.name} กลับมาเป็น${TT[p.tt]}ของ ${club().n} ตามเดิม`)}save()}
+function cgRole(){try{const p=S.p;if(S.club&&lgGap()>=10&&p.tt!=null&&p.tt<3){p.tt=3;syncRole();p.trust=Math.max(p.trust||0,50)}}catch(e){}}
 // ===== UNDO LAST (instant) MOVE =====
 function undoFind(){const h=S.hist||[];if(!S.club||h.length<2)return null;const L=S.lastMv,nm=L&&L.n?L.n:h[h.length-2].n,cur=club();if(!nm||!cur||nm===cur.n)return null;
  if(L&&L.c&&S.world[L.c]&&S.world[L.c][L.t]&&S.world[L.c][L.t].clubs[L.i]&&S.world[L.c][L.t].clubs[L.i].n===nm)return {c:L.c,t:L.t,i:L.i,n:nm};
@@ -879,7 +884,7 @@ function undoOk(){try{if(!S||S.undoTx||S.ptx)return null;if(S.lastMv&&now()-S.la
 function undoTx(){const o=undoOk();if(!o)return;if(!confirm(`ยกเลิกการย้ายล่าสุด แล้วกลับไปอยู่กับ ${o.n}?\n(ใช้ได้ครั้งเดียว · เงิน สถิติ ผู้ติดตาม ไอเท็มยังอยู่ครบ)`))return;
  const p=S.p,L=S.lastMv,newN=club().n;S.club={c:o.c,t:o.t,i:o.i};
  if(L&&L.n===o.n){p.wage=L.wage;p.contract=L.contract;p.role=L.role;p.tt=L.tt;p.trust=Math.max(L.trust||0,15);p.coach=L.coach}
- else{p.wage=Math.max(wage(o.c,o.t),Math.round((p.wage||0)*.8/10)*10);p.contract=Math.max(p.contract||0,2);if(!p.role||p.role==='kid'&&p.age>21)p.role='rot';p.tt=Math.max(p.tt||0,1);p.trust=Math.max(50,Math.min(p.trust||0,60))}
+ else{S.undoLegacy=1;p.wage=undoWage(o.c,o.t);p.contract=Math.max(p.contract||0,2);p.tt=undoTT(o.c,o.t);syncRole();p.trust=65;S.undoFix=1}
  p.wantOut=0;p.listed=0;p.benched=0;p.promise=null;p.num=0;p.numL='';
  if(S.hist&&S.hist.length&&S.hist[S.hist.length-1].n===newN)S.hist.pop();
  freshTable();newSeasonKeep();
