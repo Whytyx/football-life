@@ -1,4 +1,4 @@
-const APP_VER=39;
+const APP_VER=40;
 // ===== AUTO UPDATE (PWA) =====
 function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{typeof save==='function'&&S&&save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
@@ -1062,15 +1062,20 @@ const _esA=endSeason;endSeason=function(){if(!S.club)return _esA();AWI();const p
   if(app>=16&&(avg>=7.3||(avg>=7.0&&g+a>=12)))add('tots','📋',`ทีมยอดเยี่ยมแห่งฤดูกาล ${L}`,`ตำแหน่ง${POS[p.pos]} · ${S.slabel}`,{sp:3,f:.06,tr:3},`${p.name} ติดทีมยอดเยี่ยมแห่งฤดูกาล ${L}`);
   if(app>=12&&ps+Math.min(.3,Math.log10(p.fans+10)/20)>=7.5+R()*.4)add('fans','❤️',`ขวัญใจแฟนบอล ${cn}`,`โหวตโดยแฟนบอล · ${S.slabel}`,{f:.1,mo:10,tr:4},`แฟนบอล ${cn} โหวตให้ ${p.name} เป็นนักเตะยอดเยี่ยมของสโมสร`);
   if(p.pos==='DF'&&app>=15&&p.scs>=8&&avg>=6.9)add('wall','🧱',`กองหลังยอดเยี่ยมแห่งฤดูกาล ${L}`,`${p.scs} คลีนชีต · ${S.slabel}`,{sp:4,f:.06,tr:4},`${p.name} คว้ารางวัลกองหลังยอดเยี่ยม ${L} (${p.scs} คลีนชีต)`);
-  const gs=((avg-6)*2+g*.12+a*.08+(pos===1?1:0)+(p.smotm||0)*.1)*w;
-  if(age<=21&&app>=12){if(gs>=4.2+R()*.8)add('gboy','🏅','โกลเด้นบอย (ดาวรุ่ง U21 ยอดเยี่ยมของโลก)',S.slabel,{m:300000,sp:8,f:.25,tr:6},`🌍 ${p.name} คว้ารางวัลโกลเด้นบอย! ดาวรุ่งที่ดีที่สุดในโลก`);else if(gs>=3)news(`🏅 ${p.name} ติดโผผู้เข้าชิงโกลเด้นบอย`)}
-  if(c.t===0&&app>=18){if(gs>=6.3+R()*.9)add('ballon','🌍','ลูกฟุตบอลทองคำโลก',`นักเตะยอดเยี่ยมของโลก ${S.slabel}`,{m:2000000,sp:15,f:.4,tr:10,mo:25},`🌍🏆 ${p.name} คือนักเตะที่ดีที่สุดในโลก! คว้าลูกฟุตบอลทองคำ`);else if(gs>=4.5){const rk=gs>=5.5?rnd(2,3):rnd(4,10);news(`🌍 ${p.name} ติดอันดับ ${rk} ของรางวัลลูกฟุตบอลทองคำโลก`);toast(`🌍 ลูกฟุตบอลทองคำ: อันดับ ${rk}`)}}
+  const str=LEAGUES[c.c].tiers[c.t][1],stars=lstars(str),glob=str>=72,sw=(stars>=5?1:.7)*(TOP5.includes(c.c)?1:.75),cb=pos===1?1.5:pos<=4?.8:pos<=8?.2:-.6;
+  const gs=((avg-6)*2+g*.1+a*.07+(p.smotm||0)*.08)*sw;
+  if(glob&&age<=21&&app>=12){const v=gs+cb;if(v>=5.8+R()*1)add('gboy','🏅','โกลเด้นบอย (ดาวรุ่ง U21 ยอดเยี่ยมของโลก)',`${L} ${'⭐'.repeat(stars)} · อันดับ ${pos}`,{m:300000,sp:8,f:.25,tr:6},`🌍 ${p.name} คว้ารางวัลโกลเด้นบอย! ดาวรุ่งที่ดีที่สุดในโลก`);else if(v>=3.4)news(`🏅 ${p.name} ติดโผผู้เข้าชิงโกลเด้นบอย`)}
+  if(glob&&app>=20){const v=gs+cb*1.5;if(pos<=6&&v>=9+R()*2)add('ballon','🌍','ลูกฟุตบอลทองคำโลก',`นักเตะยอดเยี่ยมของโลก · ${L} อันดับ ${pos}`,{m:2000000,sp:15,f:.4,tr:10,mo:25},`🌍🏆 ${p.name} คือนักเตะที่ดีที่สุดในโลก! คว้าลูกฟุตบอลทองคำ`);else if(v>=4.6){const rk=v>=6.2?rnd(2,3):v>=5.4?rnd(4,10):rnd(11,30);news(`🌍 ${p.name} ติดอันดับ ${rk} ของรางวัลลูกฟุตบอลทองคำโลก`);toast(`🌍 ลูกฟุตบอลทองคำ: อันดับ ${rk}`)}}
   p.srs=0;p.srn=0;p.smotm=0;p.scs=0}catch(e){console.error('season awards',e)}
  const r=_esA();if(out.length===1)celeb(out[0].ic,out[0].n,out[0].d,out[0].r);else if(out.length)celeb(out.map(o=>o.ic).slice(0,4).join(''),`${out.length} รางวัลแห่งฤดูกาล!`,out.map(o=>`<b>${o.ic} ${o.n}</b>`).join('<br>'),out.flatMap(o=>o.r));try{achChk()}catch(e){}save();return r};
 function cabHTML(){AWI();const p=S.p,cab=S.cab;const grp=t=>{const m={};cab.filter(x=>x.t===t).forEach(x=>{const k=x.n;(m[k]=m[k]||{ic:x.ic,n:x.n,l:[]}).l.push(x)});return Object.values(m)};
  const shelf=(t,title)=>{const g=grp(t);return `<div class="card"><h2>${title}</h2>${g.length?`<div class="shelf">${g.map(x=>`<div class="trph"><div class="ti">${x.ic}${x.l.length>1?`<b>x${x.l.length}</b>`:''}</div><div class="tn">${x.n}</div><small class="mu">${x.l.slice(-3).map(y=>`${y.s}${y.c?' · '+y.c:''}${y.d&&t!=='team'&&y.d!==y.s?' · '+y.d.replace(' · '+y.s,''):''}`).join('<br>')}</small></div>`).join('')}</div>`:'<p class="mu">ยังว่างอยู่ — ลงสนามแล้วสร้างประวัติศาสตร์กันเลย!</p>'}</div>`};
  const done=ACH.filter(a=>S.ach[a[0]]).length;
  return `<div class="card row sp"><div><h2 style="margin:0">🏆 ตู้รางวัล</h2><span class="mu">${cab.length} รางวัล · 🏅 MOTM ${p.mst.motm} ครั้ง · ⚽⚽⚽ แฮตทริก ${p.mst.hat}</span></div></div>
+ <details class="fold card"><summary>ℹ️ รางวัลมีอะไรบ้าง & เงื่อนไข</summary><div class="mu" style="font-size:13px;line-height:1.55;margin-top:6px">
+ <b>ระดับลีก (ทุกดิวิชัน):</b> ผู้เล่นยอดเยี่ยมประจำเดือน (3+ นัดในเดือน), รองเท้าทองคำ (ดาวซัลโวลีก), ราชาแอสซิสต์, ผู้เล่นยอดเยี่ยมแห่งฤดูกาล, ดาวรุ่งยอดเยี่ยม (อายุ ≤21), ทีมยอดเยี่ยมแห่งฤดูกาล, กองหลังยอดเยี่ยม (คลีนชีต), ขวัญใจแฟนบอลสโมสร<br>
+ <b>🌍 ระดับโลก:</b> โกลเด้นบอย (U21) และลูกฟุตบอลทองคำโลก — <span class="ye">ต้องเล่นในลีก ⭐⭐⭐⭐ ขึ้นไป (พลังลีก 72+) และทีมต้องจบอันดับต้น ๆ</span> ลีกระดับล่างลุ้นไม่ได้แม้สถิติดีแค่ไหน · ลีก 5 ดาว แชมป์ลีก และสถิติส่วนตัวมีน้ำหนักมาก<br>
+ <b>🏆 ทีม:</b> แชมป์ลีก, เลื่อนชั้น (เกมนี้ยังไม่มีถ้วยบอลถ้วย)</div></details>
  ${shelf('team','🏆 ถ้วยรางวัลทีม')}${shelf('ind','🥇 รางวัลส่วนตัว')}${shelf('ball','⚽ ลูกบอลที่ระลึก')}${shelf('ms','🎽 ช่วงเวลาสำคัญ')}
  <div class="card"><div class="row sp"><h2>🎖️ ความสำเร็จ</h2><span class="tag">${done}/${ACH.length}</span></div>${ACH.map(a=>{const [c,g]=a[4](p),ok=S.ach[a[0]],r=a[5];return `<div class="achr ${ok?'ok':''}"><span class="ai">${ok?a[1]:'🔒'}</span><div style="flex:1;min-width:0"><b>${a[2]}</b><div class="mu" style="font-size:12px">${a[3]} · รางวัล: ${[r.sp?`⭐${r.sp}`:'',r.m?`฿${fmt(r.m)}`:'',r.f?'📈':'',r.tr?'🤝':''].filter(Boolean).join(' ')}</div>${ok?'':bar(Math.min(100,c/g*100))}<small class="mu">${ok?'✅ ปลดล็อกแล้ว':`${fmt(Math.min(c,g))}/${fmt(g)}`}</small></div></div>`}).join('')}</div>`}
 function openCab(){sheet(`<div class="row sp"><span class="tag g">🏆 ตู้รางวัล</span><button class="ab" onclick="closeM()" style="font-size:18px">✕</button></div>${cabHTML()}`)}
