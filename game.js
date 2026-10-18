@@ -1,4 +1,4 @@
-const APP_VER=37;
+const APP_VER=38;
 // ===== AUTO UPDATE (PWA) =====
 function checkUpdate(){try{fetch('index.html?t='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/game\.js\?v=(\d+)/);const nv=m?+m[1]:0;if(nv>APP_VER){const k='fl_upd_'+nv;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');try{typeof save==='function'&&S&&save()}catch(e){}location.replace(location.pathname+'?v='+nv+'&t='+Date.now())}}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
@@ -332,7 +332,7 @@ function setup(){let pos='FW',c='ENG',nat='THA';const av=Object.assign({},DAV);c
  $('#tabs').innerHTML='';draw()}
 function tabs(){if(S&&S.p)PI();const T=[['home','🏠','หน้าหลัก'],['table','🏆','ตาราง'],['me','👤','นักเตะ'],['news','📰','ข่าว'],['life','💎','ไลฟ์สไตล์'],['career','💼','อาชีพ']];
  $('#tabs').innerHTML=T.map(([k,i,l])=>`<button class="${TAB===k?'on':''}" data-t="${k}"><span style="position:relative">${i}${k==='me'&&S.p.sp?`<i class="badge">${S.p.sp}</i>`:''}</span>${l}</button>`).join('');
- document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{TAB=b.dataset.t;render()})}
+ document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const ch=TAB!==b.dataset.t;TAB=b.dataset.t;render();if(ch&&$('#app'))$('#app').scrollTop=0})}
 function header(){const c=club(),L=S.club?LEAGUES[S.club.c]:null,p=S.p;AVI();const mb=(ic,lb,v,cl2)=>`<div class="hb"><div class="hbl"><span>${ic} ${lb}</span><b>${Math.round(v)}</b></div><div class="bar ${cl2}"><i style="width:${cl(v,0,100)}%"></i></div></div>`;return `<div class="card hdr"><div class="row sp" style="gap:10px">${avatarSVG(S.p.av,56)}<div style="flex:1;min-width:0"><h1 class="hn">${p.name}</h1><div class="mu hs">${POS[p.pos]} · ${p.age} ปี · ${c?L.f+' '+c.n:'ไร้สังกัด'}</div></div><div style="text-align:right"><div class="ovr2" id="ovrb">${ovr()}<span>OVR</span></div><div class="ye" style="font-size:13px;margin-top:4px">฿${fmt(p.money)}</div></div></div><div class="row hbars">${mb('⚡','สแตมิน่า',p.stamina,p.stamina<30?'r':'')}${mb('😊','ขวัญ',p.morale,p.morale<30?'r':'')}${mb('🤝',S.club&&p.tt!=null?'โค้ช · '+TT[p.tt].split('/')[0]:'โค้ช',p.trust,'o')}</div></div>`}
 const COACH=[['🛡️ เน้นวินัย','ไม่ชอบนักเตะเกเร'],['🚀 บุกสุดตัว','ชอบนักเตะสร้างสรรค์'],['🧓 พ่อพระ','ใจดี ให้โอกาสเด็ก'],['🔥 เผด็จการ','เปลี่ยนตัวไว ด่าแรง'],['📊 สายแท็กติก','ชอบคนทำตามแผน']];
 const ROLE={star:['ตัวจริง','g',62],rot:['สำรอง','',38],kid:['ดาวรุ่ง','o',50]};
@@ -991,4 +991,6 @@ const _fnI=finish;finish=function(nx,M,msg,quiet){const p=S.p,pk=p.pkInj;p.pkInj
   else{p.inj=Math.max(p.inj,pk-1);E('trust',3);E('fans',0.02);news(`💪 ${p.name} ฝืนเจ็บลงเล่น แฟนบอลชื่นชมความทุ่มเท${p.inj?` (ยังเหลือพัก ${p.inj} นัด)`:''}`);toast(p.inj?`💪 รอดมาได้ ยังเหลือพัก ${p.inj} นัด`:'💪 รอด! อาการไม่กำเริบ')}
   if(!p.inj){p.injT=null;p.injMax=0}save()}return r};
 
+// keep the action bar outside the scroll container (fixed to viewport, never dragged by iOS bounce)
+try{new MutationObserver(ms=>{if(!ms.some(m=>m.addedNodes.length))return;const old=document.querySelector('body>#abar');const nw=document.querySelector('#app #abar');if(old&&old!==nw)old.remove();if(nw)document.body.insertBefore(nw,document.getElementById('tabs'))}).observe(document.getElementById('app'),{childList:true})}catch(e){}
 try{boot()}catch(e){console.error('boot failed',e);checkUpdate()}
