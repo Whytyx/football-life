@@ -466,7 +466,8 @@ function pitch(M,focus){const W2=300,H2=190;let s=`<svg viewBox="0 0 ${W2} ${H2}
  s+=`<circle cx="${bx}" cy="${by}" r="7.5" fill="#ff7a1a" stroke="#fff" stroke-width="2"/><text x="${bx}" y="${by-11}" fill="#fff" font-size="10" text-anchor="middle" font-family="Kanit">คุณ</text><circle cx="${bx+9}" cy="${by+5}" r="3" fill="#ffd21f"/></svg>`;return s}
 // ===== EVENT UI =====
 const ATS={pac:'ความเร็ว',sho:'ยิง',pas:'ผ่าน',dri:'เลี้ยง',def:'รับ',phy:'ร่างกาย'};
-const pct=o=>cl(Math.round((o.b+S.p.a[o.at]*o.k)*.85+tacFit(o.at)-(S.p.stamina<40?8:0)+(S.p.morale-60)/8),5,95);
+const attrCurve=v=>v<60?50+(v-60):50+(v-60)*.95,optDiff=o=>cl(((o.b+70*o.k)-40)*.6,-15,15)+({goal:-8,assist:1,stop:3,foul:0}[o.g]||0);
+const pct=o=>cl(Math.round(attrCurve(S.p.a[o.at])+optDiff(o)+Math.min(5,tacFit(o.at))-(S.p.stamina<40?6:0)+cl((S.p.morale-60)/10,-4,4)),5,95);
 function showEvent(ev,M,cb){const tagged=ev.m?`<span class="tag">${ev.fm?'⚽ จังหวะสำคัญ':ev.ht?'🚿 ห้องแต่งตัว':'⚠️ ดราม่าในสนาม'}</span> ${M?`<span class="mu">${clock(M)} · ${M.gf}-${M.ga}</span>`:''}`:`<span class="tag o">นอกสนาม · ${new Date(now()).toLocaleDateString('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short'})}</span>`;
  const TG={goal:['ยิงประตูได้','g'],assist:['แอสซิสต์ได้','o'],stop:['สกัดบอล',''],foul:['ฟาวล์',''],null:['เล่นปลอดภัย','']};
  const opts=ev.fm?ev.o.map((o,i)=>{const P=pct(o);return `<button class="opt" data-o="${i}"><div class="row sp"><b>${o.l}</b><span class="tag ${TG[o.g][1]}">${TG[o.g][0]}</span></div><div class="row" style="margin:8px 0 4px">${bar(P,P<35?'r':P<60?'o':'')}<b style="width:44px;text-align:right">${P}%</b></div><div class="mu">ใช้: ${ATS[o.at]} ${S.p.a[o.at]} · เรตติ้ง <span class="gr">+${o.rs.toFixed(1)}</span> / <span class="re">${o.rf.toFixed(1)}</span></div></button>`}).join('')
@@ -508,7 +509,7 @@ function prematch(nx,base,o){const c=club(),p=S.p;base.tac=pickTac(nx);const T={
 function startLive(nx,base,o){const p=S.p,subIn=o.subIn;
  if(o.st==='bench'&&o.unused){base.played=false;return finish(nx,base,`🪑 นั่งสำรองทั้งเกม ไม่ได้ถูกส่งลง — ${o.reason}`)}
  const M=base,c=club();const d=c.s+(ovr()-c.s)*.2+(p.morale-50)/25+(nx.home?2:0)-nx.opp.s;M.lf=cl(1.0+d*.05,.2,3)*TAC[M.tac||"bal"][1];M.la=cl(1.2-d*.05,.2,3)*TAC[M.tac||"bal"][2];
- const tot=subIn?rnd(1,3):rnd(4,6),nf=Math.min(tot,cl(Math.round((ovr()-52)/8)+rnd(0,1),1,4)-(subIn?1:0)||1),nd=tot-nf;
+ const tot=subIn?rnd(1,3):rnd(4,6),nf=Math.min(tot,cl(Math.round((ovr()-56)/9)+rnd(0,1),1,4)-(subIn?1:0)||1),nd=tot-nf;
  const TB=TAC[base.tac||'bal'],nf2=cl(nf+TB[4],1,6),fms=EV.filter(e=>e.fm&&e.id!=='pen'&&e.c()).map(e=>[e,R()-(TB[5].includes(e.id)?.7:0)]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]).slice(0,nf2);
  const dr=EV.filter(e=>e.m&&!e.fm&&!e.ht&&!['redReact','subOff','celebrate','refWarn'].includes(e.id)).sort(()=>R()-.5).slice(0,nd);
  const ids=[...fms,...dr].map(e=>e.id);if(chance(.55))ids.push('freelance');if(!subIn&&chance(.06))ids.push('pen');
